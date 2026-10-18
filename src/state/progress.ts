@@ -1,0 +1,94 @@
+/** Local, versioned progress persistence. All storage access is wrapped so the app works without it. */
+export type LessonStatus = 'not-started' | 'in-progress' | 'completed'
+export type ThemePref = 'system' | 'light' | 'dark'
+
+export interface QuizRecord {
+  correct: boolean
+  attempts: number
+}
+
+export interface ProgressData {
+  version: 1
+  lessons: Record<string, { status: Exclude<LessonStatus, 'not-started'>; visitedAt: number; completedAt?: number }>
+  quiz: Record<string, QuizRecord>
+  lastLesson: string | null
+  prefs: { theme: ThemePref; speed: number; predict: boolean }
+}
+
+export const STORAGE_KEY = 'algoview:progress:v1'
+
+export const emptyProgress = (): ProgressData => ({
+  version: 1,
+  lessons: {},
+  quiz: {},
+  lastLesson: null,
+  prefs: { theme: 'system', speed: 1, predict: false },
+})
+
+export function loadProgress(): ProgressData {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return emptyProgress()
+    const parsed = JSON.parse(raw) as Partial<ProgressData>
+    if (parsed.version !== 1) return emptyProgress()
+    const base = emptyProgress()
+    return {
+      ...base,
+      ...parsed,
+      lessons: parsed.lessons ?? {},
+      quiz: parsed.quiz ?? {},
+      prefs: { ...base.prefs, ...(parsed.prefs ?? {}) },
+    } as ProgressData
+  } catch {
+    return emptyProgress()
+  }
+}
+
+export function saveProgress(p: ProgressData): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(p))
+  } catch {
+    /* storage unavailable (private mode, quota) — progress stays in memory */
+  }
+}
+
+export type ProgressAction =
+  | { type: 'visit'; lessonId: string; now: number }
+  | { type: 'complete'; lessonId: string; now: number }
+  | { type: 'uncomplete'; lessonId: string }
+  | { type: 'quiz'; key: string; correct: boolean }
+  | { type: 'prefs'; prefs: Partial<ProgressData['prefs']> }
+  | { type: 'reset' }
+
+export function progressReducer(s: ProgressData, a: ProgressAction): ProgressData {
+  switch (a.type) {
+    case 'visit': {
+      const cur = s.lessons[a.lessonId]
+      return {
+        ...s,
+        lastLesson: a.lessonId,
+        lessons: { ...s.lessons, [a.lessonId]: cur ? { ...cur, visitedAt: a.now } : { status: 'in-progress', visitedAt: a.now } },
+      }
+    }
+    case 'complete':
+      return { ...s, lessons: { ...s.lessons, [a.lessonId]: { status: 'completed', visitedAt: a.now, completedAt: a.now } } }
+    case 'uncomplete': {
+      const cur = s.lessons[a.lessonId]
+      if (!cur) return s
+      return { ...s, lessons: { ...s.lessons, [a.lessonId]: { status: 'in-progress', visitedAt: cur.visitedAt } } }
+    }
+    case 'quiz': {
+      const prev = s.quiz[a.key]
+      // Once answered correctly it stays correct; attempts keep counting.
+      return { ...s, quiz: { ...s.quiz, [a.key]: { correct: (prev?.correct ?? false) || a.correct, attempts: (prev?.attempts ?? 0) + 1 } } }
+    }
+    case 'prefs':
+      return { ...s, prefs: { ...s.prefs, ...a.prefs } }
+    case 'reset':
+      return { ...emptyProgress(), prefs: s.prefs }
+  }
+}
+
+export function lessonStatus(p: ProgressData, id: string): LessonStatus {
+  return p.lessons[id]?.status ?? 'not-started'
+}
