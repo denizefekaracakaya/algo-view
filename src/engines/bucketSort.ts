@@ -1,4 +1,5 @@
 import type { Trace, TraceStep } from '../trace/types'
+import { tx } from '../i18n/lang'
 
 /**
  * Lecture 6 "BucketSort" family: CountingSort with one FIFO bucket (linked list) per key,
@@ -29,7 +30,7 @@ export const RADIX_SORT_CODE = [
 export function countingSort(A: readonly number[], r: number): number[] {
   const B: number[][] = Array.from({ length: r }, () => [])
   for (const x of A) {
-    if (!Number.isInteger(x) || x < 0 || x >= r) throw new RangeError(`Anahtar ${x}, {0, …, ${r - 1}} aralığında değil.`)
+    if (!Number.isInteger(x) || x < 0 || x >= r) throw new RangeError(tx(`Anahtar ${x}, {0, …, ${r - 1}} aralığında değil.`, `Key ${x} is not in the range {0, …, ${r - 1}}.`))
     B[x].push(x)
   }
   return B.flat()
@@ -50,7 +51,7 @@ export function digitOf(x: number, t: number, r: number): number {
 }
 
 export function radixSort(A: readonly number[], r: number): number[] {
-  if (r < 2) throw new RangeError('Taban r en az 2 olmalı.')
+  if (r < 2) throw new RangeError(tx('Taban r en az 2 olmalı.', 'The base r must be at least 2.'))
   if (A.length === 0) return []
   let cur = [...A]
   const d = digitCount(Math.max(...A), r)
@@ -86,7 +87,7 @@ export function bucketSortTrace(A: readonly number[], mode: 'counting' | 'radix'
     trace.push({
       ...step,
       state: { ...s, input: clone(s.input), output: clone(s.output), buckets: s.buckets.map(clone), r, totalPasses: d },
-      counters: { 'temel işlem': ops },
+      counters: { [tx('temel işlem', 'basic operations')]: ops },
     })
 
   for (let pass = 0; pass < d; pass++) {
@@ -97,11 +98,11 @@ export function bucketSortTrace(A: readonly number[], mode: 'counting' | 'radix'
       { input: remaining, buckets, output: [], digit: mode === 'radix' ? pass : null, pass, highlight: null },
       {
         line: mode === 'counting' ? 2 : 4,
-        phase: mode === 'radix' ? `Geçiş ${pass + 1}/${d}` : 'Kovalar',
+        phase: mode === 'radix' ? tx(`Geçiş ${pass + 1}/${d}`, `Pass ${pass + 1}/${d}`) : tx('Kovalar', 'Buckets'),
         explain:
           mode === 'counting'
-            ? `${r} boş kova oluşturuldu (her olası anahtar 0…${r - 1} için bir tane). Bu O(r) zaman alır.`
-            : `Geçiş ${pass + 1}: anahtar olarak ${pass === 0 ? 'en anlamsız (birler)' : `${pass + 1}. en anlamsız`} basamak kullanılıyor (taban ${r}). ${r} boş kova hazır.`,
+            ? tx(`${r} boş kova oluşturuldu (her olası anahtar 0…${r - 1} için bir tane). Bu O(r) zaman alır.`, `${r} empty buckets were created (one for each possible key 0…${r - 1}). This takes O(r) time.`)
+            : tx(`Geçiş ${pass + 1}: anahtar olarak ${pass === 0 ? 'en anlamsız (birler)' : `${pass + 1}. en anlamsız`} basamak kullanılıyor (taban ${r}). ${r} boş kova hazır.`, `Pass ${pass + 1}: the ${pass === 0 ? 'least significant (ones)' : `${pass + 1}-th least significant`} digit is used as the key (base ${r}). ${r} empty buckets are ready.`),
         vars: mode === 'radix' ? { t: pass + 1, d, r } : { r },
       },
     )
@@ -114,19 +115,19 @@ export function bucketSortTrace(A: readonly number[], mode: 'counting' | 'radix'
         { input: remaining, buckets, output: [], digit: mode === 'radix' ? pass : null, pass, highlight: { tag: x.tag, bucket: b } },
         {
           line: mode === 'counting' ? 4 : 4,
-          phase: mode === 'radix' ? `Geçiş ${pass + 1}/${d}` : 'Dağıtma',
+          phase: mode === 'radix' ? tx(`Geçiş ${pass + 1}/${d}`, `Pass ${pass + 1}/${d}`) : tx('Dağıtma', 'Distribute'),
           explain:
             mode === 'counting'
-              ? `${x.key} anahtarlı eleman B[${b}] kovasının SONUNA eklendi (FIFO). Değeri doğrudan indeks olarak kullandık; karşılaştırma yok.`
-              : `${x.key} sayısının ${pass + 1}. basamağı ${b}: eleman B[${b}] kovasının sonuna eklendi.`,
+              ? tx(`${x.key} anahtarlı eleman B[${b}] kovasının SONUNA eklendi (FIFO). Değeri doğrudan indeks olarak kullandık; karşılaştırma yok.`, `The item with key ${x.key} was appended to the END of bucket B[${b}] (FIFO). We used the value directly as an index; no comparisons.`)
+              : tx(`${x.key} sayısının ${pass + 1}. basamağı ${b}: eleman B[${b}] kovasının sonuna eklendi.`, `Digit ${pass + 1} of ${x.key} is ${b}: the item was appended to the end of bucket B[${b}].`),
           vars: { anahtar: x.key, kova: b },
           predict:
             mode === 'radix'
               ? {
-                  question: `${x.key} sayısı (taban ${r}) hangi kovaya gider?`,
+                  question: tx(`${x.key} sayısı (taban ${r}) hangi kovaya gider?`, `Which bucket does ${x.key} (base ${r}) go to?`),
                   options: uniqueOptions(b, r).map((v) => `B[${v}]`),
                   answer: uniqueOptions(b, r).indexOf(b),
-                  why: `⌊${x.key} / ${r}^${pass}⌋ mod ${r} = ${b}; bu geçişte yalnızca bu basamağa bakılır.`,
+                  why: tx(`⌊${x.key} / ${r}^${pass}⌋ mod ${r} = ${b}; bu geçişte yalnızca bu basamağa bakılır.`, `⌊${x.key} / ${r}^${pass}⌋ mod ${r} = ${b}; this pass looks only at this digit.`),
                 }
               : undefined,
         },
@@ -138,11 +139,11 @@ export function bucketSortTrace(A: readonly number[], mode: 'counting' | 'radix'
       { input: [], buckets: Array.from({ length: r }, () => []), output, digit: mode === 'radix' ? pass : null, pass, highlight: null },
       {
         line: mode === 'counting' ? 5 : 4,
-        phase: mode === 'radix' ? `Geçiş ${pass + 1}/${d}` : 'Birleştirme',
+        phase: mode === 'radix' ? tx(`Geçiş ${pass + 1}/${d}`, `Pass ${pass + 1}/${d}`) : tx('Birleştirme', 'Concatenate'),
         explain:
           mode === 'counting'
-            ? `Kovalar B[0], B[1], …, B[${r - 1}] sırasıyla birleştirildi: [${output.map((x) => x.key).join(', ')}]. Eşit anahtarlar girişteki sıralarını korudu (kararlı).`
-            : `Kovalar sırayla birleştirildi: [${output.map((x) => x.key).join(', ')}]. Değişmez: dizi artık son ${pass + 1} basamağa göre sıralı.`,
+            ? tx(`Kovalar B[0], B[1], …, B[${r - 1}] sırasıyla birleştirildi: [${output.map((x) => x.key).join(', ')}]. Eşit anahtarlar girişteki sıralarını korudu (kararlı).`, `The buckets B[0], B[1], …, B[${r - 1}] were concatenated in order: [${output.map((x) => x.key).join(', ')}]. Equal keys kept their input order (stable).`)
+            : tx(`Kovalar sırayla birleştirildi: [${output.map((x) => x.key).join(', ')}]. Değişmez: dizi artık son ${pass + 1} basamağa göre sıralı.`, `The buckets were concatenated in order: [${output.map((x) => x.key).join(', ')}]. Invariant: the array is now sorted by its last ${pass + 1} digits.`),
       },
     )
     current = output
@@ -151,11 +152,11 @@ export function bucketSortTrace(A: readonly number[], mode: 'counting' | 'radix'
     { input: [], buckets: Array.from({ length: r }, () => []), output: current, digit: null, pass: d - 1, highlight: null },
     {
       line: mode === 'counting' ? 5 : 5,
-      phase: 'Bitti',
+      phase: tx('Bitti', 'Done'),
       explain:
         mode === 'counting'
-          ? `Sıralı çıktı hazır. Çalışma süresi O(n + r) = O(${A.length} + ${r}).`
-          : `${d} geçişten sonra dizi tüm basamaklara göre sıralı. Çalışma süresi O(d·(n + r)) = O(${d}·(${A.length} + ${r})).`,
+          ? tx(`Sıralı çıktı hazır. Çalışma süresi O(n + r) = O(${A.length} + ${r}).`, `The sorted output is ready. Running time O(n + r) = O(${A.length} + ${r}).`)
+          : tx(`${d} geçişten sonra dizi tüm basamaklara göre sıralı. Çalışma süresi O(d·(n + r)) = O(${d}·(${A.length} + ${r})).`, `After ${d} passes the array is sorted by all digits. Running time O(d·(n + r)) = O(${d}·(${A.length} + ${r})).`),
     },
   )
   return trace

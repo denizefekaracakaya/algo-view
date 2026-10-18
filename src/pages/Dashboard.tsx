@@ -1,84 +1,90 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, CheckCircle2, Circle, CircleDot, Search } from 'lucide-react'
-import { ALL_LESSONS, LECTURES, findLesson } from '../content/curriculum'
+import { allLessons, lectures, findLesson } from '../content/curriculum'
+import { locale, tx } from '../i18n/lang'
 import { useProgress } from '../state/ProgressContext'
 import { lessonStatus, type LessonStatus } from '../state/progress'
 import { Inline } from '../components/Tex'
 
 export function StatusIcon({ status }: { status: LessonStatus }) {
-  if (status === 'completed') return <CheckCircle2 size={16} color="var(--st-sorted)" aria-label="tamamlandı" />
-  if (status === 'in-progress') return <CircleDot size={16} color="var(--st-compare)" aria-label="devam ediyor" />
-  return <Circle size={16} color="var(--muted)" aria-label="başlanmadı" />
+  if (status === 'completed') return <CheckCircle2 size={16} color="var(--st-sorted)" aria-label={tx('tamamlandı', 'completed')} />
+  if (status === 'in-progress') return <CircleDot size={16} color="var(--st-compare)" aria-label={tx('devam ediyor', 'in progress')} />
+  return <Circle size={16} color="var(--muted)" aria-label={tx('başlanmadı', 'not started')} />
 }
 
-const STATUS_TEXT: Record<LessonStatus, string> = { completed: 'Tamamlandı', 'in-progress': 'Devam ediyor', 'not-started': 'Başlanmadı' }
+const statusText = (s: LessonStatus): string =>
+  s === 'completed' ? tx('Tamamlandı', 'Completed') : s === 'in-progress' ? tx('Devam ediyor', 'In progress') : tx('Başlanmadı', 'Not started')
 
 type Filter = 'all' | LessonStatus
 
 export function Dashboard() {
   const { progress } = useProgress()
+  const ALL_LESSONS = allLessons()
+  const LECTURES = lectures()
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
   const done = ALL_LESSONS.filter((l) => lessonStatus(progress, l.id) === 'completed').length
   const pct = Math.round((done / ALL_LESSONS.length) * 100)
   const solved = Object.values(progress.quiz).filter((q) => q.correct).length
   const totalQ = ALL_LESSONS.reduce((s, l) => s + l.quiz.length, 0)
-  const continueTarget = useMemo(() => {
+  const continueTarget = (() => {
     if (progress.lastLesson && findLesson(progress.lastLesson) && lessonStatus(progress, progress.lastLesson) !== 'completed') return findLesson(progress.lastLesson)!.lesson
     return ALL_LESSONS.find((l) => lessonStatus(progress, l.id) !== 'completed') ?? ALL_LESSONS[0]
-  }, [progress])
+  })()
 
-  const q = query.trim().toLocaleLowerCase('tr')
-  const matches = (text: string) => text.toLocaleLowerCase('tr').includes(q)
+  const q = query.trim().toLocaleLowerCase(locale())
+  const matches = (text: string) => text.toLocaleLowerCase(locale()).includes(q)
 
   return (
     <div>
       <section className="hero">
         <div>
-          <p className="lecture-num">CS161 · Ders 1–7 · Türkçe</p>
-          <h1>Algoritmaları görünür kıl.</h1>
+          <p className="lecture-num">{tx('CS161 · Ders 1–7 · Türkçe', 'CS161 · Lectures 1–7 · English')}</p>
+          <h1>{tx('Algoritmaları görünür kıl.', 'Make algorithms visible.')}</h1>
           <p className="lead">
-            Algo View; algoritmaları adım adım çalıştırmanız, her adımın <em>neden</em> olduğunu görmeniz, kendi girdilerinizle deney yapmanız ve karmaşıklık analizini
-            somut çalışmalara bağlamanız için tasarlanmış etkileşimli bir öğrenme ortamıdır.
+            {tx(
+              'Algo View; algoritmaları adım adım çalıştırmanız, her adımın neden olduğunu görmeniz, kendi girdilerinizle deney yapmanız ve karmaşıklık analizini somut çalışmalara bağlamanız için tasarlanmış etkileşimli bir öğrenme ortamıdır.',
+              'Algo View is an interactive learning environment for running algorithms step by step, seeing why each step happens, experimenting with your own inputs, and connecting complexity analysis to concrete runs.',
+            )}
           </p>
           <div className="row">
             <Link className="btn primary" to={`/ders/${continueTarget.id}`}>
-              {done === 0 && !progress.lastLesson ? 'Öğrenmeye başla' : 'Kaldığın yerden devam et'} <ArrowRight size={16} aria-hidden />
+              {done === 0 && !progress.lastLesson ? tx('Öğrenmeye başla', 'Start learning') : tx('Kaldığın yerden devam et', 'Continue where you left off')} <ArrowRight size={16} aria-hidden />
             </Link>
             <span className="small muted">
-              Sıradaki: Ders {continueTarget.lecture} · {continueTarget.title}
+              {tx('Sıradaki: Ders', 'Up next: Lecture')} {continueTarget.lecture} · {continueTarget.title}
             </span>
           </div>
         </div>
-        <div className="card card-pad stack" aria-label="İlerleme özeti">
+        <div className="card card-pad stack" aria-label={tx('İlerleme özeti', 'Progress summary')}>
           <div className="row" style={{ justifyContent: 'space-between' }}>
-            <strong>İlerlemen</strong>
+            <strong>{tx('İlerlemen', 'Your progress')}</strong>
             <span className="mono">{pct}%</span>
           </div>
-          <div className="progressbar" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Tamamlanan dersler">
+          <div className="progressbar" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={tx('Tamamlanan dersler', 'Completed lessons')}>
             <span style={{ width: `${pct}%` }} />
           </div>
           <dl className="kv" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
             <div>
-              <dt>ders</dt>
+              <dt>{tx('ders', 'lessons')}</dt>
               <dd>
                 {done}/{ALL_LESSONS.length}
               </dd>
             </div>
             <div>
-              <dt>soru</dt>
+              <dt>{tx('soru', 'questions')}</dt>
               <dd>
                 {solved}/{totalQ}
               </dd>
             </div>
             <div>
-              <dt>konu</dt>
+              <dt>{tx('konu', 'lectures')}</dt>
               <dd>{LECTURES.length}</dd>
             </div>
           </dl>
           <p className="small muted" style={{ margin: 0 }}>
-            İlerleme yalnızca bu tarayıcıda saklanır. Ayarlar sayfasından sıfırlayabilirsiniz.
+            {tx('İlerleme yalnızca bu tarayıcıda saklanır. Ayarlar sayfasından sıfırlayabilirsiniz.', 'Progress is stored only in this browser. You can reset it on the Settings page.')}
           </p>
         </div>
       </section>
@@ -86,13 +92,13 @@ export function Dashboard() {
       <div className="filterbar" role="search">
         <label className="row" style={{ flex: '1 1 260px', gap: 6 }}>
           <Search size={16} aria-hidden className="muted" />
-          <span className="sr-only">Konu ara</span>
-          <input className="input grow" placeholder="Konu ara: ör. Master, pivot, kırmızı-siyah…" value={query} onChange={(e) => setQuery(e.target.value)} />
+          <span className="sr-only">{tx('Konu ara', 'Search topics')}</span>
+          <input className="input grow" placeholder={tx('Konu ara: ör. Master, pivot, kırmızı-siyah…', 'Search topics: e.g. Master, pivot, red-black…')} value={query} onChange={(e) => setQuery(e.target.value)} />
         </label>
-        <div className="seg" role="group" aria-label="Duruma göre filtrele">
+        <div className="seg" role="group" aria-label={tx('Duruma göre filtrele', 'Filter by status')}>
           {(['all', 'not-started', 'in-progress', 'completed'] as Filter[]).map((f) => (
             <button key={f} aria-pressed={filter === f} onClick={() => setFilter(f)}>
-              {f === 'all' ? 'Tümü' : STATUS_TEXT[f]}
+              {f === 'all' ? tx('Tümü', 'All') : statusText(f)}
             </button>
           ))}
         </div>
@@ -113,12 +119,12 @@ export function Dashboard() {
               <header>
                 <div>
                   <div className="lecture-num">
-                    Ders {lec.n} · {lec.date}
+                    {tx('Ders', 'Lecture')} {lec.n} · {lec.date}
                   </div>
                   <h2 id={`lec-${lec.n}`} style={{ margin: '2px 0 0' }}>
                     {lec.title}
                   </h2>
-                  <div className="small muted">{lec.titleEn}</div>
+                  {lec.titleEn !== lec.title && <div className="small muted">{lec.titleEn}</div>}
                 </div>
                 <span className={'badge ' + (lecStatus === 'completed' ? 'done' : lecStatus === 'in-progress' ? 'progress' : '')}>
                   {lecDone}/{lec.lessons.length}
@@ -137,7 +143,7 @@ export function Dashboard() {
                       <span className="grow">
                         <Inline src={l.title} />
                       </span>
-                      <span className="small muted">{l.minutes} dk</span>
+                      <span className="small muted">{l.minutes} {tx('dk', 'min')}</span>
                     </Link>
                   </li>
                 ))}
@@ -148,11 +154,14 @@ export function Dashboard() {
       </div>
       {LECTURES.every((lec) => !lec.lessons.some((l) => (filter === 'all' || lessonStatus(progress, l.id) === filter) && (!q || matches(l.title) || matches(l.titleEn) || matches(l.summary) || matches(lec.title)))) && (
         <p className="muted" role="status">
-          Aramanızla eşleşen ders bulunamadı.
+          {tx('Aramanızla eşleşen ders bulunamadı.', 'No lessons match your search.')}
         </p>
       )}
       <p className="small muted" style={{ marginTop: 24 }}>
-        Kapsam: Ders 1–7 (“Why are you here?”tan “Binary Search Trees and Red-Black Trees”e). Ders 8 (Hashing) ve sonrası bu sürümün kapsamı dışındadır.
+        {tx(
+          'Kapsam: Ders 1–7 (“Why are you here?”tan “Binary Search Trees and Red-Black Trees”e). Ders 8 (Hashing) ve sonrası bu sürümün kapsamı dışındadır.',
+          'Scope: Lectures 1–7 (from “Why are you here?” to “Binary Search Trees and Red-Black Trees”). Lecture 8 (Hashing) and later are outside the scope of this release.',
+        )}
       </p>
     </div>
   )

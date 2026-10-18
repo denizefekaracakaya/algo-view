@@ -27,7 +27,7 @@ export const lecture5: Lecture = {
         {
           kind: 'intuition',
           title: 'Sezgi',
-          label: 'Sezgi',
+          label: 'intuition',
           body: `QuickSort, Select’e çok benzer: bir pivot $x$ seç, diziyi $[A_<,\\ x,\\ A_>]$ olarak düzenle. Fark: Select yalnızca bir tarafa özyinelerken QuickSort **iki** tarafı da sıralar. Bölümlemeden sonra pivot **son konumundadır** ve bir daha hareket etmez.
 
 Notlar elemanların farklı olduğunu varsayar (genelliği bozmadan). Buradaki yerinde sürümde pivota eşit elemanlar sağ tarafa gider; tekrarlı anahtarlarla da doğru sıralar.`,
@@ -47,7 +47,7 @@ Notlar elemanların farklı olduğunu varsayar (genelliği bozmadan). Buradaki y
         {
           kind: 'correctness',
           title: 'Doğruluk',
-          label: 'Kanıt fikri',
+          label: 'proofIdea',
           proof: [
             { title: 'Bölümleme değişmezi', body: 'Döngünün her adımında $A[lo..i-1] <$ pivot $\\le A[i..j-1]$. Başta iki bölge de boş; her adım bir elemanı doğru bölgeye ekler.' },
             { title: 'Pivot yerinde', body: 'Döngü bitince pivotu $A[i]$ ile takas ederiz: solundakilerin hepsi küçük, sağındakilerin hepsi büyük ya da eşit. Pivot, sıralı dizideki konumundadır.' },
@@ -138,7 +138,7 @@ Slaytlardaki karşılaştırma: QuickSort (rastgele pivot) yerinde kolayca uygul
           kind: 'formal',
           title: 'Kurulum (Ders 5 notları)',
           box: 'formal',
-          label: 'Biçimsel',
+          label: 'formal',
           body: `$z_1 < z_2 < \\dots < z_n$ sıralı dizinin elemanları olsun. $X_{i,j}$: $z_i$ ile $z_j$’nin karşılaştırılma sayısı. Her karşılaştırma pivotla yapılır ve pivot sonraki çağrılara dahil edilmez; bu yüzden $X_{i,j} \\in \\{0, 1\\}$ — bir **göstergeç değişkeni**.
 
 $$C = \\sum_{i<j} X_{i,j}, \\qquad E[C] = \\sum_{i<j} E[X_{i,j}] = \\sum_{i<j} P[z_i, z_j \\text{ karşılaştırılır}].$$
@@ -153,10 +153,10 @@ $$C = \\sum_{i<j} X_{i,j}, \\qquad E[C] = \\sum_{i<j} E[X_{i,j}] = \\sum_{i<j} P
         {
           kind: 'correctness',
           title: 'Türetme',
-          label: 'Biçimsel kanıt',
+          label: 'formalProof',
           proof: [
             { title: 'Pencere fikri', body: '$\\{z_i, \\dots, z_j\\}$ penceresine bakın. Bu penceredeki bir eleman pivot seçilene kadar, hepsi aynı alt dizide kalır.' },
-            { title: 'İlk pivot karar verir', body: 'Penceden ilk seçilen pivot $z_i$ ya da $z_j$ ise ikisi karşılaştırılır. Aradaki bir $z_k$ ise ($i<k<j$) $z_i$ ile $z_j$ farklı taraflara ayrılır ve asla karşılaştırılmaz.' },
+            { title: 'İlk pivot karar verir', body: 'Pencereden ilk seçilen pivot $z_i$ ya da $z_j$ ise ikisi karşılaştırılır. Aradaki bir $z_k$ ise ($i<k<j$) $z_i$ ile $z_j$ farklı taraflara ayrılır ve asla karşılaştırılmaz.' },
             { title: 'Olasılık', body: 'Pencerede $j - i + 1$ eleman var ve ilk seçilen her biri eşit olasılıklı: $P = \\frac{1}{j-i+1} + \\frac{1}{j-i+1} = \\frac{2}{j-i+1}$.' },
             { title: 'Toplam', body: '$E[C] = \\sum_{i=1}^{n}\\sum_{j=i+1}^{n}\\frac{2}{j-i+1} \\le \\sum_{i=1}^{n} 2\\left(\\frac12 + \\frac13 + \\dots + \\frac1n\\right) \\le 2n\\ln n$.' },
             { title: 'Çalışma süresi', body: 'Boyutu $k$ olan her çağrı $k-1$ karşılaştırma ve $O(k)$ iş yapar; tek elemanlı çağrılar en fazla $n$ tane. Toplam süre $O(C + n)$, beklenen süre $O(n\\log n)$ — **her girdi için**.' },

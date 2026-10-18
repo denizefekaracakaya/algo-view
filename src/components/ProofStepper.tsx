@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Rich } from './Tex'
+import { tx } from '../i18n/lang'
 
 /** Reveals the steps of a proof one at a time, so the reader predicts each step before seeing it. */
 export function ProofStepper({ steps, label }: { steps: { title: string; body: string }[]; label?: string }) {
@@ -19,14 +20,14 @@ export function ProofStepper({ steps, label }: { steps: { title: string; body: s
       </ol>
       <div className="row">
         <button className="btn sm primary" onClick={() => setShown((x) => Math.min(steps.length, x + 1))} disabled={shown >= steps.length}>
-          Sonraki adım ({shown}/{steps.length})
+          {tx('Sonraki adım', 'Next step')} ({shown}/{steps.length})
         </button>
         <button className="btn sm" onClick={() => setShown(steps.length)} disabled={shown >= steps.length}>
-          Tümünü göster
+          {tx('Tümünü göster', 'Show all')}
         </button>
         {shown > 1 && (
           <button className="btn sm ghost" onClick={() => setShown(1)}>
-            Gizle
+            {tx('Gizle', 'Hide')}
           </button>
         )}
       </div>

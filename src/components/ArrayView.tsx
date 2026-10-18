@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { tx } from '../i18n/lang'
 
 export type CellState = 'compare' | 'pivot' | 'sorted' | 'less' | 'greater' | 'elim' | 'active' | 'hole' | 'found' | 'none'
 
@@ -16,18 +17,19 @@ const STATE_GLYPH: Record<CellState, string> = {
   none: '',
 }
 
-const STATE_LABEL: Record<CellState, string> = {
-  compare: 'karşılaştırılıyor',
-  pivot: 'pivot',
-  sorted: 'sıralı / son konumunda',
-  less: 'pivottan küçük',
-  greater: 'pivottan büyük',
-  elim: 'elendi',
-  active: 'etkin bölge',
-  hole: 'boşluk',
-  found: 'sonuç',
-  none: '',
-}
+const stateLabel = (s: CellState): string =>
+  ({
+    compare: tx('karşılaştırılıyor', 'being compared'),
+    pivot: 'pivot',
+    sorted: tx('sıralı / son konumunda', 'sorted / in final position'),
+    less: tx('pivottan küçük', 'less than pivot'),
+    greater: tx('pivottan büyük', 'greater than pivot'),
+    elim: tx('elendi', 'eliminated'),
+    active: tx('etkin bölge', 'active region'),
+    hole: tx('boşluk', 'gap'),
+    found: tx('sonuç', 'result'),
+    none: '',
+  })[s]
 
 export interface CellSpec {
   value: number | string | null
@@ -57,7 +59,7 @@ export function ArrayView({ cells, bars = true, label, showIndex = true, ...rang
       {cells.map((c, i) => {
         const st = c.state ?? 'none'
         const h = typeof c.value === 'number' ? 18 + ((c.value - min) / span) * 110 : 40
-        const desc = `indeks ${i}: ${c.value ?? 'boş'}${st !== 'none' ? ', ' + STATE_LABEL[st] : ''}${c.mark ? ', ' + c.mark : ''}`
+        const desc = `${tx('indeks', 'index')} ${i}: ${c.value ?? tx('boş', 'empty')}${st !== 'none' ? ', ' + stateLabel(st) : ''}${c.mark ? ', ' + c.mark : ''}`
         return (
           <div key={i} role="listitem" aria-label={desc} className={`cell st-${st} ${bars ? '' : 'box'}`}>
             {c.mark && <span className="mark">{c.mark}</span>}
@@ -84,7 +86,7 @@ export function Legend({ states }: { states: CellState[] }): ReactNode {
           <span className="swatch" style={swatchStyle(s)} aria-hidden>
             {STATE_GLYPH[s]}
           </span>
-          {STATE_LABEL[s]}
+          {stateLabel(s)}
         </span>
       ))}
     </>

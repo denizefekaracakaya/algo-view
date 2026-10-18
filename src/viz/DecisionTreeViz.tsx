@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react'
 import { Tex } from '../components/Tex'
 import { LABELS, buildDecisionTree, factorial, log2Factorial, permutations, runWithOracle, type DTAlgo, type DTNode } from '../engines/decisionTree'
+import { tx } from '../i18n/lang'
 
-const ALGO_LABEL: Record<DTAlgo, string> = { insertion: 'InsertionSort', merge: 'MergeSort', quick: 'QuickSort (ilk eleman pivot)' }
+const algoLabel = (): Record<DTAlgo, string> => ({ insertion: 'InsertionSort', merge: 'MergeSort', quick: tx('QuickSort (ilk eleman pivot)', 'QuickSort (first-element pivot)') })
 
 /** Decision tree of a comparison sort on n = 3 or 4 items, with the path of a chosen input highlighted. */
 export function DecisionTreeViz() {
@@ -23,14 +24,15 @@ export function DecisionTreeViz() {
     }
     return new Set(ids)
   }, [run, tree])
+  const ALGO_LABEL = algoLabel()
   const inputText = (r: number[]) => r.map((rank, x) => `${LABELS[x]}=${rank + 1}`).join(', ')
 
   return (
     <div className="card viz">
       <div className="viz-toolbar">
         <div className="field">
-          Algoritma
-          <div className="seg" role="group" aria-label="Algoritma">
+          {tx('Algoritma', 'Algorithm')}
+          <div className="seg" role="group" aria-label={tx('Algoritma', 'Algorithm')}>
             {(Object.keys(ALGO_LABEL) as DTAlgo[]).map((a) => (
               <button key={a} aria-pressed={algo === a} onClick={() => setAlgo(a)}>
                 {ALGO_LABEL[a]}
@@ -39,7 +41,7 @@ export function DecisionTreeViz() {
           </div>
         </div>
         <div className="field">
-          Eleman sayısı
+          {tx('Eleman sayısı', 'Number of items')}
           <div className="seg" role="group" aria-label="n">
             {[3, 4].map((k) => (
               <button
@@ -56,7 +58,7 @@ export function DecisionTreeViz() {
           </div>
         </div>
         <label className="field">
-          Gizli girdi sırası (genie’nin bildiği)
+          {tx('Gizli girdi sırası (genie’nin bildiği)', 'Hidden input order (known to the genie)')}
           <select className="input mono" value={permIdx} onChange={(e) => setPermIdx(Number(e.target.value))}>
             {perms.map((p, i) => (
               <option key={i} value={i}>
@@ -70,28 +72,31 @@ export function DecisionTreeViz() {
         <div className="viz-stage">
           <DTSvg tree={tree} path={pathIds} />
           <p className="small muted">
-            İç düğümler “x &lt; y ?” sorularıdır (sol dal EVET, sağ dal HAYIR). Yapraklar çıktı sıralamasıdır. Vurgulanan yol seçilen girdinin çalışmasıdır.
+            {tx(
+              'İç düğümler “x < y ?” sorularıdır (sol dal EVET, sağ dal HAYIR). Yapraklar çıktı sıralamasıdır. Vurgulanan yol seçilen girdinin çalışmasıdır.',
+              'Internal nodes are “x < y ?” questions (left branch YES, right branch NO). Leaves are output orderings. The highlighted path is the run on the selected input.',
+            )}
           </p>
         </div>
         <aside className="viz-side">
           <div>
-            <span className="label-tag">Bu girdi için sorulan sorular</span>
+            <span className="label-tag">{tx('Bu girdi için sorulan sorular', 'Questions asked for this input')}</span>
             <ol className="small" style={{ margin: 0, paddingLeft: '1.3em' }} aria-live="polite">
               {run.path.map((p, i) => (
                 <li key={i} className="mono">
-                  {LABELS[p.q[0]]} &lt; {LABELS[p.q[1]]} ? → {p.yes ? 'EVET' : 'HAYIR'}
+                  {LABELS[p.q[0]]} &lt; {LABELS[p.q[1]]} ? → {p.yes ? tx('EVET', 'YES') : tx('HAYIR', 'NO')}
                 </li>
               ))}
             </ol>
             <p className="small" style={{ marginTop: 6 }}>
-              Çıktı: <span className="mono">{run.output.map((x) => LABELS[x]).join(' < ')}</span> ({run.path.length} karşılaştırma)
+              {tx('Çıktı:', 'Output:')} <span className="mono">{run.output.map((x) => LABELS[x]).join(' < ')}</span> ({run.path.length} {tx('karşılaştırma', 'comparisons')})
             </p>
           </div>
           <div className="table-wrap">
             <table className="data">
               <tbody>
                 <tr>
-                  <td>Yaprak sayısı (farklı çıktı)</td>
+                  <td>{tx('Yaprak sayısı (farklı çıktı)', 'Number of leaves (distinct outputs)')}</td>
                   <td className="num">{tree.leaves}</td>
                 </tr>
                 <tr>
@@ -101,12 +106,12 @@ export function DecisionTreeViz() {
                   <td className="num">{factorial(n)}</td>
                 </tr>
                 <tr>
-                  <td>Ağaç yüksekliği (en kötü durum karşılaştırma)</td>
+                  <td>{tx('Ağaç yüksekliği (en kötü durum karşılaştırma)', 'Tree height (worst-case comparisons)')}</td>
                   <td className="num">{tree.height}</td>
                 </tr>
                 <tr className="hl">
                   <td>
-                    Alt sınır <Tex>{'\\lceil \\log_2 n! \\rceil'}</Tex>
+                    {tx('Alt sınır', 'Lower bound')} <Tex>{'\\lceil \\log_2 n! \\rceil'}</Tex>
                   </td>
                   <td className="num">{Math.ceil(log2Factorial(n) - 1e-9)}</td>
                 </tr>
@@ -114,7 +119,8 @@ export function DecisionTreeViz() {
             </table>
           </div>
           <p className="small">
-            Yüksekliği h olan bir ikili ağacın en fazla <Tex>{'2^h'}</Tex> yaprağı vardır. Doğru bir algoritma her <Tex>{'n!'}</Tex> sıralamayı ayırt etmek zorunda olduğundan <Tex>{'2^h \\ge n!'}</Tex>, yani <Tex>{'h \\ge \\log_2 n!'}</Tex>.
+            {tx('Yüksekliği h olan bir ikili ağacın en fazla', 'A binary tree of height h has at most')} <Tex>{'2^h'}</Tex> {tx('yaprağı vardır. Doğru bir algoritma her', 'leaves. A correct algorithm must distinguish all')} <Tex>{'n!'}</Tex>{' '}
+            {tx('sıralamayı ayırt etmek zorunda olduğundan', 'orderings, so')} <Tex>{'2^h \\ge n!'}</Tex>, {tx('yani', 'i.e.')} <Tex>{'h \\ge \\log_2 n!'}</Tex>.
           </p>
         </aside>
       </div>
@@ -141,7 +147,7 @@ function DTSvg({ tree, path }: { tree: ReturnType<typeof buildDecisionTree>; pat
   const P = (id: number) => ({ x: 10 + gx / 2 + pos.get(id)!.x * gx, y: 24 + pos.get(id)!.y * gy })
   const label = (nd: DTNode) => (nd.q ? `${LABELS[nd.q[0]]}<${LABELS[nd.q[1]]}?` : nd.output!.map((x) => LABELS[x]).join(''))
   return (
-    <svg className="tree-svg" viewBox={`0 0 ${W} ${H}`} width={W} role="img" aria-label={`Karar ağacı: ${tree.leaves} yaprak, yükseklik ${tree.height}`}>
+    <svg className="tree-svg" viewBox={`0 0 ${W} ${H}`} width={W} role="img" aria-label={tx(`Karar ağacı: ${tree.leaves} yaprak, yükseklik ${tree.height}`, `Decision tree: ${tree.leaves} leaves, height ${tree.height}`)}>
       {nodes.map((nd) =>
         (['yes', 'no'] as const).map((br) => {
           const c = nd[br]
@@ -153,7 +159,7 @@ function DTSvg({ tree, path }: { tree: ReturnType<typeof buildDecisionTree>; pat
             <g key={nd.id + br}>
               <line className={'edge' + (on ? ' path' : '')} x1={a.x} y1={a.y} x2={b.x} y2={b.y} />
               <text x={(a.x + b.x) / 2 + (br === 'yes' ? -8 : 8)} y={(a.y + b.y) / 2} fontSize={10} fill="var(--muted)" textAnchor="middle">
-                {br === 'yes' ? 'E' : 'H'}
+                {br === 'yes' ? tx('E', 'Y') : tx('H', 'N')}
               </text>
             </g>
           )

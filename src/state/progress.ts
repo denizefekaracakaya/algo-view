@@ -1,4 +1,6 @@
 /** Local, versioned progress persistence. All storage access is wrapped so the app works without it. */
+import type { Lang } from '../i18n/lang'
+
 export type LessonStatus = 'not-started' | 'in-progress' | 'completed'
 export type ThemePref = 'system' | 'light' | 'dark'
 
@@ -12,7 +14,7 @@ export interface ProgressData {
   lessons: Record<string, { status: Exclude<LessonStatus, 'not-started'>; visitedAt: number; completedAt?: number }>
   quiz: Record<string, QuizRecord>
   lastLesson: string | null
-  prefs: { theme: ThemePref; speed: number; predict: boolean }
+  prefs: { theme: ThemePref; speed: number; predict: boolean; lang: Lang }
 }
 
 export const STORAGE_KEY = 'algoview:progress:v1'
@@ -22,7 +24,7 @@ export const emptyProgress = (): ProgressData => ({
   lessons: {},
   quiz: {},
   lastLesson: null,
-  prefs: { theme: 'system', speed: 1, predict: false },
+  prefs: { theme: 'system', speed: 1, predict: false, lang: 'tr' },
 })
 
 export function loadProgress(): ProgressData {

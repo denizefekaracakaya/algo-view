@@ -4,6 +4,7 @@ import type { Trace, TraceStep } from '../trace/types'
 import { SPEEDS, useTracePlayer } from '../trace/player'
 import { useProgress } from '../state/ProgressContext'
 import { Pseudocode } from './Pseudocode'
+import { tx } from '../i18n/lang'
 
 interface Props<S> {
   trace: Trace<S>
@@ -84,11 +85,11 @@ export function TraceViewer<S>({ trace, label, render, code, codeTitle, legend, 
           {render(step, p.index)}
           {legend && <div className="legend">{legend}</div>}
         </div>
-        <aside className="viz-side" aria-label="Adım açıklaması">
+        <aside className="viz-side" aria-label={tx('Adım açıklaması', 'Step explanation')}>
           {pq ? (
-            <div className="predict" role="group" aria-label="Tahmin sorusu">
+            <div className="predict" role="group" aria-label={tx('Tahmin sorusu', 'Prediction question')}>
               <h3>
-                <HelpCircle size={16} style={{ verticalAlign: '-3px' }} aria-hidden /> Önce tahmin et
+                <HelpCircle size={16} style={{ verticalAlign: '-3px' }} aria-hidden /> {tx('Önce tahmin et', 'Predict first')}
               </h3>
               <p className="small" style={{ marginBottom: 8 }}>
                 {pq.question}
@@ -108,10 +109,10 @@ export function TraceViewer<S>({ trace, label, render, code, codeTitle, legend, 
               {pAnswer !== undefined && (
                 <div className={'feedback ' + (pAnswer === pq.answer ? 'ok' : 'no')} role="status">
                   {pAnswer === pq.answer ? <CheckCircle2 size={15} aria-hidden /> : <XCircle size={15} aria-hidden />}{' '}
-                  <strong>{pAnswer === pq.answer ? 'Doğru.' : 'Tam değil.'}</strong> {pq.why}
+                  <strong>{pAnswer === pq.answer ? tx('Doğru.', 'Correct.') : tx('Tam değil.', 'Not quite.')}</strong> {pq.why}
                   <div style={{ marginTop: 8 }}>
                     <button className="btn sm primary" onClick={continueAfter} autoFocus>
-                      Adımı göster <ChevronRight size={15} aria-hidden />
+                      {tx('Adımı göster', 'Show the step')} <ChevronRight size={15} aria-hidden />
                     </button>
                   </div>
                 </div>
@@ -127,7 +128,7 @@ export function TraceViewer<S>({ trace, label, render, code, codeTitle, legend, 
           )}
           {step.vars && Object.keys(step.vars).length > 0 && (
             <div>
-              <span className="label-tag">Değişkenler</span>
+              <span className="label-tag">{tx('Değişkenler', 'Variables')}</span>
               <dl className="kv">
                 {Object.entries(step.vars).map(([k, v]) => (
                   <div key={k}>
@@ -140,7 +141,7 @@ export function TraceViewer<S>({ trace, label, render, code, codeTitle, legend, 
           )}
           {step.counters && (
             <div>
-              <span className="label-tag">Sayaçlar</span>
+              <span className="label-tag">{tx('Sayaçlar', 'Counters')}</span>
               <dl className="kv">
                 {Object.entries(step.counters).map(([k, v]) => (
                   <div key={k}>
@@ -154,32 +155,32 @@ export function TraceViewer<S>({ trace, label, render, code, codeTitle, legend, 
           {side?.(step)}
           {code && (
             <div>
-              <span className="label-tag">{codeTitle ?? 'Sözde kod (pseudocode)'}</span>
+              <span className="label-tag">{codeTitle ?? tx('Sözde kod (pseudocode)', 'Pseudocode')}</span>
               <Pseudocode lines={code} active={step.line} />
             </div>
           )}
         </aside>
       </div>
-      <div className="viz-controls" role="toolbar" aria-label="Oynatma kontrolleri">
-        <button className="btn icon" onClick={() => { setPending(null); p.reset() }} aria-label="Başa sar" title="Başa sar">
+      <div className="viz-controls" role="toolbar" aria-label={tx('Oynatma kontrolleri', 'Playback controls')}>
+        <button className="btn icon" onClick={() => { setPending(null); p.reset() }} aria-label={tx('Başa sar', 'Reset')} title={tx('Başa sar', 'Reset')}>
           <RotateCcw size={17} aria-hidden />
         </button>
-        <button className="btn icon" onClick={() => { setPending(null); p.prev() }} disabled={p.index === 0} aria-label="Önceki adım" title="Önceki adım (←)">
+        <button className="btn icon" onClick={() => { setPending(null); p.prev() }} disabled={p.index === 0} aria-label={tx('Önceki adım', 'Previous step')} title={tx('Önceki adım (←)', 'Previous step (←)')}>
           <ChevronLeft size={18} aria-hidden />
         </button>
         {p.playing ? (
-          <button className="btn primary" onClick={p.pause} aria-label="Duraklat">
-            <Pause size={17} aria-hidden /> Duraklat
+          <button className="btn primary" onClick={p.pause} aria-label={tx('Duraklat', 'Pause')}>
+            <Pause size={17} aria-hidden /> {tx('Duraklat', 'Pause')}
           </button>
         ) : (
-          <button className="btn primary" onClick={() => (atEnd ? (setPending(null), p.reset(), p.play()) : p.play())} disabled={trace.length <= 1 || pending !== null} aria-label="Oynat">
-            <Play size={17} aria-hidden /> Oynat
+          <button className="btn primary" onClick={() => (atEnd ? (setPending(null), p.reset(), p.play()) : p.play())} disabled={trace.length <= 1 || pending !== null} aria-label={tx('Oynat', 'Play')}>
+            <Play size={17} aria-hidden /> {tx('Oynat', 'Play')}
           </button>
         )}
-        <button className="btn icon" onClick={onNext} disabled={atEnd || pending !== null} aria-label="Sonraki adım" title="Sonraki adım (→)">
+        <button className="btn icon" onClick={onNext} disabled={atEnd || pending !== null} aria-label={tx('Sonraki adım', 'Next step')} title={tx('Sonraki adım (→)', 'Next step (→)')}>
           <ChevronRight size={18} aria-hidden />
         </button>
-        <button className="btn icon" onClick={() => { setPending(null); p.end() }} disabled={atEnd} aria-label="Sona git" title="Sona git">
+        <button className="btn icon" onClick={() => { setPending(null); p.end() }} disabled={atEnd} aria-label={tx('Sona git', 'Jump to end')} title={tx('Sona git', 'Jump to end')}>
           <SkipForward size={17} aria-hidden />
         </button>
         <input
@@ -192,14 +193,14 @@ export function TraceViewer<S>({ trace, label, render, code, codeTitle, legend, 
             setPending(null)
             p.goto(Number(e.target.value))
           }}
-          aria-label="Adım seçici"
+          aria-label={tx('Adım seçici', 'Step scrubber')}
         />
         <span className="step-count" aria-live="off">
           {p.index + 1} / {trace.length}
         </span>
         <label className="row small" style={{ gap: 4 }}>
-          <span className="muted">Hız</span>
-          <select className="input" style={{ minHeight: 30, padding: '2px 6px' }} value={speed} onChange={(e) => dispatch({ type: 'prefs', prefs: { speed: Number(e.target.value) } })} aria-label="Oynatma hızı">
+          <span className="muted">{tx('Hız', 'Speed')}</span>
+          <select className="input" style={{ minHeight: 30, padding: '2px 6px' }} value={speed} onChange={(e) => dispatch({ type: 'prefs', prefs: { speed: Number(e.target.value) } })} aria-label={tx('Oynatma hızı', 'Playback speed')}>
             {SPEEDS.map((s) => (
               <option key={s} value={s}>
                 {s}×
@@ -214,9 +215,9 @@ export function TraceViewer<S>({ trace, label, render, code, codeTitle, legend, 
             setPending(null)
             dispatch({ type: 'prefs', prefs: { predict: !predictMode } })
           }}
-          title="Açıkken, önemli adımlardan önce ne olacağını tahmin etmeniz istenir."
+          title={tx('Açıkken, önemli adımlardan önce ne olacağını tahmin etmeniz istenir.', 'When on, you are asked to predict what happens before key steps.')}
         >
-          <HelpCircle size={15} aria-hidden /> Tahmin modu
+          <HelpCircle size={15} aria-hidden /> {tx('Tahmin modu', 'Prediction mode')}
         </button>
       </div>
     </section>

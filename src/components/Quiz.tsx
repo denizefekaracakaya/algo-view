@@ -3,6 +3,7 @@ import { ArrowDown, ArrowUp, CheckCircle2, Lightbulb, XCircle, Eye } from 'lucid
 import type { MCQ, NumericQ, OrderQ, Practice, Question } from '../content/types'
 import { useProgress } from '../state/ProgressContext'
 import { Inline, Rich } from './Tex'
+import { tx } from '../i18n/lang'
 
 export function Quiz({ lessonId, questions }: { lessonId: string; questions: Question[] }) {
   const { progress } = useProgress()
@@ -10,7 +11,7 @@ export function Quiz({ lessonId, questions }: { lessonId: string; questions: Que
   return (
     <div>
       <p className="small muted" aria-live="polite">
-        {solved} / {questions.length} soru doğru cevaplandı.
+        {tx(`${solved} / ${questions.length} soru doğru cevaplandı.`, `${solved} / ${questions.length} questions answered correctly.`)}
       </p>
       {questions.map((q, i) => (
         <QuestionCard key={q.id} q={q} n={i + 1} storeKey={`${lessonId}:${q.id}`} />
@@ -29,11 +30,11 @@ function QuestionCard({ q, n, storeKey }: { q: Question; n: number; storeKey: st
     <article className="quiz-q" aria-labelledby={`q-${storeKey}`}>
       <div className="q-head">
         <h3 id={`q-${storeKey}`} style={{ fontSize: '0.98rem', margin: 0 }}>
-          <span className="muted mono">S{n}.</span> <Inline src={q.prompt} />
+          <span className="muted mono">{tx('S', 'Q')}{n}.</span> <Inline src={q.prompt} />
         </h3>
         {rec?.correct && (
           <span className="badge done">
-            <CheckCircle2 size={12} aria-hidden /> çözüldü
+            <CheckCircle2 size={12} aria-hidden /> {tx('çözüldü', 'solved')}
           </span>
         )}
       </div>
@@ -42,10 +43,10 @@ function QuestionCard({ q, n, storeKey }: { q: Question; n: number; storeKey: st
       {q.kind === 'order' && <OrderBody q={q} onAnswer={record} />}
       <div className="row" style={{ marginTop: 6 }}>
         <button className="btn sm ghost" onClick={() => setShowHint((s) => !s)} aria-expanded={showHint}>
-          <Lightbulb size={14} aria-hidden /> İpucu
+          <Lightbulb size={14} aria-hidden /> {tx('İpucu', 'Hint')}
         </button>
         <button className="btn sm ghost" onClick={() => setReveal((s) => !s)} aria-expanded={reveal}>
-          <Eye size={14} aria-hidden /> Çözümü göster
+          <Eye size={14} aria-hidden /> {tx('Çözümü göster', 'Show solution')}
         </button>
       </div>
       {showHint && (
@@ -55,7 +56,7 @@ function QuestionCard({ q, n, storeKey }: { q: Question; n: number; storeKey: st
       )}
       {reveal && (
         <div className="feedback ok">
-          <strong>Çözüm: </strong>
+          <strong>{tx('Çözüm: ', 'Solution: ')}</strong>
           {q.kind === 'mcq' && <Inline src={q.options[q.answer] + '. '} />}
           {q.kind === 'numeric' && <span className="mono">{q.answer}. </span>}
           {q.kind === 'order' && <span>{q.items.join(' → ')}. </span>}
@@ -81,7 +82,7 @@ function McqBody({ q, onAnswer }: { q: MCQ; onAnswer: (c: boolean) => void }) {
       }}
     >
       <fieldset>
-        <legend className="sr-only">Seçenekler</legend>
+        <legend className="sr-only">{tx('Seçenekler', 'Options')}</legend>
         {q.options.map((o, i) => (
           <label key={i} className={'option' + (checked !== null && i === checked ? (correct ? ' correct' : ' wrong') : '')}>
             <input type="radio" name={name} checked={choice === i} onChange={() => setChoice(i)} />
@@ -96,8 +97,8 @@ function McqBody({ q, onAnswer }: { q: MCQ; onAnswer: (c: boolean) => void }) {
       </button>
       {checked !== null && (
         <div className={'feedback ' + (correct ? 'ok' : 'no')} role="status">
-          {correct ? <CheckCircle2 size={15} aria-hidden /> : <XCircle size={15} aria-hidden />} <strong>{correct ? 'Doğru!' : 'Yanlış.'}</strong>{' '}
-          {correct ? <Inline src={q.explanation} /> : <Inline src={q.feedback?.[checked] ?? 'Tekrar deneyin; gerekirse ipucuna bakın.'} />}
+          {correct ? <CheckCircle2 size={15} aria-hidden /> : <XCircle size={15} aria-hidden />} <strong>{correct ? tx('Doğru!', 'Correct!') : tx('Yanlış.', 'Incorrect.')}</strong>{' '}
+          {correct ? <Inline src={q.explanation} /> : <Inline src={q.feedback?.[checked] ?? tx('Tekrar deneyin; gerekirse ipucuna bakın.', 'Try again; look at the hint if needed.')} />}
         </div>
       )}
     </form>
@@ -116,7 +117,7 @@ function NumericBody({ q, onAnswer }: { q: NumericQ; onAnswer: (c: boolean) => v
         e.preventDefault()
         const v = Number(val.replace(',', '.'))
         if (val.trim() === '' || !Number.isFinite(v)) {
-          setErr('Lütfen bir sayı girin.')
+          setErr(tx('Lütfen bir sayı girin.', 'Please enter a number.'))
           return
         }
         setErr(null)
@@ -125,14 +126,14 @@ function NumericBody({ q, onAnswer }: { q: NumericQ; onAnswer: (c: boolean) => v
         onAnswer(ok)
       }}
     >
-      <input className="input mono" style={{ width: 140 }} inputMode="decimal" value={val} onChange={(e) => setVal(e.target.value)} aria-label="Cevabınız" aria-invalid={!!err} />
+      <input className="input mono" style={{ width: 140 }} inputMode="decimal" value={val} onChange={(e) => setVal(e.target.value)} aria-label={tx('Cevabınız', 'Your answer')} aria-invalid={!!err} />
       <button className="btn sm primary" type="submit">
         Kontrol et
       </button>
       {err && <span className="error-msg">{err}</span>}
       {res !== null && (
         <div className={'feedback ' + (res ? 'ok' : 'no')} role="status" style={{ flexBasis: '100%' }}>
-          <strong>{res ? 'Doğru!' : 'Yanlış.'}</strong> {res ? <Inline src={q.explanation} /> : 'Tekrar deneyin; gerekirse ipucuna bakın.'}
+          <strong>{res ? tx('Doğru!', 'Correct!') : tx('Yanlış.', 'Incorrect.')}</strong> {res ? <Inline src={q.explanation} /> : tx('Tekrar deneyin; gerekirse ipucuna bakın.', 'Try again; look at the hint if needed.')}
         </div>
       )}
     </form>
@@ -163,17 +164,17 @@ function OrderBody({ q, onAnswer }: { q: OrderQ; onAnswer: (c: boolean) => void 
   }
   return (
     <div>
-      <ol className="order-list" aria-label="Sıralanacak adımlar">
+      <ol className="order-list" aria-label={tx('Sıralanacak adımlar', 'Steps to order')}>
         {list.map((item, i) => (
           <li key={item}>
             <span className="mono muted">{i + 1}.</span>
             <span className="grow">
               <Inline src={item} />
             </span>
-            <button className="btn icon sm" onClick={() => move(i, -1)} disabled={i === 0} aria-label={`"${item}" yukarı taşı`}>
+            <button className="btn icon sm" onClick={() => move(i, -1)} disabled={i === 0} aria-label={tx(`"${item}" yukarı taşı`, `Move "${item}" up`)}>
               <ArrowUp size={14} aria-hidden />
             </button>
-            <button className="btn icon sm" onClick={() => move(i, 1)} disabled={i === list.length - 1} aria-label={`"${item}" aşağı taşı`}>
+            <button className="btn icon sm" onClick={() => move(i, 1)} disabled={i === list.length - 1} aria-label={tx(`"${item}" aşağı taşı`, `Move "${item}" down`)}>
               <ArrowDown size={14} aria-hidden />
             </button>
           </li>
@@ -187,12 +188,12 @@ function OrderBody({ q, onAnswer }: { q: OrderQ; onAnswer: (c: boolean) => void 
           onAnswer(ok)
         }}
       >
-        Sıralamayı kontrol et
+        {tx('Sıralamayı kontrol et', 'Check order')}
       </button>
       {res !== null && (
         <div className={'feedback ' + (res ? 'ok' : 'no')} role="status">
-          <strong>{res ? 'Doğru!' : 'Henüz değil.'}</strong>{' '}
-          {res ? <Inline src={q.explanation} /> : `${list.filter((x, i) => x === q.items[i]).length} / ${list.length} adım doğru yerde.`}
+          <strong>{res ? tx('Doğru!', 'Correct!') : tx('Henüz değil.', 'Not yet.')}</strong>{' '}
+          {res ? <Inline src={q.explanation} /> : tx(`${list.filter((x, i) => x === q.items[i]).length} / ${list.length} adım doğru yerde.`, `${list.filter((x, i) => x === q.items[i]).length} / ${list.length} steps in the right place.`)}
         </div>
       )}
     </div>
@@ -215,21 +216,21 @@ function PracticeCard({ p, n }: { p: Practice; n: number }) {
   return (
     <article className="quiz-q">
       <h3 style={{ fontSize: '0.98rem' }}>
-        <span className="muted mono">A{n}.</span> Alıştırma
+        <span className="muted mono">{tx('A', 'P')}{n}.</span> {tx('Alıştırma', 'Practice')}
       </h3>
       <Rich text={p.prompt} />
       {p.hints.slice(0, hints).map((h, i) => (
         <div key={i} className="feedback hint">
-          <strong>İpucu {i + 1}: </strong>
+          <strong>{tx('İpucu', 'Hint')} {i + 1}: </strong>
           <Inline src={h} />
         </div>
       ))}
       <div className="row" style={{ marginTop: 8 }}>
         <button className="btn sm" onClick={() => setHints((h) => h + 1)} disabled={hints >= p.hints.length}>
-          <Lightbulb size={14} aria-hidden /> {hints >= p.hints.length ? 'Tüm ipuçları açıldı' : `İpucu (${hints}/${p.hints.length})`}
+          <Lightbulb size={14} aria-hidden /> {hints >= p.hints.length ? tx('Tüm ipuçları açıldı', 'All hints shown') : `${tx('İpucu', 'Hint')} (${hints}/${p.hints.length})`}
         </button>
         <button className="btn sm ghost" onClick={() => setSol((s) => !s)} aria-expanded={sol}>
-          <Eye size={14} aria-hidden /> {sol ? 'Çözümü gizle' : 'Çözümü göster'}
+          <Eye size={14} aria-hidden /> {sol ? tx('Çözümü gizle', 'Hide solution') : tx('Çözümü göster', 'Show solution')}
         </button>
       </div>
       {sol && (

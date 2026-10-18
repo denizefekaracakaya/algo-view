@@ -26,7 +26,7 @@ export const lecture3: Lecture = {
         {
           kind: 'intuition',
           title: 'Sezgi: üç kuvvetin yarışı',
-          label: 'Sezgi',
+          label: 'intuition',
           body: `$T(n) = a\\,T(n/b) + O(n^d)$ biçimindeki bir algoritmada iki kuvvet yarışır:
 
 - **Dallanma** $a$: her seviyede alt problem sayısı $a$ katına çıkar.
@@ -38,7 +38,7 @@ Seviye $j$’deki toplam iş $c\\,n^d (a/b^d)^j$’dir. Oran $1$ ise her seviye 
           kind: 'formal',
           title: 'Master Teoremi (Ders 3 notları, Teorem 1)',
           box: 'formal',
-          label: 'Biçimsel',
+          label: 'formal',
           body: `$a \\ge 1$ (tam sayı), $b > 1$, $d \\ge 0$ sabitler ve $T(n) = a\\cdot T\\!\\left(\\frac{n}{b}\\right) + O(n^d)$, $T(1) = O(1)$ olsun. O hâlde
 $$T(n) = \\begin{cases} O(n^d \\log n) & a = b^d \\\\ O(n^d) & a < b^d \\\\ O(n^{\\log_b a}) & a > b^d. \\end{cases}$$
 
@@ -55,7 +55,7 @@ $$T(n) = \\begin{cases} O(n^d \\log n) & a = b^d \\\\ O(n^d) & a < b^d \\\\ O(n^
         {
           kind: 'correctness',
           title: 'Kanıt fikri: özyineleme ağacı',
-          label: 'Biçimsel kanıt',
+          label: 'formalProof',
           proof: [
             { title: 'Kurulum', body: '$T(1) = 1$ ve $n$’nin $b$’nin kuvveti olduğunu varsayalım. Bir $c > 0$ için $T(n) \\le a\\,T(n/b) + c\\,n^d$.' },
             { title: 'Seviye j', body: '$a^j$ alt problem, her biri $n/b^j$ boyutunda ve en fazla $c(n/b^j)^d$ özyinelemesiz iş: seviye toplamı $a^j c (n/b^j)^d = c\\,n^d (a/b^d)^j$.' },
@@ -164,14 +164,14 @@ $$T(n) = \\begin{cases} O(n^d \\log n) & a = b^d \\\\ O(n^d) & a < b^d \\\\ O(n^
         {
           kind: 'intuition',
           title: 'Sezgi',
-          label: 'Sezgi',
+          label: 'intuition',
           body: `Özyineleme ağacı karmaşıklaşınca (alt problemler farklı boyutlardaysa) cevabı **tahmin edip** tümevarımla doğrularız. Tahmin $T(n) \\le D\\cdot g(n)$ biçimindedir; $D$’yi önceden bilmeyiz — kanıtı yazarken $D$’nin hangi koşulu sağlaması gerektiğini **keşfederiz**.`,
         },
         {
           kind: 'formal',
           title: 'Yöntem (Ders 3–4 notları)',
           box: 'formal',
-          label: 'Biçimsel',
+          label: 'formal',
           body: `$T(n) \\le f(n) + \\sum_{i=1}^k T(n_i)$ için tahmin: $T(n) \\le D\\,g(n)$ ($n \\ge n_0$).
 
 1. **Taban:** $T(n_0) \\le D\\,g(n_0)$ olacak şekilde $D$ seçilebilir (ör. $T(1) = 1 \\le D$).
@@ -189,7 +189,7 @@ $$T(n) = \\begin{cases} O(n^d \\log n) & a = b^d \\\\ O(n^d) & a < b^d \\\\ O(n^
         {
           kind: 'steps',
           title: 'Özgün çalışılmış örnek: $T(n) \\le T(n/3) + T(n/2) + n$',
-          label: 'Biçimsel kanıt',
+          label: 'formalProof',
           proof: [
             { title: 'Tahmin', body: '$T(n) \\le D\\,n$ (doğrusal). Neden doğrusal? Alt problem boyutlarının toplamı $n/3 + n/2 = 5n/6 < n$: ağaçta seviyeler geometrik olarak küçülür.' },
             { title: 'Taban', body: '$T(1) = 1 \\le D$ ise sağlanır.' },

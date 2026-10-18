@@ -1,6 +1,6 @@
 # Algo View
 
-**Algoritmaları görünür kıl.** Algo View, Stanford CS161 *Design and Analysis of Algorithms* (Winter 2026) dersinin kamuya açık materyallerine dayanan, Türkçe, etkileşimli bir algoritma öğrenme uygulamasıdır. Öğrenci kendi girdisini verir, algoritmayı adım adım (ileri/geri) çalıştırır, her adımın nedenini okur, bir sonraki adımı tahmin eder ve çalışmayı karmaşıklık analizine bağlar.
+**Algoritmaları görünür kıl.** Algo View, Stanford CS161 *Design and Analysis of Algorithms* (Winter 2026) dersinin kamuya açık materyallerine dayanan, Türkçe ve İngilizce, etkileşimli bir algoritma öğrenme uygulamasıdır. Öğrenci kendi girdisini verir, algoritmayı adım adım (ileri/geri) çalıştırır, her adımın nedenini okur, bir sonraki adımı tahmin eder ve çalışmayı karmaşıklık analizine bağlar.
 
 > Algo View bağımsız bir eğitim projesidir; Stanford Üniversitesi ile bağlantılı ya da onun resmî bir ürünü değildir. Açıklamalar, örnekler ve sorular özgündür; resmî materyallere yalnızca bağlantı verilir. Resmî ödev çözümleri yer almaz.
 
@@ -19,6 +19,11 @@
 Ders 8 (Hashing) ve sonrası bu sürümün kapsamı dışındadır.
 
 Her ders: öğrenme hedefleri, ön koşullar, sezgi, biçimsel tanım, etkileşimli görselleştirme, sözde kod, doğruluk (adım adım açılan kanıt), karmaşıklık (varsayımlarıyla), sık hatalar, mini quiz (çoktan seçmeli / sayısal / sıralama; ipucu, geri bildirim, çözüm), özgün alıştırmalar, resmî kaynak bağlantıları ve tamamlama düğmesi.
+
+## Dil ve tema
+
+- **Türkçe / English:** Üst çubuktaki **TR | EN** düğmesi (veya Ayarlar → Dil) tüm arayüzü, ders içeriğini, quizleri ve algoritma adım açıklamalarını değiştirir. Seçim `localStorage`’da saklanır. İngilizce içerik `src/content/en/` altındadır; `content.test.ts` iki dilin aynı ders/soru/cevap/görselleştirici yapısına sahip olduğunu denetler.
+- **Açık / karanlık mod:** Üst çubuktaki güneş/ay düğmesi açık ve karanlık mod arasında geçiş yapar; Ayarlar’da “sistem ayarını izle” seçeneği de vardır. Tema ilk boyamadan önce uygulanır (yanıp sönme olmaz).
 
 ## Teknolojiler
 
@@ -48,7 +53,8 @@ src/
   trace/        İz modeli (TraceStep) ve oynatıcı durum makinesi (useTracePlayer)
   components/   TraceViewer, ArrayView, TreeView, LineChart, Quiz, Tex/Rich, ProofStepper…
   viz/          Derslere özgü görselleştiriciler ve registry (içerikteki `viz` anahtarları)
-  content/      Ders verisi (lecture1..7.ts), kaynaklar, curriculum + içerik testleri
+  content/      Ders verisi (lecture1..7.ts; İngilizcesi en/), kaynaklar, curriculum + içerik testleri
+  i18n/         Etkin dil ve tx(tr, en) yardımcısı
   state/        İlerleme modeli, reducer, localStorage kalıcılığı
   pages/        Panel, Ders, Kaynaklar, Ayarlar
 e2e/            Playwright testleri

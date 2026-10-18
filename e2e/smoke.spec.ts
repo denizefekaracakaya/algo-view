@@ -106,3 +106,30 @@ for (const id of ['l1-karatsuba', 'l2-asymptotics', 'l3-master', 'l3-substitutio
     await noHorizontalOverflow(page)
   })
 }
+
+test('English mode: header switch translates the app; every lesson renders without errors or overflow', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (e) => errors.push(e.message))
+  page.on('console', (m) => m.type() === 'error' && errors.push(m.text()))
+  await page.goto('/#/')
+  await page.getByRole('button', { name: 'EN' }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Make algorithms visible.')
+  for (const id of ['l1-why', 'l1-karatsuba', 'l2-insertion', 'l2-mergesort', 'l2-asymptotics', 'l3-master', 'l3-substitution', 'l4-select', 'l5-quicksort', 'l5-expected', 'l6-lower-bound', 'l6-bucketsort', 'l6-compare', 'l7-bst', 'l7-redblack', 'l7-compare']) {
+    await page.goto(`/#/ders/${id}`)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    await expect(page.getByText('Learning objectives')).toBeVisible()
+    await noHorizontalOverflow(page)
+  }
+  expect(errors).toEqual([])
+})
+
+test('theme toggle switches to dark mode and survives reload', async ({ page }) => {
+  await page.goto('/#/')
+  const toggle = page.getByRole('button', { name: /moda geç/ })
+  const before = await page.evaluate(() => document.documentElement.getAttribute('data-theme'))
+  await toggle.click()
+  const after = await page.evaluate(() => document.documentElement.getAttribute('data-theme'))
+  expect(after).not.toBe(before)
+  await page.reload()
+  expect(await page.evaluate(() => document.documentElement.getAttribute('data-theme'))).toBe(after)
+})

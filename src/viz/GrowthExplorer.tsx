@@ -4,6 +4,7 @@ import { Tex } from '../components/Tex'
 import { insertionSortComparisons } from '../engines/insertionSort'
 import { mergeSortComparisons } from '../engines/mergeSort'
 import { makeRng, randomPermutation } from '../engines/random'
+import { tx } from '../i18n/lang'
 
 interface Fn {
   id: string
@@ -46,7 +47,7 @@ export function GrowthExplorer() {
   }))
   return (
     <div className="card card-pad stack">
-      <div className="row" role="group" aria-label="Fonksiyon seçimi (en fazla 4)">
+      <div className="row" role="group" aria-label={tx('Fonksiyon seçimi (en fazla 4)', 'Function choice (at most 4)')}>
         {GROWTH_FNS.map((f) => (
           <button key={f.id} className="btn sm" aria-pressed={selected.includes(f.id)} onClick={() => toggle(f.id)}>
             <Tex>{f.tex}</Tex>
@@ -55,15 +56,20 @@ export function GrowthExplorer() {
       </div>
       <div className="row">
         <label className="field" style={{ flex: '1 1 220px' }}>
-          n üst sınırı: {maxN}
+          {tx('n üst sınırı', 'Upper limit for n')}: {maxN}
           <input type="range" min={8} max={1024} step={8} value={maxN} onChange={(e) => setMaxN(Number(e.target.value))} style={{ accentColor: 'var(--accent)' }} />
         </label>
         <label className="row small">
-          <input type="checkbox" checked={logY} onChange={(e) => setLogY(e.target.checked)} /> Logaritmik dikey eksen
+          <input type="checkbox" checked={logY} onChange={(e) => setLogY(e.target.checked)} /> {tx('Logaritmik dikey eksen', 'Logarithmic vertical axis')}
         </label>
       </div>
-      <LineChart title="Büyüme fonksiyonları (kuramsal)" xLabel="n" yLabel={logY ? 'f(n) (log)' : 'f(n)'} logY={logY} series={series} />
-      <p className="small muted">Bunlar kuramsal fonksiyonlardır, ölçüm değildir. Sabit çarpanlar küçük n için sıralamayı değiştirebilir; asimptotik analiz n → ∞ davranışıyla ilgilenir.</p>
+      <LineChart title={tx('Büyüme fonksiyonları (kuramsal)', 'Growth functions (theoretical)')} xLabel="n" yLabel={logY ? 'f(n) (log)' : 'f(n)'} logY={logY} series={series} />
+      <p className="small muted">
+        {tx(
+          'Bunlar kuramsal fonksiyonlardır, ölçüm değildir. Sabit çarpanlar küçük n için sıralamayı değiştirebilir; asimptotik analiz n → ∞ davranışıyla ilgilenir.',
+          'These are theoretical functions, not measurements. Constant factors can change the order for small n; asymptotic analysis is about the behavior as n → ∞.',
+        )}
+      </p>
     </div>
   )
 }
@@ -120,7 +126,7 @@ export function BigOWitness() {
           </select>
         </label>
         <label className="field">
-          İddia
+          {tx('İddia', 'Claim')}
           <select className="input" value={mode} onChange={(e) => setMode(e.target.value as 'O' | 'Omega')}>
             <option value="O">T(n) = O(f(n))</option>
             <option value="Omega">T(n) = Ω(f(n))</option>
@@ -146,29 +152,36 @@ export function BigOWitness() {
         </label>
       </div>
       <div className="callout formal">
-        <span className="label-tag">Tanım (Ders 2)</span>
+        <span className="label-tag">{tx('Tanım (Ders 2)', 'Definition (Lecture 2)')}</span>
         {mode === 'O' ? (
-          <Tex>{'T(n) = O(f(n)) \\iff \\exists\\, c > 0,\\ n_0 \\text{ öyle ki } \\forall n \\ge n_0:\\ 0 \\le T(n) \\le c\\cdot f(n)'}</Tex>
+          <Tex>{`T(n) = O(f(n)) \\iff \\exists\\, c > 0,\\ n_0 \\text{ ${tx('öyle ki', 'such that')} } \\forall n \\ge n_0:\\ 0 \\le T(n) \\le c\\cdot f(n)`}</Tex>
         ) : (
-          <Tex>{'T(n) = \\Omega(f(n)) \\iff \\exists\\, c > 0,\\ n_0 \\text{ öyle ki } \\forall n \\ge n_0:\\ 0 \\le c\\cdot f(n) \\le T(n)'}</Tex>
+          <Tex>{`T(n) = \\Omega(f(n)) \\iff \\exists\\, c > 0,\\ n_0 \\text{ ${tx('öyle ki', 'such that')} } \\forall n \\ge n_0:\\ 0 \\le c\\cdot f(n) \\le T(n)`}</Tex>
         )}
       </div>
       <div role="status" className={'feedback ' + (result.firstFail === null ? 'ok' : 'no')}>
         {result.firstFail === null ? (
           <>
-            n₀ = {n0} ile {N}’e kadar her n için <Tex>{mode === 'O' ? `T(n) \\le ${c}\\cdot ${F.tex}` : `T(n) \\ge ${c}\\cdot ${F.tex}`}</Tex> sağlanıyor. Bu, sonlu bir aralıkta yapılan sayısal bir
-            kontroldür; tanık (c, n₀) için gerçek bir kanıt tüm n ≥ n₀ için cebirsel bir eşitsizlik gerektirir.
+            {tx(`n₀ = ${n0} ile ${N}’e kadar her n için`, `With n₀ = ${n0}, for every n up to ${N},`)}{' '}
+            <Tex>{mode === 'O' ? `T(n) \\le ${c}\\cdot ${F.tex}` : `T(n) \\ge ${c}\\cdot ${F.tex}`}</Tex>{' '}
+            {tx(
+              'sağlanıyor. Bu, sonlu bir aralıkta yapılan sayısal bir kontroldür; tanık (c, n₀) için gerçek bir kanıt tüm n ≥ n₀ için cebirsel bir eşitsizlik gerektirir.',
+              'holds. This is a numerical check on a finite range; a real proof for the witness (c, n₀) needs an algebraic inequality for all n ≥ n₀.',
+            )}
           </>
         ) : (
           <>
-            n = {result.firstFail} için koşul bozuluyor ({result.fails} karşı örnek, n ≤ {N}). Ya c / n₀ yeterli değil ya da iddia yanlış: hiçbir sabit c işe yaramıyorsa (ör. n² = O(n) denemesi), iddia yanlıştır.
+            {tx(
+              `n = ${result.firstFail} için koşul bozuluyor (${result.fails} karşı örnek, n ≤ ${N}). Ya c / n₀ yeterli değil ya da iddia yanlış: hiçbir sabit c işe yaramıyorsa (ör. n² = O(n) denemesi), iddia yanlıştır.`,
+              `The condition fails at n = ${result.firstFail} (${result.fails} counterexamples, n ≤ ${N}). Either c / n₀ is not enough or the claim is false: if no constant c works (e.g. trying n² = O(n)), the claim is false.`,
+            )}
           </>
         )}
       </div>
       <LineChart
-        title="T(n) ile c·f(n) karşılaştırması"
+        title={tx('T(n) ile c·f(n) karşılaştırması', 'T(n) compared with c·f(n)')}
         xLabel="n"
-        yLabel="değer (log)"
+        yLabel={tx('değer (log)', 'value (log)')}
         logY
         series={[
           { name: 'T(n)', color: 'var(--series-1)', points: uniq.map((n) => ({ x: n, y: T.f(n) })) },
@@ -194,25 +207,31 @@ export function EmpiricalSorting() {
     <div className="card card-pad stack">
       <div className="row">
         <span className="small muted grow">
-          Her n için rastgele bir permütasyon (tohum {seed}) üzerinde gerçek karşılaştırma sayıları (nokta = ölçüm), kesikli çizgiler kuramsal referanslar.
+          {tx(
+            `Her n için rastgele bir permütasyon (tohum ${seed}) üzerinde gerçek karşılaştırma sayıları (nokta = ölçüm), kesikli çizgiler kuramsal referanslar.`,
+            `Actual comparison counts on a random permutation for each n (seed ${seed}) (dot = measurement); dashed lines are theoretical references.`,
+          )}
         </span>
         <button className="btn sm" onClick={() => setSeed((s) => s + 1)}>
-          Yeni rastgele girdiler
+          {tx('Yeni rastgele girdiler', 'New random inputs')}
         </button>
       </div>
       <LineChart
-        title="InsertionSort ve MergeSort karşılaştırma sayıları"
+        title={tx('InsertionSort ve MergeSort karşılaştırma sayıları', 'InsertionSort and MergeSort comparison counts')}
         xLabel="n"
-        yLabel="karşılaştırma"
+        yLabel={tx('karşılaştırma', 'comparisons')}
         series={[
-          { name: 'InsertionSort (ölçüm)', color: 'var(--series-2)', dots: true, points: data.map((d) => ({ x: d.n, y: d.ins })) },
-          { name: 'n²/4 (kuram, ortalama)', color: 'var(--series-2)', dashed: true, points: data.map((d) => ({ x: d.n, y: (d.n * d.n) / 4 })) },
-          { name: 'MergeSort (ölçüm)', color: 'var(--series-1)', dots: true, points: data.map((d) => ({ x: d.n, y: d.mer })) },
-          { name: 'n log₂ n (kuram)', color: 'var(--series-1)', dashed: true, points: data.map((d) => ({ x: d.n, y: d.n * lg(d.n) })) },
+          { name: tx('InsertionSort (ölçüm)', 'InsertionSort (measured)'), color: 'var(--series-2)', dots: true, points: data.map((d) => ({ x: d.n, y: d.ins })) },
+          { name: tx('n²/4 (kuram, ortalama)', 'n²/4 (theory, average)'), color: 'var(--series-2)', dashed: true, points: data.map((d) => ({ x: d.n, y: (d.n * d.n) / 4 })) },
+          { name: tx('MergeSort (ölçüm)', 'MergeSort (measured)'), color: 'var(--series-1)', dots: true, points: data.map((d) => ({ x: d.n, y: d.mer })) },
+          { name: tx('n log₂ n (kuram)', 'n log₂ n (theory)'), color: 'var(--series-1)', dashed: true, points: data.map((d) => ({ x: d.n, y: d.n * lg(d.n) })) },
         ]}
       />
       <p className="small muted">
-        Uyarı: Bu noktalar belirli girdilerdeki sayımlardır. En kötü durum garantisi (ör. MergeSort için O(n log n)) her girdi için geçerli bir kanıttan gelir, birkaç ölçümden değil.
+        {tx(
+          'Uyarı: Bu noktalar belirli girdilerdeki sayımlardır. En kötü durum garantisi (ör. MergeSort için O(n log n)) her girdi için geçerli bir kanıttan gelir, birkaç ölçümden değil.',
+          'Warning: these dots are counts on particular inputs. A worst-case guarantee (e.g. O(n log n) for MergeSort) comes from a proof valid for every input, not from a few measurements.',
+        )}
       </p>
     </div>
   )

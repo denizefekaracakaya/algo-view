@@ -25,7 +25,7 @@ export const lecture1: Lecture = {
         {
           kind: 'intuition',
           title: 'Sezgi: neden algoritmalar?',
-          label: 'Sezgi',
+          label: 'intuition',
           body: `Ders 1 notları üç neden sayar: algoritmalar bilgisayar biliminin **temelidir** (işletim sistemleri, ağlar, makine öğrenmesi, kriptografi ve hesaplamalı biyoloji hep algoritmik fikirlere dayanır), **faydalıdır** (donanım hızlandıkça hızlı ve yavaş algoritma arasındaki fark _büyür_) ve **eğlencelidir** (yaratıcılık ile matematiksel kesinliğin birleşimi; “daha iyi bir algoritma var mı?” sorusu sürekli sürprizler doğurur).
 
 Bu derste algoritmayı yalnızca “çalışan kod” olarak değil, **iki soruya cevap verilmesi gereken bir nesne** olarak ele alacağız:
@@ -37,7 +37,7 @@ Bu derste algoritmayı yalnızca “çalışan kod” olarak değil, **iki soruy
           kind: 'formal',
           title: 'Çalışma süresini nasıl ölçeriz?',
           box: 'formal',
-          label: 'Biçimsel',
+          label: 'formal',
           body: `Çalışma süresini milisaniye ile ölçmek, algoritmayı değil **algoritma + gerçekleştirim + donanım** üçlüsünü ölçer. Okul yöntemiyle çarpma elle de bilgisayarda da aynı algoritmadır.
 
 Bunun yerine, işin girdi büyüklüğü $n$ ile **nasıl ölçeklendiğine** bakarız. İki $n$ basamaklı sayıyı okul yöntemiyle çarparken her basamak çifti çarpılır: $n^2$ tek basamaklı çarpma. Bu yüzden okul yönteminin çalışma süresi “$n^2$ gibi ölçeklenir”. (Kesin tanımı Ders 2’de Big-O ile yapacağız.)`,
@@ -130,7 +130,7 @@ Bunun yerine, işin girdi büyüklüğü $n$ ile **nasıl ölçeklendiğine** ba
         {
           kind: 'intuition',
           title: 'Sezgi',
-          label: 'Sezgi',
+          label: 'intuition',
           body: `$1234 \\times 5678$’i $\\big((12\\cdot 100) + 34\\big)\\big((56 \\cdot 100) + 78\\big)$ olarak yazabiliriz. Genel olarak $x = 10^{n/2} a + b$, $y = 10^{n/2} c + d$ ise
 
 $$x \\cdot y = 10^{n}\\,ac + 10^{n/2}(ad + bc) + bd.$$
@@ -141,7 +141,7 @@ Bu, $n/2$ basamaklı **dört** çarpım ($ac, ad, bc, bd$) ve birkaç ucuz topla
           kind: 'formal',
           title: 'İki algoritma',
           box: 'formal',
-          label: 'Biçimsel',
+          label: 'formal',
           body: `**Mult1:** $ac, ad, bc, bd$’yi özyinelemeli hesapla. Yalnızca tek basamaklı çarpmaları sayarsak (notlardaki maliyet modeli) $T(n) = 4\\,T(n/2)$, $T(1) = 1$.
 
 **Karatsuba:** $z_1 = ac$, $z_2 = bd$, $z_3 = (a+b)(c+d)$ hesapla; $ad + bc = z_3 - z_1 - z_2$. Bu $T(n) = 3\\,T(n/2)$ verir.
@@ -173,7 +173,7 @@ Mult1 için aynı açılım $4^{\\log_2 n} = n^2$ verir — okul yöntemiyle ayn
         {
           kind: 'correctness',
           title: 'Neden doğru?',
-          label: 'Kanıt fikri',
+          label: 'proofIdea',
           body: `Cebirsel özdeşlik: $(a+b)(c+d) = ac + ad + bc + bd$, dolayısıyla $z_3 - z_1 - z_2 = ad + bc$. Özyinelemeli çağrıların doğru çarptığını varsayarsak (tümevarım hipotezi), döndürülen değer tam olarak $10^{2m}ac + 10^m(ad+bc) + bd = xy$ olur. Özyineleme sonlanır çünkü alt problemlerdeki sayıların değeri küçülür ve sonunda tek basamaklı sayılara ulaşılır.`,
         },
         {

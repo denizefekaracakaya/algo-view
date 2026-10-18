@@ -5,20 +5,21 @@ import { TraceViewer } from '../components/TraceViewer'
 import { INSERTION_SORT_CODE, insertionSortComparisons, insertionSortTrace, type InsertionState } from '../engines/insertionSort'
 import { MERGE_SORT_CODE, mergeSortComparisons, mergeSortTrace, type MergeSortState, type MSNode } from '../engines/mergeSort'
 import { makeRng, randomArray } from '../engines/random'
+import { tx } from '../i18n/lang'
 
 type Algo = 'insertion' | 'merge'
 
-const PRESETS = [
-  { label: 'Ders örneği', values: [6, 4, 3, 8, 1, 5, 2, 7] },
-  { label: 'Ters sıralı (en kötü)', values: [8, 7, 6, 5, 4, 3, 2, 1] },
-  { label: 'Neredeyse sıralı', values: [1, 2, 3, 5, 4, 6, 7, 8] },
-  { label: 'Tekrarlı', values: [3, 1, 3, 2, 1, 3] },
-  { label: 'Negatifler', values: [0, -4, 7, -1, 3, -4] },
+const presets = () => [
+  { label: tx('Ders örneği', 'Lecture example'), values: [6, 4, 3, 8, 1, 5, 2, 7] },
+  { label: tx('Ters sıralı (en kötü)', 'Reverse sorted (worst)'), values: [8, 7, 6, 5, 4, 3, 2, 1] },
+  { label: tx('Neredeyse sıralı', 'Nearly sorted'), values: [1, 2, 3, 5, 4, 6, 7, 8] },
+  { label: tx('Tekrarlı', 'Duplicates'), values: [3, 1, 3, 2, 1, 3] },
+  { label: tx('Negatifler', 'Negatives'), values: [0, -4, 7, -1, 3, -4] },
 ]
 
 export function SortingLab({ initial = 'insertion', lock = false }: { initial?: Algo; lock?: boolean }) {
   const [algo, setAlgo] = useState<Algo>(initial)
-  const [arr, setArr] = useState<number[]>(PRESETS[0].values)
+  const [arr, setArr] = useState<number[]>(presets()[0].values)
   const [seed, setSeed] = useState(1)
   const comps = useMemo(() => ({ insertion: insertionSortComparisons(arr), merge: mergeSortComparisons(arr) }), [arr])
 
@@ -26,8 +27,8 @@ export function SortingLab({ initial = 'insertion', lock = false }: { initial?: 
     <>
       {!lock && (
         <div className="field">
-          Algoritma
-          <div className="seg" role="group" aria-label="Algoritma seçimi">
+          {tx('Algoritma', 'Algorithm')}
+          <div className="seg" role="group" aria-label={tx('Algoritma seçimi', 'Algorithm choice')}>
             <button aria-pressed={algo === 'insertion'} onClick={() => setAlgo('insertion')}>
               InsertionSort
             </button>
@@ -40,19 +41,19 @@ export function SortingLab({ initial = 'insertion', lock = false }: { initial?: 
       <ArrayInput
         value={arr}
         onChange={setArr}
-        presets={PRESETS}
+        presets={presets()}
         options={{ maxLength: 16, min: -99, max: 99 }}
         random={() => {
           setSeed((s) => s + 1)
           return randomArray(makeRng(seed * 7919), 8 + (seed % 5), -9, 30)
         }}
-        hint="En fazla 16 tam sayı (−99…99). Aynı girdi her zaman aynı adımları üretir."
+        hint={tx('En fazla 16 tam sayı (−99…99). Aynı girdi her zaman aynı adımları üretir.', 'Up to 16 integers (−99…99). The same input always produces the same steps.')}
       />
     </>
   )
   const side = () => (
     <div>
-      <span className="label-tag">Bu girdide karşılaştırma sayısı</span>
+      <span className="label-tag">{tx('Bu girdide karşılaştırma sayısı', 'Comparisons on this input')}</span>
       <table className="data">
         <tbody>
           <tr className={algo === 'insertion' ? 'hl' : ''}>
@@ -66,7 +67,7 @@ export function SortingLab({ initial = 'insertion', lock = false }: { initial?: 
         </tbody>
       </table>
       <p className="small muted" style={{ marginTop: 4 }}>
-        Ölçülen sayılardır (ampirik), tek bir girdi içindir; asimptotik bir kanıt değildir.
+        {tx('Ölçülen sayılardır (ampirik), tek bir girdi içindir; asimptotik bir kanıt değildir.', 'These are measured counts (empirical) for a single input; not an asymptotic proof.')}
       </p>
     </div>
   )
@@ -101,16 +102,16 @@ function InsertionView({ arr, toolbar, side }: { arr: number[]; toolbar: ReactNo
               current = <strong className="mono">{s.current}</strong>
             </span>
           )}
-          {!s.done && s.sortedEnd >= 0 && <span className="muted">Sıralı önek: A[:{s.sortedEnd + 1}]</span>}
+          {!s.done && s.sortedEnd >= 0 && <span className="muted">{tx('Sıralı önek', 'Sorted prefix')}: A[:{s.sortedEnd + 1}]</span>}
         </div>
-        <ArrayView cells={cells} label="InsertionSort dizi durumu" minValue={min} maxValue={max} />
+        <ArrayView cells={cells} label={tx('InsertionSort dizi durumu', 'InsertionSort array state')} minValue={min} maxValue={max} />
       </div>
     )
   }
   return (
     <TraceViewer
       trace={trace}
-      label="InsertionSort görselleştirmesi"
+      label={tx('InsertionSort görselleştirmesi', 'InsertionSort visualization')}
       render={render}
       code={INSERTION_SORT_CODE}
       toolbar={toolbar}
@@ -126,7 +127,7 @@ function MergeView({ arr, toolbar, side }: { arr: number[]; toolbar: ReactNode; 
   return (
     <TraceViewer
       trace={trace}
-      label="MergeSort görselleştirmesi"
+      label={tx('MergeSort görselleştirmesi', 'MergeSort visualization')}
       render={render}
       code={MERGE_SORT_CODE}
       toolbar={toolbar}
@@ -134,7 +135,7 @@ function MergeView({ arr, toolbar, side }: { arr: number[]; toolbar: ReactNode; 
       legend={
         <>
           <Legend states={['active', 'compare', 'sorted']} />
-          <span className="muted">Satırlar özyineleme seviyeleridir (seviye 0 = tüm dizi).</span>
+          <span className="muted">{tx('Satırlar özyineleme seviyeleridir (seviye 0 = tüm dizi).', 'Rows are recursion levels (level 0 = the whole array).')}</span>
         </>
       }
     />
@@ -142,7 +143,7 @@ function MergeView({ arr, toolbar, side }: { arr: number[]; toolbar: ReactNode; 
 }
 
 function MergeTree({ s, n }: { s: MergeSortState; n: number }) {
-  if (n === 0) return <p className="muted">Boş dizi.</p>
+  if (n === 0) return <p className="muted">{tx('Boş dizi.', 'Empty array.')}</p>
   const rows: MSNode[][] = Array.from({ length: s.maxDepth + 1 }, () => [])
   for (const node of s.nodes) rows[node.depth].push(node)
   const cell = 34
@@ -157,7 +158,7 @@ function MergeTree({ s, n }: { s: MergeSortState; n: number }) {
       <div style={{ display: 'grid', gap: 10, minWidth: n * (cell + 6) + 60 }}>
         {rows.map((row, depth) => (
           <div key={depth} style={{ display: 'grid', gridTemplateColumns: `52px repeat(${n}, ${cell}px)`, columnGap: 6, alignItems: 'center' }}>
-            <span className="small muted mono">sv {depth}</span>
+            <span className="small muted mono">{tx('sv', 'lv')} {depth}</span>
             {row.map((node) => {
               const st = statusState(node.status, node.id)
               const waiting = node.status === 'waiting'
@@ -166,7 +167,7 @@ function MergeTree({ s, n }: { s: MergeSortState; n: number }) {
                   key={node.id}
                   className={`cell box st-${st}`}
                   style={{ gridColumn: `${node.lo + 2} / ${node.hi + 2}`, opacity: waiting ? 0.45 : 1, minWidth: 0 }}
-                  aria-label={`Seviye ${depth}, A[${node.lo}:${node.hi}] = [${node.values.join(', ')}], ${node.status}`}
+                  aria-label={`${tx('Seviye', 'Level')} ${depth}, A[${node.lo}:${node.hi}] = [${node.values.join(', ')}], ${node.status}`}
                 >
                   <div className="bar" style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', height: 34 }}>
                     {node.values.map((v, i) => (
@@ -190,7 +191,7 @@ function MergeTree({ s, n }: { s: MergeSortState; n: number }) {
             <span className="mono small" style={{ width: 22 }}>
               S
             </span>
-            <ArrayView bars={false} label="Birleştirilmiş çıktı S" cells={s.merge.S.map((v, i) => ({ value: v, state: i === s.merge!.S.length - 1 && s.merge!.took ? 'active' : 'sorted' }))} />
+            <ArrayView bars={false} label={tx('Birleştirilmiş çıktı S', 'Merged output S')} cells={s.merge.S.map((v, i) => ({ value: v, state: i === s.merge!.S.length - 1 && s.merge!.took ? 'active' : 'sorted' }))} />
           </div>
         </div>
       )}
@@ -206,7 +207,7 @@ function MergeRow({ name, values, ptr, took }: { name: string; values: number[];
       </span>
       <ArrayView
         bars={false}
-        label={`${name} listesi`}
+        label={tx(`${name} listesi`, `list ${name}`)}
         cells={values.map((v, i) => ({
           value: v,
           state: i < ptr ? (i === ptr - 1 && took ? 'active' : 'elim') : i === ptr ? 'compare' : 'none',

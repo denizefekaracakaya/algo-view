@@ -429,6 +429,16 @@ textarea.input {
 .topbar .spacer {
   flex: 1;
 }
+.lang-switch {
+  flex: none;
+  flex-wrap: nowrap;
+}
+.lang-switch button {
+  padding: 4px 9px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
 .page {
   max-width: 1360px;
   margin: 0 auto;
@@ -1286,9 +1296,15 @@ table.data tr.hl td {
   .topnav {
     margin-left: 0;
   }
+  .topbar-inner {
+    gap: 6px;
+  }
   .topnav a {
-    padding: 6px 7px;
-    font-size: 0.86rem;
+    padding: 6px 6px;
+    font-size: 0.84rem;
+  }
+  .lang-switch button {
+    padding: 4px 7px;
   }
   .brand span.brand-text {
     display: none;

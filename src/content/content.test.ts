@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { ALL_LESSONS, LECTURES } from './curriculum'
+import { LECTURES_BY_LANG } from './curriculum'
+import type { Lesson } from './types'
 import { VIZ } from '../viz/registry'
 import { multiply } from '../engines/karatsuba'
 import { insertionSortComparisons } from '../engines/insertionSort'
@@ -10,7 +11,9 @@ import { substitution } from '../engines/recurrence'
 import { log2Factorial } from '../engines/decisionTree'
 import { radixSort } from '../engines/bucketSort'
 
-describe('curriculum integrity', () => {
+describe.each(['tr', 'en'] as const)('curriculum integrity (%s)', (lang) => {
+  const LECTURES = LECTURES_BY_LANG[lang]
+  const ALL_LESSONS = LECTURES.flatMap((l) => l.lessons)
   it('covers exactly lectures 1–7 in order', () => {
     expect(LECTURES.map((l) => l.n)).toEqual([1, 2, 3, 4, 5, 6, 7])
   })
@@ -50,6 +53,31 @@ describe('curriculum integrity', () => {
   })
   it('no out-of-scope topics leak into lesson titles', () => {
     for (const l of ALL_LESSONS) expect(l.title + l.titleEn).not.toMatch(/hash|dijkstra|dynamic programming|greedy|BFS|DFS/i)
+  })
+})
+
+describe('English content mirrors the Turkish content', () => {
+  const tr = LECTURES_BY_LANG.tr.flatMap((l) => l.lessons)
+  const en = LECTURES_BY_LANG.en.flatMap((l) => l.lessons)
+  const shape = (l: Lesson) => ({
+    id: l.id,
+    lecture: l.lecture,
+    minutes: l.minutes,
+    objectives: l.objectives.length,
+    prerequisites: l.prerequisites.length,
+    sections: l.sections.map((s) => [s.kind, s.viz ?? null, s.box ?? null, s.label ?? null, s.code?.join('|') ?? null, s.proof?.length ?? 0, !!s.body]),
+    quiz: l.quiz.map((q) => [q.id, q.kind, q.kind === 'mcq' ? [q.answer, q.options.length, Object.keys(q.feedback ?? {})] : q.kind === 'numeric' ? [q.answer, q.tolerance ?? null] : q.items.length]),
+    practice: l.practice.map((p) => [p.id, p.hints.length]),
+    sources: l.sources.map((s) => s.url),
+  })
+  it('same lessons, sections, visualizers, answers and sources in both languages', () => {
+    expect(en.map(shape)).toEqual(tr.map(shape))
+    expect(LECTURES_BY_LANG.en.map((l) => [l.n, l.lessons.length])).toEqual(LECTURES_BY_LANG.tr.map((l) => [l.n, l.lessons.length]))
+  })
+  it('English content contains no Turkish-specific letters', () => {
+    // Source labels carry both languages; proper names like Schönhage are fine.
+    const text = JSON.stringify(LECTURES_BY_LANG.en, (k, v) => (k === 'label' ? undefined : v)).replace(/Schönhage/g, '')
+    expect(text.match(/\S*[çğışöüÇĞİŞÖÜ]\S*/g) ?? []).toEqual([])
   })
 })
 

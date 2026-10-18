@@ -5,12 +5,13 @@ import { TraceViewer } from '../components/TraceViewer'
 import { CHOOSE_PIVOT_MOM_CODE, SELECT_CODE, selectTrace, validateK, type PivotStrategy, type SelectRole, type SelectState } from '../engines/select'
 import { makeRng, randomPermutation } from '../engines/random'
 import { Pseudocode } from '../components/Pseudocode'
+import { tx } from '../i18n/lang'
 
-const PRESETS = [
-  { label: 'Örnek', values: [9, 3, 15, 1, 12, 7, 4, 11, 6, 2, 14, 8] },
-  { label: 'Sıralı (ilk-eleman kötü)', values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
-  { label: 'Tekrarlı', values: [5, 2, 5, 9, 1, 5, 7, 2] },
-  { label: '25 eleman', values: [23, 7, 18, 2, 25, 11, 14, 5, 20, 9, 1, 16, 12, 22, 4, 19, 8, 24, 13, 3, 17, 6, 21, 10, 15] },
+const presets = () => [
+  { label: tx('Örnek', 'Example'), values: [9, 3, 15, 1, 12, 7, 4, 11, 6, 2, 14, 8] },
+  { label: tx('Sıralı (ilk-eleman kötü)', 'Sorted (bad for first-element)'), values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+  { label: tx('Tekrarlı', 'Duplicates'), values: [5, 2, 5, 9, 1, 5, 7, 2] },
+  { label: tx('25 eleman', '25 elements'), values: [23, 7, 18, 2, 25, 11, 14, 5, 20, 9, 1, 16, 12, 22, 4, 19, 8, 24, 13, 3, 17, 6, 21, 10, 15] },
 ]
 
 const ROLE_STATE: Record<SelectRole, CellState> = {
@@ -24,7 +25,7 @@ const ROLE_STATE: Record<SelectRole, CellState> = {
 }
 
 export function SelectViz() {
-  const [arr, setArr] = useState(PRESETS[0].values)
+  const [arr, setArr] = useState(presets()[0].values)
   const [k, setK] = useState(6)
   const [kText, setKText] = useState('6')
   const [strategy, setStrategy] = useState<PivotStrategy>('random')
@@ -45,10 +46,10 @@ export function SelectViz() {
             setKText(String(nk))
           }
         }}
-        presets={PRESETS}
+        presets={presets()}
         options={{ minLength: 1, maxLength: 30, min: -99, max: 99 }}
         random={() => randomPermutation(makeRng(Date.now() % 100000), 12 + Math.floor(Math.random() * 10))}
-        hint="1–30 tam sayı. Tekrarlı değerler desteklenir (A= kümesi)."
+        hint={tx('1–30 tam sayı. Tekrarlı değerler desteklenir (A= kümesi).', '1–30 integers. Repeated values are supported (the set A=).')}
       />
       <form
         className="row"
@@ -61,33 +62,33 @@ export function SelectViz() {
         }}
       >
         <label className="field">
-          k (1 tabanlı)
+          {tx('k (1 tabanlı)', 'k (1-based)')}
           <input className="input mono" style={{ width: 70 }} value={kText} onChange={(e) => setKText(e.target.value)} aria-invalid={!!kErr} inputMode="numeric" />
         </label>
         <button className="btn" type="submit" style={{ alignSelf: 'flex-end' }}>
-          Ayarla
+          {tx('Ayarla', 'Set')}
         </button>
         <button className="btn sm" type="button" style={{ alignSelf: 'flex-end' }} onClick={() => { const m = Math.ceil(arr.length / 2); setK(m); setKText(String(m)); setKErr(null) }}>
-          Medyan
+          {tx('Medyan', 'Median')}
         </button>
       </form>
       <div className="field">
         ChoosePivot
-        <div className="seg" role="group" aria-label="Pivot stratejisi">
+        <div className="seg" role="group" aria-label={tx('Pivot stratejisi', 'Pivot strategy')}>
           <button aria-pressed={strategy === 'first'} onClick={() => setStrategy('first')}>
-            İlk eleman
+            {tx('İlk eleman', 'First element')}
           </button>
           <button aria-pressed={strategy === 'random'} onClick={() => setStrategy('random')}>
-            Rastgele
+            {tx('Rastgele', 'Random')}
           </button>
           <button aria-pressed={strategy === 'mom'} onClick={() => setStrategy('mom')}>
-            Medyanların medyanı
+            {tx('Medyanların medyanı', 'Median of medians')}
           </button>
         </div>
       </div>
       {strategy === 'random' && (
         <label className="field">
-          Tohum (seed)
+          {tx('Tohum (seed)', 'Seed')}
           <input className="input mono" style={{ width: 90 }} type="number" value={seed} onChange={(e) => setSeed(Math.floor(Number(e.target.value) || 0))} />
         </label>
       )}
@@ -104,11 +105,11 @@ export function SelectViz() {
     <TraceViewer
       key={arr.join(',') + effectiveK + strategy + seed}
       trace={trace}
-      label="Select görselleştirmesi"
+      label={tx('Select görselleştirmesi', 'Select visualization')}
       toolbar={toolbar}
       code={SELECT_CODE}
       render={(step) => <SelectStage s={step.state} />}
-      side={() => (strategy === 'mom' ? <details><summary className="small">ChoosePivot (medyanların medyanı)</summary><Pseudocode lines={CHOOSE_PIVOT_MOM_CODE} /></details> : null)}
+      side={() => (strategy === 'mom' ? <details><summary className="small">{tx('ChoosePivot (medyanların medyanı)', 'ChoosePivot (median of medians)')}</summary><Pseudocode lines={CHOOSE_PIVOT_MOM_CODE} /></details> : null)}
       legend={<Legend states={['active', 'pivot', 'less', 'greater', 'elim', 'found']} />}
     />
   )
@@ -124,9 +125,9 @@ function SelectStage({ s }: { s: SelectState }) {
   return (
     <div className="stack">
       <div className="row small">
-        <span className="badge accent">aranan sıra k = {s.k}</span>
-        <span className="badge">aday sayısı {s.current.length}</span>
-        <span className="badge">derinlik {s.depth}</span>
+        <span className="badge accent">{tx('aranan sıra', 'target rank')} k = {s.k}</span>
+        <span className="badge">{tx('aday sayısı', 'candidates')} {s.current.length}</span>
+        <span className="badge">{tx('derinlik', 'depth')} {s.depth}</span>
         {s.sizes && (
           <span className="badge">
             |A&lt;| = {s.sizes.less}, |A=| = {s.sizes.equal}, |A&gt;| = {s.sizes.greater}
@@ -134,15 +135,15 @@ function SelectStage({ s }: { s: SelectState }) {
         )}
       </div>
       <div>
-        <span className="label-tag">Orijinal dizi (konumlar korunur)</span>
-        <ArrayView cells={cells} label="Select dizi durumu" />
+        <span className="label-tag">{tx('Orijinal dizi (konumlar korunur)', 'Original array (positions preserved)')}</span>
+        <ArrayView cells={cells} label={tx('Select dizi durumu', 'Select array state')} />
       </div>
       {s.groups && (
         <div>
-          <span className="label-tag">5’li gruplar (sıralanmış) ve medyanları</span>
+          <span className="label-tag">{tx('5’li gruplar (sıralanmış) ve medyanları', 'Groups of 5 (sorted) and their medians')}</span>
           <div className="row" style={{ alignItems: 'flex-start', gap: 14 }}>
             {s.groups.map((g, gi) => (
-              <div key={gi} style={{ display: 'flex', flexDirection: 'column', gap: 3 }} aria-label={`Grup ${gi + 1}`}>
+              <div key={gi} style={{ display: 'flex', flexDirection: 'column', gap: 3 }} aria-label={`${tx('Grup', 'Group')} ${gi + 1}`}>
                 {g.map((id) => {
                   const isMed = s.medianIds?.includes(id)
                   const isP = s.pivotId === id
@@ -170,7 +171,7 @@ function SelectStage({ s }: { s: SelectState }) {
         </div>
       )}
       <details className="small muted">
-        <summary>Kontrol: dizinin sıralı hâli (cevabı gösterir)</summary>
+        <summary>{tx('Kontrol: dizinin sıralı hâli (cevabı gösterir)', 'Check: the sorted array (reveals the answer)')}</summary>
         <span className="mono">{sorted.join(' ')}</span>
       </details>
     </div>

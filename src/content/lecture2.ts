@@ -28,7 +28,7 @@ export const lecture2: Lecture = {
         {
           kind: 'intuition',
           title: 'Sezgi',
-          label: 'Sezgi',
+          label: 'intuition',
           body: `Elinizdeki iskambil kartlarını sıralar gibi: soldaki kartlar zaten sıralı; sağdan yeni bir kart alıp (\`current\`) solundaki daha büyük kartları birer sağa kaydırarak doğru yere yerleştirirsiniz. Her turda sıralı bölge bir büyür.`,
         },
         {
@@ -45,7 +45,7 @@ export const lecture2: Lecture = {
         {
           kind: 'correctness',
           title: 'Doğruluk: döngü değişmezi',
-          label: 'Biçimsel kanıt',
+          label: 'formalProof',
           body: `**Değişmez (inductive hypothesis):** $i$. iterasyondan sonra $A[:i+1]$ sıralıdır. Kanıtı adım adım açın; her adımı görmeden önce ne olması gerektiğini düşünün.`,
           proof: [
             { title: 'Taban durumu (i = 0)', body: 'Döngüye girmeden önce $A[:1]$ tek elemanlıdır; tek elemanlı her liste sıralıdır.' },
@@ -141,7 +141,7 @@ export const lecture2: Lecture = {
         {
           kind: 'intuition',
           title: 'Sezgi',
-          label: 'Sezgi',
+          label: 'intuition',
           body: `Diziyi ikiye bölün, iki yarıyı (sihirli bir şekilde, özyinelemeyle) sıralayın, sonra iki sıralı yarıyı fermuar gibi birleştirin. Birleştirme kolaydır: iki listenin önündeki elemanlardan küçük olanı alırsınız.
 
 Kötümser bakış: her seviyede çağrı sayısı ikiye katlanıyor. İyimser bakış: her seviyede alt problem boyutu yarıya iniyor. Notların dediği gibi, “bugün iyimserler kazanıyor”.`,
@@ -161,7 +161,7 @@ Kötümser bakış: her seviyede çağrı sayısı ikiye katlanıyor. İyimser b
         {
           kind: 'correctness',
           title: 'Doğruluk: özyineleme değişmezi',
-          label: 'Kanıt fikri',
+          label: 'proofIdea',
           proof: [
             { title: 'Hipotez', body: '“MergeSort, uzunluğu $< i$ olan her girdi için sıralı bir dizi döndürür.”' },
             { title: 'Taban durumu', body: 'Uzunluğu 0 ya da 1 olan dizi zaten sıralıdır ve aynen döndürülür.' },
@@ -172,7 +172,7 @@ Kötümser bakış: her seviyede çağrı sayısı ikiye katlanıyor. İyimser b
         {
           kind: 'complexity',
           title: 'Çalışma süresi: özyineleme ağacı',
-          label: 'Biçimsel kanıt',
+          label: 'formalProof',
           body: `$n$’nin 2’nin kuvveti olduğunu varsayalım (notlardaki gerekçe: diziyi en yakın 2’nin kuvvetine $\\infty$ ile tamamlamak boyutu en fazla iki katına çıkarır). Boyutu $m$ olan bir çağrı en fazla $11m$ işlem yapar (taban kontrolü, kopyalama, Merge).
 
 - Seviye $t$’de $2^t$ alt problem var, her biri $n/2^t$ boyutunda.
@@ -260,7 +260,7 @@ Bu bir **en kötü durum** sınırıdır: girdinin ne olduğuna bakılmaksızın
         {
           kind: 'intuition',
           title: 'En kötü durum analizi',
-          label: 'Sezgi',
+          label: 'intuition',
           body: `Bir rakiple oyun oynadığımızı düşünün: biz bir algoritma ve bir süre sınırı $T(n)$ söyleriz; rakip, algoritmamızı en çok yavaşlatacak $n$ boyutlu girdiyi seçer. Rakip ne seçerse seçsin süre $T(n)$’yi aşmıyorsa kazanırız. Bu, **her girdi için** geçerli, çok güçlü bir garantidir.
 
 Ortalama durum analizi (girdiler üzerinde bir dağılım varsayar) daha zordur ve girdiye dair güçlü varsayımlar ister; bu ders ağırlıklı olarak en kötü durumla çalışır.`,
@@ -269,7 +269,7 @@ Ortalama durum analizi (girdiler üzerinde bir dağılım varsayar) daha zordur 
           kind: 'formal',
           title: 'Asimptotik gösterim (Ders 2 notları)',
           box: 'formal',
-          label: 'Biçimsel',
+          label: 'formal',
           body: `$T(n)$ ve $f(n)$ negatif olmayan fonksiyonlar olsun.
 
 $$T(n) = O(f(n)) \\iff \\exists\\, c > 0,\\ n_0 \\ \\text{öyle ki}\\ \\forall n \\ge n_0:\\ 0 \\le T(n) \\le c\\,f(n)$$
@@ -293,7 +293,7 @@ Sezgisel olarak: O bir **üst sınır**, Ω bir **alt sınır**, Θ ise **sıkı
         {
           kind: 'correctness',
           title: 'İki örnek kanıt (notlardaki iddialar)',
-          label: 'Biçimsel kanıt',
+          label: 'formalProof',
           proof: [
             {
               title: 'İddia: derecesi $k$ olan polinomlar $O(n^k)$’dir',

@@ -1,4 +1,5 @@
 import type { Trace } from '../trace/types'
+import { tx } from '../i18n/lang'
 
 /**
  * Divide-and-conquer integer multiplication from Lecture 1 (and its recurrence analysis in Lecture 3).
@@ -92,7 +93,7 @@ export function multiplyTrace(xIn: bigint, yIn: bigint, algo: MultAlgo): Trace<M
       line,
       explain,
       vars,
-      counters: { 'tek basamaklı çarpma': ops, 'çağrı': calls },
+      counters: { [tx('tek basamaklı çarpma', 'one-digit products')]: ops, [tx('çağrı', 'calls')]: calls },
     })
   const set = (id: string, p: Partial<MultNode>) => nodes.set(id, { ...nodes.get(id)!, ...p })
 
@@ -104,7 +105,7 @@ export function multiplyTrace(xIn: bigint, yIn: bigint, algo: MultAlgo): Trace<M
       ops++
       const r = x * y
       set(id, { status: 'base', result: r.toString() })
-      push(id, 2, `Taban durumu: ${x} ve ${y} tek basamaklı. Doğrudan ${x}·${y} = ${r} hesaplanır (1 tek basamaklı çarpma).`)
+      push(id, 2, tx(`Taban durumu: ${x} ve ${y} tek basamaklı. Doğrudan ${x}·${y} = ${r} hesaplanır (1 tek basamaklı çarpma).`, `Base case: ${x} and ${y} are one-digit. ${x}·${y} = ${r} is computed directly (1 one-digit multiplication).`))
       set(id, { status: 'done' })
       return r
     }
@@ -119,7 +120,7 @@ export function multiplyTrace(xIn: bigint, yIn: bigint, algo: MultAlgo): Trace<M
     push(
       id,
       3,
-      `${x} × ${y}: n = ${n} basamak, m = ⌊n/2⌋ = ${m}. x = 10^${m}·${a} + ${b}, y = 10^${m}·${c} + ${d}.`,
+      tx(`${x} × ${y}: n = ${n} basamak, m = ⌊n/2⌋ = ${m}. x = 10^${m}·${a} + ${b}, y = 10^${m}·${c} + ${d}.`, `${x} × ${y}: n = ${n} digits, m = ⌊n/2⌋ = ${m}. x = 10^${m}·${a} + ${b}, y = 10^${m}·${c} + ${d}.`),
       { n, m, a: a.toString(), b: b.toString(), c: c.toString(), d: d.toString() },
     )
     let result: bigint
@@ -130,7 +131,7 @@ export function multiplyTrace(xIn: bigint, yIn: bigint, algo: MultAlgo): Trace<M
       const z4 = rec(b, d, id + '4', id, depth + 1, 'z4 = bd')
       result = z1 * P * P + (z2 + z3) * P + z4
       set(id, { status: 'done', result: result.toString() })
-      push(id, 8, `Dört alt çarpım hazır: ac = ${z1}, ad = ${z2}, bc = ${z3}, bd = ${z4}. Sonuç = ${z1}·10^${2 * m} + (${z2} + ${z3})·10^${m} + ${z4} = ${result}.`)
+      push(id, 8, tx(`Dört alt çarpım hazır: ac = ${z1}, ad = ${z2}, bc = ${z3}, bd = ${z4}. Sonuç = ${z1}·10^${2 * m} + (${z2} + ${z3})·10^${m} + ${z4} = ${result}.`, `All four sub-products are ready: ac = ${z1}, ad = ${z2}, bc = ${z3}, bd = ${z4}. Result = ${z1}·10^${2 * m} + (${z2} + ${z3})·10^${m} + ${z4} = ${result}.`))
     } else {
       const z1 = rec(a, c, id + '1', id, depth + 1, 'z1 = ac')
       const z2 = rec(b, d, id + '2', id, depth + 1, 'z2 = bd')
@@ -141,12 +142,12 @@ export function multiplyTrace(xIn: bigint, yIn: bigint, algo: MultAlgo): Trace<M
       push(
         id,
         8,
-        `Yalnızca üç alt çarpım: z1 = ${z1}, z2 = ${z2}, z3 = ${z3}. ad + bc = z3 − z1 − z2 = ${z4} (toplama/çıkarma ucuzdur). Sonuç = ${z1}·10^${2 * m} + ${z4}·10^${m} + ${z2} = ${result}.`,
+        tx(`Yalnızca üç alt çarpım: z1 = ${z1}, z2 = ${z2}, z3 = ${z3}. ad + bc = z3 − z1 − z2 = ${z4} (toplama/çıkarma ucuzdur). Sonuç = ${z1}·10^${2 * m} + ${z4}·10^${m} + ${z2} = ${result}.`, `Only three sub-products: z1 = ${z1}, z2 = ${z2}, z3 = ${z3}. ad + bc = z3 − z1 − z2 = ${z4} (addition/subtraction is cheap). Result = ${z1}·10^${2 * m} + ${z4}·10^${m} + ${z2} = ${result}.`),
       )
     }
     return result
   }
-  const product = rec(xIn, yIn, 'r', null, 0, 'kök')
-  push(null, 8, `Bitti: ${xIn} × ${yIn} = ${product}. ${ops} tek basamaklı çarpma, ${calls} özyinelemeli çağrı. Okul yöntemi ${gradeSchoolOps(xIn, yIn)} çarpma yapardı.`)
+  const product = rec(xIn, yIn, 'r', null, 0, tx('kök', 'root'))
+  push(null, 8, tx(`Bitti: ${xIn} × ${yIn} = ${product}. ${ops} tek basamaklı çarpma, ${calls} özyinelemeli çağrı. Okul yöntemi ${gradeSchoolOps(xIn, yIn)} çarpma yapardı.`, `Done: ${xIn} × ${yIn} = ${product}. ${ops} one-digit multiplications, ${calls} recursive calls. The grade-school method would make ${gradeSchoolOps(xIn, yIn)} multiplications.`))
   return trace
 }

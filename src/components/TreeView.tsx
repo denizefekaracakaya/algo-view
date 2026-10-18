@@ -1,5 +1,6 @@
 import type { TNode } from '../engines/tree'
 import type { NodeRole } from '../engines/bst'
+import { tx } from '../i18n/lang'
 
 interface Laid {
   key: number
@@ -23,15 +24,16 @@ function layoutTree(root: TNode | null): Laid[] {
   return out
 }
 
-const ROLE_TEXT: Record<NodeRole, string> = {
-  current: 'şu anki düğüm',
-  path: 'arama yolu',
-  found: 'bulundu',
-  new: 'yeni',
-  removed: 'silinecek',
-  successor: 'ardıl',
-  focus: 'odak',
-}
+const roleText = (r: NodeRole): string =>
+  ({
+    current: tx('şu anki düğüm', 'current node'),
+    path: tx('arama yolu', 'search path'),
+    found: tx('bulundu', 'found'),
+    new: tx('yeni', 'new'),
+    removed: tx('silinecek', 'to be removed'),
+    successor: tx('ardıl', 'successor'),
+    focus: tx('odak', 'focus'),
+  })[r]
 
 interface Props {
   root: TNode | null
@@ -46,7 +48,7 @@ interface Props {
 
 export function TreeView({ root, roles = {}, labels = {}, bad = [], label, onNodeClick, probe, minWidth = 320 }: Props) {
   const nodes = layoutTree(root)
-  if (!root) return <p className="muted">Ağaç boş.</p>
+  if (!root) return <p className="muted">{tx('Ağaç boş.', 'The tree is empty.')}</p>
   const gx = 44
   const gy = 58
   const r = 16
@@ -58,7 +60,7 @@ export function TreeView({ root, roles = {}, labels = {}, bad = [], label, onNod
   const pos = new Map(nodes.map((n) => [n.key, { x: offset + n.x * gx, y: pad + n.y * gy }]))
   const badSet = new Set(bad)
   const desc = (n: Laid) =>
-    `${n.key}${n.node.color ? (n.node.color === 'R' ? ', kırmızı' : ', siyah') : ''}${roles[n.key] ? ', ' + ROLE_TEXT[roles[n.key]] : ''}${labels[n.key] ? ', ' + labels[n.key] : ''}${badSet.has(n.key) ? ', ihlal' : ''}`
+    `${n.key}${n.node.color ? (n.node.color === 'R' ? tx(', kırmızı', ', red') : tx(', siyah', ', black')) : ''}${roles[n.key] ? ', ' + roleText(roles[n.key]) : ''}${labels[n.key] ? ', ' + labels[n.key] : ''}${badSet.has(n.key) ? tx(', ihlal', ', violation') : ''}`
   return (
     <svg className="tree-svg" viewBox={`0 0 ${width} ${height}`} width={width} role="img" aria-label={`${label}: ${nodes.map(desc).join('; ')}`}>
       {nodes.map((n) => {
@@ -81,7 +83,7 @@ export function TreeView({ root, roles = {}, labels = {}, bad = [], label, onNod
             onKeyDown={onNodeClick ? (e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), onNodeClick(n.key)) : undefined}
             tabIndex={onNodeClick ? 0 : undefined}
             role={onNodeClick ? 'button' : undefined}
-            aria-label={onNodeClick ? `Düğüm ${desc(n)}; rengini değiştir` : undefined}
+            aria-label={onNodeClick ? tx(`Düğüm ${desc(n)}; rengini değiştir`, `Node ${desc(n)}; toggle its color`) : undefined}
           >
             <circle className="ring" r={r + 5} />
             <circle r={r} />

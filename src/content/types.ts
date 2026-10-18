@@ -42,6 +42,7 @@ export type SourceKind = 'notes' | 'slides' | 'pre' | 'notebook' | 'concept' | '
 
 export interface SourceRef {
   label: string
+  labelEn: string
   url: string
   kind: SourceKind
 }
@@ -71,7 +72,7 @@ export interface Section {
   /** For proofs: steps revealed one by one. */
   proof?: { title: string; body: string }[]
   /** Marks content as intuitive vs. formal so the two are never confused. */
-  label?: 'Sezgi' | 'Biçimsel' | 'Kanıt fikri' | 'Biçimsel kanıt'
+  label?: 'intuition' | 'formal' | 'proofIdea' | 'formalProof'
 }
 
 export interface Lesson {

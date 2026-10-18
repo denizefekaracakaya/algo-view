@@ -12,6 +12,8 @@ import { insertionSortTrace } from './engines/insertionSort'
 import { LessonPage } from './pages/LessonPage'
 import { Dashboard } from './pages/Dashboard'
 import type { Question } from './content/types'
+import App from './App'
+import { setCurrentLang } from './i18n/lang'
 
 describe('player reducer', () => {
   const s0 = { index: 0, length: 5, playing: false }
@@ -235,5 +237,31 @@ describe('pages', () => {
     )
     expect(screen.getAllByLabelText('tamamlandı').length).toBe(1)
     expect(screen.getByRole('link', { name: /Kaldığın yerden devam et/ })).toHaveAttribute('href', '/ders/l1-karatsuba')
+  })
+})
+
+describe('language and theme switches', () => {
+  it('switches the whole UI and lesson content to English and back, and persists the choice', async () => {
+    const user = userEvent.setup()
+    window.location.hash = '#/ders/l3-master'
+    render(<App />)
+    expect(await screen.findByRole('heading', { level: 1, name: /Özyineleme ağaçları ve Master Teoremi/ })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'EN' }))
+    expect(await screen.findByRole('heading', { level: 1, name: /Recursion trees and the Master Theorem/ })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Settings' })).toBeInTheDocument()
+    expect(document.documentElement.lang).toBe('en')
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).prefs.lang).toBe('en')
+    await user.click(screen.getByRole('button', { name: 'TR' }))
+    expect(await screen.findByRole('link', { name: 'Ayarlar' })).toBeInTheDocument()
+    setCurrentLang('tr')
+    window.location.hash = ''
+  })
+  it('theme button toggles between light and dark', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByRole('button', { name: 'Karanlık moda geç' }))
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
+    await user.click(screen.getByRole('button', { name: 'Açık moda geç' }))
+    expect(document.documentElement.getAttribute('data-theme')).toBe('light')
   })
 })

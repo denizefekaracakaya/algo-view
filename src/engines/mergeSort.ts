@@ -1,4 +1,5 @@
 import type { Trace, TraceStep } from '../trace/types'
+import { tx } from '../i18n/lang'
 
 /**
  * MergeSort as in the Lecture 2 notes (Python slicing, n/2 = floor). The notes' Merge
@@ -120,13 +121,13 @@ export function mergeSortTrace(input: readonly number[]): Trace<MergeSortState> 
     trace.push({
       ...step,
       state: { nodes: snapshot(), merge: merge ? { ...merge, L: [...merge.L], R: [...merge.R], S: [...merge.S] } : null, activeId, maxDepth },
-      counters: { 'karşılaştırma': comparisons },
+      counters: { [tx('karşılaştırma', 'comparisons')]: comparisons },
     })
   }
   const set = (id: string, patch: Partial<MSNode>) => nodes.set(id, { ...nodes.get(id)!, ...patch })
 
   if (input.length === 0) {
-    trace.push({ state: { nodes: [], merge: null, activeId: null, maxDepth: 0 }, line: 3, explain: 'Boş dizi: n = 0 ≤ 1, hemen döndürülür.' })
+    trace.push({ state: { nodes: [], merge: null, activeId: null, maxDepth: 0 }, line: 3, explain: tx('Boş dizi: n = 0 ≤ 1, hemen döndürülür.', 'Empty array: n = 0 ≤ 1, returned immediately.') })
     return trace
   }
 
@@ -136,7 +137,7 @@ export function mergeSortTrace(input: readonly number[]): Trace<MergeSortState> 
     set(id, { status: 'active' })
     if (n <= 1) {
       set(id, { status: 'base' })
-      push({ line: 3, phase: 'Taban durumu', explain: `[${node.values.join(', ')}] dizisinin uzunluğu ${n} ≤ 1: zaten sıralı, olduğu gibi döndürülür.`, vars: { n } }, null, id)
+      push({ line: 3, phase: tx('Taban durumu', 'Base case'), explain: tx(`[${node.values.join(', ')}] dizisinin uzunluğu ${n} ≤ 1: zaten sıralı, olduğu gibi döndürülür.`, `[${node.values.join(', ')}] has length ${n} ≤ 1: already sorted, returned as is.`), vars: { n } }, null, id)
       set(id, { status: 'done' })
       return [...node.values]
     }
@@ -145,19 +146,19 @@ export function mergeSortTrace(input: readonly number[]): Trace<MergeSortState> 
     push(
       {
         line: 4,
-        phase: 'Bölme',
-        explain: `n = ${n}: dizi A[:${mid}] = [${node.values.slice(0, mid).join(', ')}] ve A[${mid}:] = [${node.values.slice(mid).join(', ')}] olarak ikiye bölünür; önce sol yarı özyinelemeli olarak sıralanır.`,
+        phase: tx('Bölme', 'Split'),
+        explain: tx(`n = ${n}: dizi A[:${mid}] = [${node.values.slice(0, mid).join(', ')}] ve A[${mid}:] = [${node.values.slice(mid).join(', ')}] olarak ikiye bölünür; önce sol yarı özyinelemeli olarak sıralanır.`, `n = ${n}: the array is split into A[:${mid}] = [${node.values.slice(0, mid).join(', ')}] and A[${mid}:] = [${node.values.slice(mid).join(', ')}]; the left half is sorted recursively first.`),
         vars: { n, 'n//2': mid },
       },
       null,
       id,
     )
     const L = rec(id + 'L')
-    push({ line: 5, phase: 'Bölme', explain: `Sol yarı sıralandı: L = [${L.join(', ')}]. Şimdi sağ yarı özyinelemeli olarak sıralanıyor.`, vars: { n } }, null, id)
+    push({ line: 5, phase: tx('Bölme', 'Split'), explain: tx(`Sol yarı sıralandı: L = [${L.join(', ')}]. Şimdi sağ yarı özyinelemeli olarak sıralanıyor.`, `Left half sorted: L = [${L.join(', ')}]. Now the right half is sorted recursively.`), vars: { n } }, null, id)
     const R = rec(id + 'R')
     set(id, { status: 'merging' })
     const mv: MergeView = { nodeId: id, L, R, i: 0, j: 0, S: [] }
-    push({ line: 9, phase: 'Birleştirme', explain: `İki sıralı yarı hazır: L = [${L.join(', ')}], R = [${R.join(', ')}]. Merge, her adımda iki listenin önündeki en küçük elemanı S'e ekler.`, vars: { i: 0, j: 0 } }, mv, id)
+    push({ line: 9, phase: tx('Birleştirme', 'Merge'), explain: tx(`İki sıralı yarı hazır: L = [${L.join(', ')}], R = [${R.join(', ')}]. Merge, her adımda iki listenin önündeki en küçük elemanı S'e ekler.`, `Both sorted halves are ready: L = [${L.join(', ')}], R = [${R.join(', ')}]. At each step Merge appends the smaller of the two front elements to S.`), vars: { i: 0, j: 0 } }, mv, id)
     for (let k = 0; k < L.length + R.length; k++) {
       const i = mv.i
       const j = mv.j
@@ -166,23 +167,23 @@ export function mergeSortTrace(input: readonly number[]): Trace<MergeSortState> 
       let predict: TraceStep<MergeSortState>['predict']
       if (j === R.length) {
         takeL = true
-        explain = `R tükendi (j = ${j} = len(R)); kalan L[${i}] = ${L[i]} doğrudan S'e eklenir.`
+        explain = tx(`R tükendi (j = ${j} = len(R)); kalan L[${i}] = ${L[i]} doğrudan S'e eklenir.`, `R is exhausted (j = ${j} = len(R)); the remaining L[${i}] = ${L[i]} is appended to S directly.`)
       } else if (i === L.length) {
         takeL = false
-        explain = `L tükendi (i = ${i} = len(L)); kalan R[${j}] = ${R[j]} doğrudan S'e eklenir.`
+        explain = tx(`L tükendi (i = ${i} = len(L)); kalan R[${j}] = ${R[j]} doğrudan S'e eklenir.`, `L is exhausted (i = ${i} = len(L)); the remaining R[${j}] = ${R[j]} is appended to S directly.`)
       } else {
         comparisons++
         takeL = L[i] <= R[j]
         explain = takeL
-          ? `L[${i}] = ${L[i]} ≤ R[${j}] = ${R[j]}: daha küçük (veya eşit) olan L[${i}] S'e eklenir.`
-          : `L[${i}] = ${L[i]} > R[${j}] = ${R[j]}: daha küçük olan R[${j}] S'e eklenir.`
+          ? tx(`L[${i}] = ${L[i]} ≤ R[${j}] = ${R[j]}: daha küçük (veya eşit) olan L[${i}] S'e eklenir.`, `L[${i}] = ${L[i]} ≤ R[${j}] = ${R[j]}: the smaller (or equal) L[${i}] is appended to S.`)
+          : tx(`L[${i}] = ${L[i]} > R[${j}] = ${R[j]}: daha küçük olan R[${j}] S'e eklenir.`, `L[${i}] = ${L[i]} > R[${j}] = ${R[j]}: the smaller R[${j}] is appended to S.`)
         predict = {
-          question: `L[${i}] = ${L[i]} ve R[${j}] = ${R[j]}. S'e sıradaki hangi değer eklenir?`,
+          question: tx(`L[${i}] = ${L[i]} ve R[${j}] = ${R[j]}. S'e sıradaki hangi değer eklenir?`, `L[${i}] = ${L[i]} and R[${j}] = ${R[j]}. Which value is appended to S next?`),
           options: [`L[${i}] = ${L[i]}`, `R[${j}] = ${R[j]}`],
           answer: takeL ? 0 : 1,
           why: takeL
-            ? `${L[i]} ≤ ${R[j]}; iki liste de sıralı olduğundan kalan elemanların en küçüğü L[${i}].${L[i] === R[j] ? ' Eşitlikte L tercih edilir; bu, sıralamayı kararlı (stable) yapar.' : ''}`
-            : `${R[j]} < ${L[i]}; iki liste de sıralı olduğundan kalan elemanların en küçüğü R[${j}].`,
+            ? tx(`${L[i]} ≤ ${R[j]}; iki liste de sıralı olduğundan kalan elemanların en küçüğü L[${i}].${L[i] === R[j] ? ' Eşitlikte L tercih edilir; bu, sıralamayı kararlı (stable) yapar.' : ''}`, `${L[i]} ≤ ${R[j]}; since both lists are sorted, the smallest remaining element is L[${i}].${L[i] === R[j] ? ' On ties L is preferred; this makes the sort stable.' : ''}`)
+            : tx(`${R[j]} < ${L[i]}; iki liste de sıralı olduğundan kalan elemanların en küçüğü R[${j}].`, `${R[j]} < ${L[i]}; since both lists are sorted, the smallest remaining element is R[${j}].`),
         }
       }
       if (takeL) {
@@ -193,13 +194,13 @@ export function mergeSortTrace(input: readonly number[]): Trace<MergeSortState> 
         mv.j++
       }
       mv.took = takeL ? 'L' : 'R'
-      push({ line: takeL ? 12 : 14, phase: 'Birleştirme', explain, vars: { k, i: mv.i, j: mv.j }, predict }, mv, id)
+      push({ line: takeL ? 12 : 14, phase: tx('Birleştirme', 'Merge'), explain, vars: { k, i: mv.i, j: mv.j }, predict }, mv, id)
     }
     set(id, { status: 'done', values: [...mv.S] })
-    push({ line: 15, phase: 'Birleştirme', explain: `Merge tamamlandı: [${mv.S.join(', ')}] sıralı olarak döndürülür. (Özyineleme değişmezi: MergeSort her zaman sıralı bir dizi döndürür.)` }, null, id)
+    push({ line: 15, phase: tx('Birleştirme', 'Merge'), explain: tx(`Merge tamamlandı: [${mv.S.join(', ')}] sıralı olarak döndürülür. (Özyineleme değişmezi: MergeSort her zaman sıralı bir dizi döndürür.)`, `Merge finished: [${mv.S.join(', ')}] is returned sorted. (Recursion invariant: MergeSort always returns a sorted array.)`) }, null, id)
     return mv.S
   }
   const result = rec('r')
-  push({ line: 6, phase: 'Bitti', explain: `Sonuç: [${result.join(', ')}]. Toplam ${comparisons} anahtar karşılaştırması; özyineleme ağacında ${maxDepth + 1} seviye var.` }, null, null)
+  push({ line: 6, phase: tx('Bitti', 'Done'), explain: tx(`Sonuç: [${result.join(', ')}]. Toplam ${comparisons} anahtar karşılaştırması; özyineleme ağacında ${maxDepth + 1} seviye var.`, `Result: [${result.join(', ')}]. ${comparisons} key comparisons in total; the recursion tree has ${maxDepth + 1} levels.`) }, null, null)
   return trace
 }

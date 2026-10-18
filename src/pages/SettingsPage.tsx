@@ -3,6 +3,7 @@ import { Trash2 } from 'lucide-react'
 import { useProgress } from '../state/ProgressContext'
 import type { ThemePref } from '../state/progress'
 import { SPEEDS } from '../trace/player'
+import { tx, type Lang } from '../i18n/lang'
 
 export function SettingsPage() {
   const { progress, dispatch } = useProgress()
@@ -23,59 +24,74 @@ export function SettingsPage() {
 
   return (
     <div className="stack" style={{ maxWidth: 720 }}>
-      <h1>Ayarlar</h1>
+      <h1>{tx('Ayarlar', 'Settings')}</h1>
       <div className="card card-pad stack">
-        <h2>Görünüm ve oynatma</h2>
+        <h2>{tx('Görünüm ve oynatma', 'Appearance and playback')}</h2>
         <label className="field">
-          Tema
-          <select className="input" value={progress.prefs.theme} onChange={(e) => dispatch({ type: 'prefs', prefs: { theme: e.target.value as ThemePref } })}>
-            <option value="system">Sistem ayarını izle</option>
-            <option value="light">Açık</option>
-            <option value="dark">Koyu</option>
+          {tx('Dil', 'Language')}
+          <select className="input" value={progress.prefs.lang} onChange={(e) => dispatch({ type: 'prefs', prefs: { lang: e.target.value as Lang } })}>
+            <option value="tr">Türkçe</option>
+            <option value="en">English</option>
           </select>
         </label>
         <label className="field">
-          Varsayılan oynatma hızı
+          {tx('Tema', 'Theme')}
+          <select className="input" value={progress.prefs.theme} onChange={(e) => dispatch({ type: 'prefs', prefs: { theme: e.target.value as ThemePref } })}>
+            <option value="system">{tx('Sistem ayarını izle', 'Follow system setting')}</option>
+            <option value="light">{tx('Açık', 'Light')}</option>
+            <option value="dark">{tx('Karanlık', 'Dark')}</option>
+          </select>
+        </label>
+        <label className="field">
+          {tx('Varsayılan oynatma hızı', 'Default playback speed')}
           <select className="input" value={progress.prefs.speed} onChange={(e) => dispatch({ type: 'prefs', prefs: { speed: Number(e.target.value) } })}>
             {SPEEDS.map((s) => (
               <option key={s} value={s}>
-                {s} adım/saniye
+                {s} {tx('adım/saniye', 'steps/second')}
               </option>
             ))}
           </select>
         </label>
         <label className="row">
           <input type="checkbox" checked={progress.prefs.predict} onChange={(e) => dispatch({ type: 'prefs', prefs: { predict: e.target.checked } })} />
-          Tahmin modu: önemli adımlardan önce ne olacağını sor
+          {tx('Tahmin modu: önemli adımlardan önce ne olacağını sor', 'Prediction mode: ask what will happen before key steps')}
         </label>
         <p className="small muted" style={{ margin: 0 }}>
-          Sistem “hareketi azalt” ayarı açıksa animasyonlar otomatik olarak kapatılır.
+          {tx('Sistem “hareketi azalt” ayarı açıksa animasyonlar otomatik olarak kapatılır.', 'Animations are turned off automatically when the system “reduce motion” setting is on.')}
         </p>
       </div>
       <div className="card card-pad stack">
-        <h2>Öğrenme ilerlemesi</h2>
+        <h2>{tx('Öğrenme ilerlemesi', 'Learning progress')}</h2>
         <p className="small" style={{ margin: 0 }}>
-          {lessonsTouched} derse girildi, {answered} quiz sorusu denendi. Veriler yalnızca bu tarayıcıda (localStorage) saklanır; hesap ya da sunucu yoktur.
+          {tx(
+            `${lessonsTouched} derse girildi, ${answered} quiz sorusu denendi. Veriler yalnızca bu tarayıcıda (localStorage) saklanır; hesap ya da sunucu yoktur.`,
+            `${lessonsTouched} lessons opened, ${answered} quiz questions attempted. Data is stored only in this browser (localStorage); there is no account or server.`,
+          )}
         </p>
         <div>
           <button className="btn danger" onClick={() => setConfirming(true)}>
-            <Trash2 size={15} aria-hidden /> İlerlemeyi sıfırla
+            <Trash2 size={15} aria-hidden /> {tx('İlerlemeyi sıfırla', 'Reset progress')}
           </button>
         </div>
         {done && (
           <p role="status" className="feedback ok" style={{ margin: 0 }}>
-            İlerleme sıfırlandı.
+            {tx('İlerleme sıfırlandı.', 'Progress has been reset.')}
           </p>
         )}
       </div>
       {confirming && (
         <div className="modal-backdrop" onClick={() => setConfirming(false)}>
           <div className="card card-pad modal" role="alertdialog" aria-modal="true" aria-labelledby="reset-title" aria-describedby="reset-desc" onClick={(e) => e.stopPropagation()}>
-            <h2 id="reset-title">İlerleme sıfırlansın mı?</h2>
-            <p id="reset-desc">Tamamlanan dersler, quiz sonuçları ve son ziyaret edilen ders silinecek. Tema ve oynatma tercihleri korunur. Bu işlem geri alınamaz.</p>
+            <h2 id="reset-title">{tx('İlerleme sıfırlansın mı?', 'Reset progress?')}</h2>
+            <p id="reset-desc">
+              {tx(
+                'Tamamlanan dersler, quiz sonuçları ve son ziyaret edilen ders silinecek. Dil, tema ve oynatma tercihleri korunur. Bu işlem geri alınamaz.',
+                'Completed lessons, quiz results and the last visited lesson will be deleted. Language, theme and playback preferences are kept. This cannot be undone.',
+              )}
+            </p>
             <div className="row" style={{ justifyContent: 'flex-end' }}>
               <button ref={cancelRef} className="btn" onClick={() => setConfirming(false)}>
-                Vazgeç
+                {tx('Vazgeç', 'Cancel')}
               </button>
               <button
                 className="btn danger"
@@ -85,7 +101,7 @@ export function SettingsPage() {
                   setDone(true)
                 }}
               >
-                Evet, sıfırla
+                {tx('Evet, sıfırla', 'Yes, reset')}
               </button>
             </div>
           </div>

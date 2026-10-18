@@ -28,7 +28,7 @@ export const lecture4: Lecture = {
         {
           kind: 'intuition',
           title: 'Sezgi: sırasız dizide ikili arama',
-          label: 'Sezgi',
+          label: 'intuition',
           body: `Bir pivot $p$ seçin ve diziyi $p$’den küçükler ($A_<$) ile büyükler ($A_>$) olarak ayırın. $|A_<|$’yi bilince, aradığımız $k$. elemanın hangi tarafta olduğunu kesin olarak biliriz — diğer tarafı tamamen **atabiliriz**. İkili aramaya benzer; ama dizi sıralı değil, her adımda bölümleme yaparız.
 
 Özel durum $k = 1$ (minimum): tek bir tarama $O(n)$’de yeter ve her deterministik algoritma her elemana bakmak zorunda olduğundan $\\Omega(n)$ gerekir. Genel $k$ için de $O(n)$ mümkün mü? Evet!`,
@@ -37,7 +37,7 @@ export const lecture4: Lecture = {
           kind: 'formal',
           title: 'Problem ve algoritma',
           box: 'formal',
-          label: 'Biçimsel',
+          label: 'formal',
           body: `**Girdi:** $n$ sayıdan oluşan $A$ dizisi ve $k \\in \\{1, \\dots, n\\}$. **Çıktı:** $A$’nın $k$. en küçük elemanı.
 
 Notlar elemanların farklı olduğunu varsayar. Aşağıdaki sürüm tekrarlı değerlerde de doğru çalışsın diye $A_= = \\{A[i] = p\\}$ kümesini de oluşturur; elemanlar farklıysa $A_= = \\{p\\}$ olur ve notlardaki algoritmayla aynıdır:
@@ -60,13 +60,13 @@ Notlar elemanların farklı olduğunu varsayar. Aşağıdaki sürüm tekrarlı d
         {
           kind: 'steps',
           title: 'Bir tarafı atmak neden güvenli?',
-          label: 'Kanıt fikri',
+          label: 'proofIdea',
           body: `Pivot $p$’den küçük tam olarak $|A_<|$ eleman var. Dizinin sıralı hâlinde $A_<$’nin elemanları ilk $|A_<|$ konumu, $p$’ye eşitler sonraki $|A_=|$ konumu, $A_>$ kalan konumları kaplar. Aradığımız $k$. konum bu üç bloktan tam olarak birine düşer; diğer bloklardaki hiçbir eleman $k$. konumda olamaz. $A_>$’ye geçerken, atılan $|A_<| + |A_=|$ elemanın hepsi aranandan küçük (veya eşit) olduğundan sıra $k' = k - |A_<| - |A_=|$ olur.`,
         },
         {
           kind: 'correctness',
           title: 'Doğruluk (güçlü tümevarım, Ders 4 notları)',
-          label: 'Biçimsel kanıt',
+          label: 'formalProof',
           proof: [
             { title: 'Hipotez', body: '$n$ boyutlu her dizi ve $k \\in \\{1..n\\}$ için Select $k$. en küçüğü döndürür.' },
             { title: 'Taban (n = 1)', body: '$k = 1$ olmak zorunda; tek eleman döndürülür — doğru.' },

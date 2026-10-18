@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, type Dispatch, type ReactNode } from 'react'
+import { setCurrentLang } from '../i18n/lang'
 import { loadProgress, progressReducer, saveProgress, type ProgressAction, type ProgressData } from './progress'
 
 interface Ctx {
@@ -10,7 +11,12 @@ const ProgressCtx = createContext<Ctx | null>(null)
 
 export function ProgressProvider({ children }: { children: ReactNode }) {
   const [progress, dispatch] = useReducer(progressReducer, undefined, loadProgress)
+  // Set synchronously so children rendered in this pass already read the right language.
+  setCurrentLang(progress.prefs.lang)
   useEffect(() => saveProgress(progress), [progress])
+  useEffect(() => {
+    document.documentElement.lang = progress.prefs.lang
+  }, [progress.prefs.lang])
   useEffect(() => {
     const root = document.documentElement
     if (progress.prefs.theme === 'system') root.removeAttribute('data-theme')

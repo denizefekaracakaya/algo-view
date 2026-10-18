@@ -27,7 +27,7 @@ export const lecture7: Lecture = {
         {
           kind: 'intuition',
           title: 'Sezgi: sıralı dizi ile bağlı listenin en iyi yanları',
-          label: 'Sezgi',
+          label: 'intuition',
           body: `Sıralı dizide arama $O(\\log n)$ ama ekleme/silme $O(n)$; bağlı listede ekleme $O(1)$ ama arama $O(n)$. **Dengeli** bir ikili arama ağacı üçünü de $O(\\log n)$’de yapar.
 
 BST’deki her düğüm, kendi alt ağacı için bir QuickSort pivotu gibidir: sol alt ağaç $A_<$, sağ alt ağaç $A_>$.`,
@@ -36,7 +36,7 @@ BST’deki her düğüm, kendi alt ağacı için bir QuickSort pivotu gibidir: s
           kind: 'formal',
           title: 'Tanım (Ders 7 notları)',
           box: 'formal',
-          label: 'Biçimsel',
+          label: 'formal',
           body: `Her $x$ düğümünün bir anahtarı $key(x)$, ebeveyni $p(x)$ ve çocukları $left(x)$, $right(x)$ vardır (yoksa NIL). **BST özelliği:** her $x$ için $left(x)$ altındaki tüm anahtarlar $< key(x)$, $right(x)$ altındakiler $> key(x)$. Bu derste anahtarlar farklıdır.
 
 **Yükseklik:** kökten bir yaprağa en uzun yolun kenar sayısı (slaytlardaki tanım).`,
@@ -148,7 +148,7 @@ Yani sıradan bir BST için **$O(\\log n)$ garantisi yoktur**. Logaritmik yükse
           kind: 'formal',
           title: 'Tanım (Ders 7 notları, Tanım 10)',
           box: 'formal',
-          label: 'Biçimsel',
+          label: 'formal',
           body: `Kırmızı-siyah ağaç, aşağıdaki özellikleri sağlayan bir BST’dir (yaprakların çocukları NIL kabul edilir):
 
 1. Her düğüm kırmızı ya da siyahtır.
@@ -192,7 +192,7 @@ Notlar $x$’in sol, $u$’nun sağ çocuk olduğu durumu ayrıntılı gösterir
         {
           kind: 'correctness',
           title: 'Yükseklik garantisi (Claim 16)',
-          label: 'Biçimsel kanıt',
+          label: 'formalProof',
           proof: [
             { title: 'Siyah yükseklik', body: '$b(x)$: $x$’ten NIL’e herhangi bir yoldaki siyah düğüm sayısı, $x$ hariç (NIL dahil). Özellik 5 sayesinde iyi tanımlıdır.' },
             { title: 'Lemma', body: '$x$’in alt ağacında en az $2^{b(x)} - 1$ NIL olmayan düğüm vardır. Taban: NIL için $b = 0$, $2^0 - 1 = 0$ ✓.' },

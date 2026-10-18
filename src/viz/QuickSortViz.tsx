@@ -5,18 +5,25 @@ import { TraceViewer } from '../components/TraceViewer'
 import { QUICKSORT_CODE, expectedComparisons, quickSort, quickSortTrace, type QSCall, type QSPivot, type QuickSortState } from '../engines/quickSort'
 import { makeRng, randomPermutation } from '../engines/random'
 import { Tex } from '../components/Tex'
+import { getLang, tx } from '../i18n/lang'
 
-const PRESETS = [
-  { label: 'Slayt örneği', values: [8, 7, 1, 3, 5, 6, 4] },
-  { label: 'Sıralı (deterministik pivot için en kötü)', values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
-  { label: 'Tekrarlı', values: [4, 2, 4, 1, 4, 3, 2] },
-  { label: '14 eleman', values: [12, 3, 9, 14, 1, 7, 11, 5, 2, 13, 8, 6, 10, 4] },
+const presets = () => [
+  { label: tx('Slayt örneği', 'Slide example'), values: [8, 7, 1, 3, 5, 6, 4] },
+  { label: tx('Sıralı (deterministik pivot için en kötü)', 'Sorted (worst for a deterministic pivot)'), values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+  { label: tx('Tekrarlı', 'Duplicates'), values: [4, 2, 4, 1, 4, 3, 2] },
+  { label: tx('14 eleman', '14 elements'), values: [12, 3, 9, 14, 1, 7, 11, 5, 2, 13, 8, 6, 10, 4] },
 ]
 
-const PIVOT_LABEL: Record<QSPivot, string> = { last: 'Son eleman', first: 'İlk eleman', random: 'Rastgele', median: 'Medyan (ideal)' }
+const pivotLabel = (): Record<QSPivot, string> => ({
+  last: tx('Son eleman', 'Last element'),
+  first: tx('İlk eleman', 'First element'),
+  random: tx('Rastgele', 'Random'),
+  median: tx('Medyan (ideal)', 'Median (ideal)'),
+})
 
 export function QuickSortViz() {
-  const [arr, setArr] = useState(PRESETS[0].values)
+  const PIVOT_LABEL = pivotLabel()
+  const [arr, setArr] = useState(presets()[0].values)
   const [strategy, setStrategy] = useState<QSPivot>('random')
   const [seed, setSeed] = useState(1)
   const trace = useMemo(() => quickSortTrace(arr, strategy, seed), [arr, strategy, seed])
@@ -25,14 +32,14 @@ export function QuickSortViz() {
       <ArrayInput
         value={arr}
         onChange={setArr}
-        presets={PRESETS}
+        presets={presets()}
         options={{ maxLength: 20, min: -99, max: 99 }}
         random={() => randomPermutation(makeRng(seed * 31 + arr.length), 10)}
-        hint="En fazla 20 tam sayı. Rastgele pivot için tohum aynı kaldıkça çalışma birebir tekrarlanır."
+        hint={tx('En fazla 20 tam sayı. Rastgele pivot için tohum aynı kaldıkça çalışma birebir tekrarlanır.', 'Up to 20 integers. With a random pivot, the run repeats exactly as long as the seed stays the same.')}
       />
       <div className="field">
-        Pivot kuralı
-        <div className="seg" role="group" aria-label="Pivot kuralı">
+        {tx('Pivot kuralı', 'Pivot rule')}
+        <div className="seg" role="group" aria-label={tx('Pivot kuralı', 'Pivot rule')}>
           {(Object.keys(PIVOT_LABEL) as QSPivot[]).map((p) => (
             <button key={p} aria-pressed={strategy === p} onClick={() => setStrategy(p)}>
               {PIVOT_LABEL[p]}
@@ -41,11 +48,11 @@ export function QuickSortViz() {
         </div>
       </div>
       <div className="field">
-        Tohum (seed)
+        {tx('Tohum (seed)', 'Seed')}
         <div className="row" style={{ gap: 4 }}>
-          <input className="input mono" style={{ width: 80 }} type="number" value={seed} disabled={strategy !== 'random'} onChange={(e) => setSeed(Math.floor(Number(e.target.value) || 0))} aria-label="Rastgele tohum" />
+          <input className="input mono" style={{ width: 80 }} type="number" value={seed} disabled={strategy !== 'random'} onChange={(e) => setSeed(Math.floor(Number(e.target.value) || 0))} aria-label={tx('Rastgele tohum', 'Random seed')} />
           <button className="btn sm" disabled={strategy !== 'random'} onClick={() => setSeed((s) => s + 1)}>
-            Yeni tohum
+            {tx('Yeni tohum', 'New seed')}
           </button>
         </div>
       </div>
@@ -55,14 +62,14 @@ export function QuickSortViz() {
     <TraceViewer
       key={arr.join(',') + strategy + seed}
       trace={trace}
-      label="QuickSort görselleştirmesi"
+      label={tx('QuickSort görselleştirmesi', 'QuickSort visualization')}
       toolbar={toolbar}
       code={QUICKSORT_CODE}
       render={(step) => <QSStage s={step.state} />}
       legend={
         <>
           <Legend states={['pivot', 'less', 'greater', 'compare', 'sorted', 'elim']} />
-          <span className="muted">✕ = şu anki çağrının dışında</span>
+          <span className="muted">{tx('✕ = şu anki çağrının dışında', '✕ = outside the current call')}</span>
         </>
       }
     />
@@ -92,14 +99,14 @@ function QSStage({ s }: { s: QuickSortState }) {
   })
   return (
     <div className="stack">
-      <ArrayView cells={cells} label="QuickSort dizi durumu" />
+      <ArrayView cells={cells} label={tx('QuickSort dizi durumu', 'QuickSort array state')} />
       {s.pending.length > 0 && (
         <p className="small muted" style={{ margin: 0 }}>
-          Bekleyen sağ parçalar (çağrı yığını): {s.pending.filter(([a, b]) => a <= b).map(([a, b]) => `A[${a}..${b}]`).join(', ') || '—'}
+          {tx('Bekleyen sağ parçalar (çağrı yığını)', 'Pending right parts (call stack)')}: {s.pending.filter(([a, b]) => a <= b).map(([a, b]) => `A[${a}..${b}]`).join(', ') || '—'}
         </p>
       )}
       <div>
-        <span className="label-tag">Özyineleme ağacı (her düğüm bir çağrının pivotu)</span>
+        <span className="label-tag">{tx('Özyineleme ağacı (her düğüm bir çağrının pivotu)', 'Recursion tree (each node is the pivot of one call)')}</span>
         <CallTree calls={s.calls} active={s.activeCall} />
       </div>
     </div>
@@ -107,7 +114,7 @@ function QSStage({ s }: { s: QuickSortState }) {
 }
 
 function CallTree({ calls, active }: { calls: QSCall[]; active: number | null }) {
-  if (!calls.length) return <p className="small muted">Henüz çağrı yok.</p>
+  if (!calls.length) return <p className="small muted">{tx('Henüz çağrı yok.', 'No calls yet.')}</p>
   // Pivots form a BST: lay out by array position (lo..hi midpoint of the pivot's final slot).
   const maxDepth = Math.max(...calls.map((c) => c.depth))
   const span = Math.max(...calls.map((c) => c.hi)) + 1
@@ -118,7 +125,7 @@ function CallTree({ calls, active }: { calls: QSCall[]; active: number | null })
   const x = (c: QSCall) => 10 + gx / 2 + ((c.lo + c.hi) / 2) * gx
   const byId = new Map(calls.map((c) => [c.id, c]))
   return (
-    <svg className="tree-svg" viewBox={`0 0 ${W} ${H}`} width={W} role="img" aria-label={`Özyineleme ağacı: ${calls.length} çağrı, derinlik ${maxDepth + 1}`}>
+    <svg className="tree-svg" viewBox={`0 0 ${W} ${H}`} width={W} role="img" aria-label={tx(`Özyineleme ağacı: ${calls.length} çağrı, derinlik ${maxDepth + 1}`, `Recursion tree: ${calls.length} calls, depth ${maxDepth + 1}`)}>
       {calls.map((c) => {
         if (c.parent === null) return null
         const p = byId.get(c.parent)!
@@ -165,7 +172,7 @@ export function QuickSortExperiment() {
           <input type="range" min={4} max={200} value={n} onChange={(e) => setN(Number(e.target.value))} style={{ accentColor: 'var(--accent)' }} />
         </label>
         <label className="field">
-          Çalıştırma sayısı (farklı tohumlar)
+          {tx('Çalıştırma sayısı (farklı tohumlar)', 'Number of runs (different seeds)')}
           <select className="input" value={runs} onChange={(e) => setRuns(Number(e.target.value))}>
             {[50, 300, 1000].map((r) => (
               <option key={r} value={r}>
@@ -175,10 +182,10 @@ export function QuickSortExperiment() {
           </select>
         </label>
         <label className="field">
-          Sabit girdi
+          {tx('Sabit girdi', 'Fixed input')}
           <select className="input" value={input} onChange={(e) => setInput(e.target.value as 'sorted' | 'random')}>
-            <option value="sorted">Sıralı dizi (deterministik pivot için kötü)</option>
-            <option value="random">Sabit bir karışık dizi</option>
+            <option value="sorted">{tx('Sıralı dizi (deterministik pivot için kötü)', 'Sorted array (bad for a deterministic pivot)')}</option>
+            <option value="random">{tx('Sabit bir karışık dizi', 'A fixed shuffled array')}</option>
           </select>
         </label>
       </div>
@@ -186,34 +193,34 @@ export function QuickSortExperiment() {
         <table className="data">
           <tbody>
             <tr>
-              <td>Rastgele pivot, ölçülen ortalama ({runs} tohum)</td>
+              <td>{tx(`Rastgele pivot, ölçülen ortalama (${runs} tohum)`, `Random pivot, measured mean (${runs} seeds)`)}</td>
               <td className="num">{data.mean.toFixed(1)}</td>
             </tr>
             <tr>
-              <td>Rastgele pivot, en az / en çok gözlenen</td>
+              <td>{tx('Rastgele pivot, en az / en çok gözlenen', 'Random pivot, min / max observed')}</td>
               <td className="num">
                 {data.min} / {data.max}
               </td>
             </tr>
             <tr className="hl">
               <td>
-                Kuramsal beklenen değer <Tex>{'E[C] = 2(n+1)H_n - 4n'}</Tex>
+                {tx('Kuramsal beklenen değer', 'Theoretical expected value')} <Tex>{'E[C] = 2(n+1)H_n - 4n'}</Tex>
               </td>
               <td className="num">{E.toFixed(1)}</td>
             </tr>
             <tr>
               <td>
-                Kuramsal üst sınır <Tex>{'2n\\ln n'}</Tex>
+                {tx('Kuramsal üst sınır', 'Theoretical upper bound')} <Tex>{'2n\\ln n'}</Tex>
               </td>
               <td className="num">{(2 * n * Math.log(n)).toFixed(1)}</td>
             </tr>
             <tr>
-              <td>Deterministik “son eleman” pivotu, bu girdi</td>
+              <td>{tx('Deterministik “son eleman” pivotu, bu girdi', 'Deterministic “last element” pivot, this input')}</td>
               <td className="num">{data.det}</td>
             </tr>
             <tr>
               <td>
-                En kötü durum <Tex>{'n(n-1)/2'}</Tex>
+                {tx('En kötü durum', 'Worst case')} <Tex>{'n(n-1)/2'}</Tex>
               </td>
               <td className="num">{(n * (n - 1)) / 2}</td>
             </tr>
@@ -221,14 +228,14 @@ export function QuickSortExperiment() {
         </table>
       </div>
       <figure style={{ margin: 0 }}>
-        <svg viewBox="0 0 640 160" className="chart" role="img" aria-label="Karşılaştırma sayısı histogramı">
+        <svg viewBox="0 0 640 160" className="chart" role="img" aria-label={tx('Karşılaştırma sayısı histogramı', 'Histogram of comparison counts')}>
           {data.hist.map((h, i) => {
             const bh = (h.count / peak) * 120
             return (
               <g key={i}>
                 <rect x={20 + i * 37} y={135 - bh} width={33} height={bh} rx={3} fill="var(--series-1)">
                   <title>
-                    {h.lo}–{h.lo + data.width - 1}: {h.count} çalıştırma
+                    {h.lo}–{h.lo + data.width - 1}: {h.count} {tx('çalıştırma', 'runs')}
                   </title>
                 </rect>
               </g>
@@ -253,11 +260,18 @@ export function QuickSortExperiment() {
           </text>
         </svg>
         <figcaption className="small muted">
-          Histogram: aynı girdide farklı tohumlarla ölçülen karşılaştırma sayıları (ampirik). Kesikli çizgi kuramsal beklenen değerdir.
+          {tx(
+            'Histogram: aynı girdide farklı tohumlarla ölçülen karşılaştırma sayıları (ampirik). Kesikli çizgi kuramsal beklenen değerdir.',
+            'Histogram: comparison counts measured on the same input with different seeds (empirical). The dashed line is the theoretical expected value.',
+          )}
         </figcaption>
       </figure>
       <div className="callout warn">
-        Tek bir çalıştırma (ya da birkaç yüz çalıştırma) beklenen süre teoremini <strong>kanıtlamaz</strong>; teorem her girdi için, algoritmanın kendi rastgele seçimleri üzerinden alınan beklentiyle ilgilidir ve bir kanıt gerektirir. Ölçümler yalnızca teoremle tutarlı olup olmadığımızı gösterir.
+        {tx('Tek bir çalıştırma (ya da birkaç yüz çalıştırma) beklenen süre teoremini', 'A single run (or a few hundred runs) does')} <strong>{tx('kanıtlamaz', 'not prove')}</strong>
+        {tx(
+          '; teorem her girdi için, algoritmanın kendi rastgele seçimleri üzerinden alınan beklentiyle ilgilidir ve bir kanıt gerektirir. Ölçümler yalnızca teoremle tutarlı olup olmadığımızı gösterir.',
+          ' the expected-time theorem; the theorem is about the expectation over the algorithm’s own random choices, for every input, and needs a proof. Measurements only show whether we are consistent with it.',
+        )}
       </div>
     </div>
   )
@@ -269,6 +283,7 @@ export function PairProbability() {
   const n = 10
   const [pair, setPair] = useState<[number, number]>([2, 6])
   const [i, j] = pair
+  const WIN = `\\{z_${i},\\dots,z_${j}\\}`
   const sim = useMemo(() => {
     const runs = 2000
     let hit = 0
@@ -292,10 +307,11 @@ export function PairProbability() {
   return (
     <div className="card card-pad stack">
       <p className="small" style={{ margin: 0 }}>
-        n = {n} sıralı eleman <Tex>{'z_1 < \\dots < z_{10}'}</Tex>. Bir hücreye tıklayarak (i, j) çiftini seçin. Hücre rengi <Tex>{'P[z_i, z_j \\text{ karşılaştırılır}] = \\tfrac{2}{j-i+1}'}</Tex> değerini gösterir.
+        n = {n} {tx('sıralı eleman', 'sorted elements')} <Tex>{'z_1 < \\dots < z_{10}'}</Tex>. {tx('Bir hücreye tıklayarak (i, j) çiftini seçin. Hücre rengi', 'Click a cell to choose the pair (i, j). The cell color shows')}{' '}
+        <Tex>{`P[z_i, z_j \\text{ ${tx('karşılaştırılır', 'compared')}}] = \\tfrac{2}{j-i+1}`}</Tex>{tx(' değerini gösterir.', '.')}
       </p>
       <div className="table-wrap">
-        <table className="data" style={{ width: 'auto' }} aria-label="Karşılaştırılma olasılıkları matrisi">
+        <table className="data" style={{ width: 'auto' }} aria-label={tx('Karşılaştırılma olasılıkları matrisi', 'Matrix of comparison probabilities')}>
           <thead>
             <tr>
               <th>i \ j</th>
@@ -320,7 +336,7 @@ export function PairProbability() {
                         className="mono"
                         onClick={() => setPair([a, b])}
                         aria-pressed={sel}
-                        aria-label={`z${a} ve z${b}: olasılık ${p.toFixed(2)}`}
+                        aria-label={tx(`z${a} ve z${b}: olasılık ${p.toFixed(2)}`, `z${a} and z${b}: probability ${p.toFixed(2)}`)}
                         style={{
                           width: 38,
                           height: 28,
@@ -342,7 +358,7 @@ export function PairProbability() {
           </tbody>
         </table>
       </div>
-      <div className="row" aria-label="Seçilen aralık">
+      <div className="row" aria-label={tx('Seçilen aralık', 'Selected window')}>
         {Array.from({ length: n }, (_, t) => {
           const v = t + 1
           const inWin = v >= i && v <= j
@@ -364,11 +380,24 @@ export function PairProbability() {
         })}
       </div>
       <div className="callout formal">
-        <span className="label-tag">Neden 2/(j−i+1)?</span>
-        <Tex>{`z_${i}`}</Tex> ile <Tex>{`z_${j}`}</Tex> ancak birisi, <Tex>{`\\{z_${i},\\dots,z_${j}\\}`}</Tex> penceresinden seçilen <strong>ilk</strong> pivot olursa karşılaştırılır. Pencerenin dışından seçilen pivotlar ikisini aynı tarafta bırakır; pencerenin içinden ama uçlardan farklı bir pivot ise onları ayırır ve bir daha karşılaşmazlar. Pencere {j - i + 1} eleman içerir ve ilk seçilen her biri eşit olasılıklıdır: <Tex>{`\\tfrac{2}{${j - i + 1}} = ${(2 / (j - i + 1)).toFixed(3)}`}</Tex>.
+        <span className="label-tag">{tx('Neden 2/(j−i+1)?', 'Why 2/(j−i+1)?')}</span>
+        {getLang() === 'en' ? (
+          <>
+            <Tex>{`z_${i}`}</Tex> and <Tex>{`z_${j}`}</Tex> are compared only if one of them is the <strong>first</strong> pivot chosen from the window <Tex>{WIN}</Tex>. Pivots chosen
+            outside the window leave both on the same side; a pivot inside the window but different from the endpoints separates them, and they never meet again. The window has{' '}
+            {j - i + 1} elements and each is equally likely to be chosen first:{' '}
+          </>
+        ) : (
+          <>
+            <Tex>{`z_${i}`}</Tex> ile <Tex>{`z_${j}`}</Tex> ancak birisi, <Tex>{WIN}</Tex> penceresinden seçilen <strong>ilk</strong> pivot olursa karşılaştırılır. Pencerenin dışından
+            seçilen pivotlar ikisini aynı tarafta bırakır; pencerenin içinden ama uçlardan farklı bir pivot ise onları ayırır ve bir daha karşılaşmazlar. Pencere {j - i + 1} eleman içerir ve
+            ilk seçilen her biri eşit olasılıklıdır:{' '}
+          </>
+        )}
+        <Tex>{`\\tfrac{2}{${j - i + 1}} = ${(2 / (j - i + 1)).toFixed(3)}`}</Tex>.
       </div>
       <p className="small muted" style={{ margin: 0 }}>
-        Simülasyon (2000 tohum, ampirik): karşılaştırılma oranı ≈ {sim.toFixed(3)}. Doğrusallık (linearity of expectation) ile tüm çiftler toplanınca <Tex>{'E[C] = \\sum_{i<j} \\tfrac{2}{j-i+1} \\le 2n\\ln n'}</Tex>.
+        {tx(`Simülasyon (2000 tohum, ampirik): karşılaştırılma oranı ≈ ${sim.toFixed(3)}. Doğrusallık (linearity of expectation) ile tüm çiftler toplanınca`, `Simulation (2000 seeds, empirical): comparison rate ≈ ${sim.toFixed(3)}. Summing over all pairs by linearity of expectation gives`)} <Tex>{'E[C] = \\sum_{i<j} \\tfrac{2}{j-i+1} \\le 2n\\ln n'}</Tex>.
       </p>
     </div>
   )

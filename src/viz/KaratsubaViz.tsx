@@ -3,6 +3,7 @@ import { TraceViewer } from '../components/TraceViewer'
 import { LineChart } from '../components/LineChart'
 import { KARATSUBA_CODE, MULT1_CODE, gradeSchoolOps, multiply, multiplyTrace, type MultAlgo, type MultNode, type MultState } from '../engines/karatsuba'
 import { makeRng } from '../engines/random'
+import { tx } from '../i18n/lang'
 
 const PRESETS: [string, string][] = [
   ['1234', '5678'],
@@ -22,7 +23,7 @@ export function KaratsubaViz() {
   const apply = (a: string, b: string) => {
     const ok = (s: string) => /^\d{1,8}$/.test(s.trim())
     if (!ok(a) || !ok(b)) {
-      setError('Her sayı 1–8 basamaklı, negatif olmayan bir tam sayı olmalı (ağacın okunabilir kalması için).')
+      setError(tx('Her sayı 1–8 basamaklı, negatif olmayan bir tam sayı olmalı (ağacın okunabilir kalması için).', 'Each number must be a non-negative integer with 1–8 digits (to keep the tree readable).'))
       return
     }
     setError(null)
@@ -34,13 +35,13 @@ export function KaratsubaViz() {
   const toolbar = (
     <>
       <div className="field">
-        Algoritma
-        <div className="seg" role="group" aria-label="Çarpma algoritması">
+        {tx('Algoritma', 'Algorithm')}
+        <div className="seg" role="group" aria-label={tx('Çarpma algoritması', 'Multiplication algorithm')}>
           <button aria-pressed={algo === 'mult1'} onClick={() => setAlgo('mult1')}>
-            Mult1 (4 alt problem)
+            {tx('Mult1 (4 alt problem)', 'Mult1 (4 subproblems)')}
           </button>
           <button aria-pressed={algo === 'karatsuba'} onClick={() => setAlgo('karatsuba')}>
-            Karatsuba (3 alt problem)
+            {tx('Karatsuba (3 alt problem)', 'Karatsuba (3 subproblems)')}
           </button>
         </div>
       </div>
@@ -61,10 +62,10 @@ export function KaratsubaViz() {
           <input className="input mono" style={{ width: 120 }} value={y} onChange={(e) => setY(e.target.value)} inputMode="numeric" aria-invalid={!!error} />
         </label>
         <button className="btn primary" style={{ alignSelf: 'flex-end' }} type="submit">
-          Uygula
+          {tx('Uygula', 'Apply')}
         </button>
       </form>
-      <div className="row" role="group" aria-label="Hazır örnekler">
+      <div className="row" role="group" aria-label={tx('Hazır örnekler', 'Preset examples')}>
         {PRESETS.map(([a, b]) => (
           <button key={a + b} className="btn sm" onClick={() => apply(a, b)}>
             {a}×{b}
@@ -84,7 +85,7 @@ export function KaratsubaViz() {
       <TraceViewer
         key={algo + input.join('x')}
         trace={trace}
-        label="Böl ve fethet çarpma görselleştirmesi"
+        label={tx('Böl ve fethet çarpma görselleştirmesi', 'Divide-and-conquer multiplication visualization')}
         toolbar={toolbar}
         code={algo === 'karatsuba' ? KARATSUBA_CODE : MULT1_CODE}
         render={(step) => <CallTree s={step.state} />}
@@ -94,23 +95,26 @@ export function KaratsubaViz() {
               <span className="swatch" style={{ borderColor: 'var(--st-active)', background: 'var(--st-active-bg)' }} aria-hidden>
                 •
               </span>
-              etkin çağrı
+              {tx('etkin çağrı', 'active call')}
             </span>
             <span>
               <span className="swatch" style={{ borderColor: 'var(--st-sorted)', background: 'var(--st-sorted-bg)' }} aria-hidden>
                 ✓
               </span>
-              tamamlandı (sonuç altta)
+              {tx('tamamlandı (sonuç altta)', 'done (result below)')}
             </span>
             <span>
               <span className="swatch" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }} aria-hidden />
-              taban durumu: 1 tek basamaklı çarpma
+              {tx('taban durumu: 1 tek basamaklı çarpma', 'base case: 1 one-digit multiplication')}
             </span>
           </>
         }
         side={() => (
           <p className="small muted">
-            Okul yöntemi bu girdide {gradeSchoolOps(BigInt(input[0]), BigInt(input[1]))} tek basamaklı çarpma yapar.
+            {tx(
+              `Okul yöntemi bu girdide ${gradeSchoolOps(BigInt(input[0]), BigInt(input[1]))} tek basamaklı çarpma yapar.`,
+              `The grade-school method makes ${gradeSchoolOps(BigInt(input[0]), BigInt(input[1]))} one-digit multiplications on this input.`,
+            )}
           </p>
         )}
       />
@@ -140,7 +144,7 @@ function CallTree({ s }: { s: MultState }) {
   const width = Math.max(leaf, 1) * W + 20
   const height = (maxD + 1) * H + 10
   return (
-    <svg className="tree-svg" viewBox={`0 0 ${width} ${height}`} width={width} role="img" aria-label={`Özyineleme ağacı, ${nodes.length} çağrı`}>
+    <svg className="tree-svg" viewBox={`0 0 ${width} ${height}`} width={width} role="img" aria-label={tx(`Özyineleme ağacı, ${nodes.length} çağrı`, `Recursion tree, ${nodes.length} calls`)}>
       {nodes.map((n) => {
         if (!n.parent) return null
         const a = pos.get(n.parent)!
@@ -190,20 +194,23 @@ function OpsChart() {
   }, [])
   return (
     <div className="card card-pad">
-      <h3>Tek basamaklı çarpma sayısı: ölçüm ve kuram</h3>
+      <h3>{tx('Tek basamaklı çarpma sayısı: ölçüm ve kuram', 'Number of one-digit multiplications: measurement and theory')}</h3>
       <p className="small muted">
-        Noktalar, sabit tohumla üretilmiş rastgele n basamaklı sayılar üzerinde gerçekten sayılan işlemlerdir (ampirik). Çizgiler kuramsal büyüme fonksiyonlarıdır. Logaritmik dikey eksen.
+        {tx(
+          'Noktalar, sabit tohumla üretilmiş rastgele n basamaklı sayılar üzerinde gerçekten sayılan işlemlerdir (ampirik). Çizgiler kuramsal büyüme fonksiyonlarıdır. Logaritmik dikey eksen.',
+          'Dots are operations actually counted on random n-digit numbers generated with a fixed seed (empirical). Lines are theoretical growth functions. Logarithmic vertical axis.',
+        )}
       </p>
       <LineChart
-        title="Basamak sayısına göre tek basamaklı çarpma sayısı"
-        xLabel="n (basamak)"
-        yLabel="işlem (log)"
+        title={tx('Basamak sayısına göre tek basamaklı çarpma sayısı', 'One-digit multiplications by number of digits')}
+        xLabel={tx('n (basamak)', 'n (digits)')}
+        yLabel={tx('işlem (log)', 'operations (log)')}
         logY
         series={[
-          { name: 'n² (kuram)', color: 'var(--series-2)', dashed: true, points: data.map((d) => ({ x: d.n, y: d.n ** 2 })) },
-          { name: 'n^log₂3 ≈ n^1.585 (kuram)', color: 'var(--series-1)', dashed: true, points: data.map((d) => ({ x: d.n, y: d.n ** Math.log2(3) })) },
-          { name: 'Mult1 (ölçüm)', color: 'var(--series-2)', dots: true, points: data.map((d) => ({ x: d.n, y: d.mult1 })) },
-          { name: 'Karatsuba (ölçüm)', color: 'var(--series-1)', dots: true, points: data.map((d) => ({ x: d.n, y: d.kara })) },
+          { name: tx('n² (kuram)', 'n² (theory)'), color: 'var(--series-2)', dashed: true, points: data.map((d) => ({ x: d.n, y: d.n ** 2 })) },
+          { name: tx('n^log₂3 ≈ n^1.585 (kuram)', 'n^log₂3 ≈ n^1.585 (theory)'), color: 'var(--series-1)', dashed: true, points: data.map((d) => ({ x: d.n, y: d.n ** Math.log2(3) })) },
+          { name: tx('Mult1 (ölçüm)', 'Mult1 (measured)'), color: 'var(--series-2)', dots: true, points: data.map((d) => ({ x: d.n, y: d.mult1 })) },
+          { name: tx('Karatsuba (ölçüm)', 'Karatsuba (measured)'), color: 'var(--series-1)', dots: true, points: data.map((d) => ({ x: d.n, y: d.kara })) },
         ]}
       />
       <div className="table-wrap">
@@ -211,7 +218,7 @@ function OpsChart() {
           <thead>
             <tr>
               <th>n</th>
-              <th>Okul yöntemi</th>
+              <th>{tx('Okul yöntemi', 'Grade school')}</th>
               <th>Mult1</th>
               <th>Karatsuba</th>
             </tr>
@@ -229,7 +236,10 @@ function OpsChart() {
         </table>
       </div>
       <p className="small muted">
-        Karatsuba sayıları tam olarak 3^log₂n olmayabilir: (a+b) ve (c+d) bir basamak daha uzun olabilir (notlarda da belirtilen “hile”). Asimptotik davranış değişmez.
+        {tx(
+          'Karatsuba sayıları tam olarak 3^log₂n olmayabilir: (a+b) ve (c+d) bir basamak daha uzun olabilir (notlarda da belirtilen “hile”). Asimptotik davranış değişmez.',
+          'The Karatsuba counts may not be exactly 3^log₂n: (a+b) and (c+d) can be one digit longer (the “cheat” the notes mention too). The asymptotic behavior is unchanged.',
+        )}
       </p>
     </div>
   )

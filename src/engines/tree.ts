@@ -1,4 +1,5 @@
 /** Immutable tree snapshots shared by the BST and red-black tree engines and the tree renderer. */
+import { tx } from '../i18n/lang'
 export type Color = 'R' | 'B'
 
 export interface TNode {
@@ -96,16 +97,16 @@ export function checkRedBlack(t: TNode | null): PropertyCheck[] {
     id: 1,
     holds: uncolored.length === 0,
     offenders: uncolored,
-    message: uncolored.length ? 'Bazı düğümlerin rengi yok.' : 'Her düğüm kırmızı ya da siyah.',
+    message: uncolored.length ? tx('Bazı düğümlerin rengi yok.', 'Some nodes have no color.') : tx('Her düğüm kırmızı ya da siyah.', 'Every node is red or black.'),
   }
   const rootOk = !t || t.color === 'B'
   const p2: PropertyCheck = {
     id: 2,
     holds: rootOk,
     offenders: rootOk ? [] : [t!.key],
-    message: rootOk ? (t ? 'Kök siyah.' : 'Ağaç boş; kök özelliği kendiliğinden sağlanır.') : `Kök (${t!.key}) kırmızı.`,
+    message: rootOk ? (t ? tx('Kök siyah.', 'The root is black.') : tx('Ağaç boş; kök özelliği kendiliğinden sağlanır.', 'The tree is empty; the root property holds trivially.')) : tx(`Kök (${t!.key}) kırmızı.`, `The root (${t!.key}) is red.`),
   }
-  const p3: PropertyCheck = { id: 3, holds: true, offenders: [], message: 'NIL yaprakları (çizilmeyen boş çocuklar) tanım gereği siyahtır.' }
+  const p3: PropertyCheck = { id: 3, holds: true, offenders: [], message: tx('NIL yaprakları (çizilmeyen boş çocuklar) tanım gereği siyahtır.', 'NIL leaves (the empty children that are not drawn) are black by definition.') }
   const redRed: number[] = []
   for (const x of all) {
     if (x.color !== 'R') continue
@@ -115,7 +116,7 @@ export function checkRedBlack(t: TNode | null): PropertyCheck[] {
     id: 4,
     holds: redRed.length === 0,
     offenders: [...new Set(redRed)],
-    message: redRed.length ? `Kırmızı-kırmızı ihlali: ${pairs(redRed)}.` : 'Her kırmızı düğümün çocukları siyah.',
+    message: redRed.length ? tx(`Kırmızı-kırmızı ihlali: ${pairs(redRed)}.`, `Red-red violation: ${pairs(redRed)}.`) : tx('Her kırmızı düğümün çocukları siyah.', 'The children of every red node are black.'),
   }
   const badBH: number[] = []
   const bh = (x: TNode | null): number => {
@@ -131,8 +132,8 @@ export function checkRedBlack(t: TNode | null): PropertyCheck[] {
     holds: badBH.length === 0,
     offenders: badBH,
     message: badBH.length
-      ? `Şu düğümlerde sol ve sağ NIL yollarındaki siyah düğüm sayısı farklı: ${badBH.join(', ')}.`
-      : 'Her düğümden NIL’e giden tüm yollarda siyah düğüm sayısı aynı.',
+      ? tx(`Şu düğümlerde sol ve sağ NIL yollarındaki siyah düğüm sayısı farklı: ${badBH.join(', ')}.`, `At these nodes the left and right paths to NIL have different numbers of black nodes: ${badBH.join(', ')}.`)
+      : tx('Her düğümden NIL’e giden tüm yollarda siyah düğüm sayısı aynı.', 'From every node, all paths to NIL contain the same number of black nodes.'),
   }
   return [p1, p2, p3, p4, p5]
 }

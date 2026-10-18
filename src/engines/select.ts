@@ -1,5 +1,6 @@
 import type { Trace, TraceStep } from '../trace/types'
 import { makeRng, randInt, type Rng } from './random'
+import { tx } from '../i18n/lang'
 
 /**
  * Select(A, k) from the Lecture 4 notes: k is 1-based (k ∈ {1,…,n}), returns the k-th smallest.
@@ -61,9 +62,9 @@ function selectItems(items: Item[], k: number, strategy: PivotStrategy, rng: Rng
 }
 
 export function validateK(n: number, k: number): string | null {
-  if (n === 0) return 'Dizi boş; seçilecek eleman yok.'
-  if (!Number.isInteger(k)) return 'k bir tam sayı olmalı.'
-  if (k < 1 || k > n) return `k, 1 ile n = ${n} arasında olmalı (1 tabanlı sıra: k = 1 en küçük eleman).`
+  if (n === 0) return tx('Dizi boş; seçilecek eleman yok.', 'The array is empty; there is nothing to select.')
+  if (!Number.isInteger(k)) return tx('k bir tam sayı olmalı.', 'k must be an integer.')
+  if (k < 1 || k > n) return tx(`k, 1 ile n = ${n} arasında olmalı (1 tabanlı sıra: k = 1 en küçük eleman).`, `k must be between 1 and n = ${n} (1-based rank: k = 1 is the smallest element).`)
   return null
 }
 
@@ -118,7 +119,7 @@ export function selectTrace(A: readonly number[], kIn: number, strategy: PivotSt
         ...s,
         current: [...s.current],
       },
-      counters: { 'karşılaştırma (pivotla)': comparisons, 'Select çağrısı': calls },
+      counters: { [tx('karşılaştırma (pivotla)', 'comparisons (with pivot)')]: comparisons, [tx('Select çağrısı', 'Select calls')]: calls },
     })
 
   let items: Item[] = A.map((v, id) => ({ id, v }))
@@ -133,14 +134,14 @@ export function selectTrace(A: readonly number[], kIn: number, strategy: PivotSt
         line: 1,
         explain:
           depth === 0
-            ? `Select(A, n = ${items.length}, k = ${k}): ${k}. en küçük elemanı arıyoruz. Tüm elemanlar aday.`
-            : `Özyinelemeli çağrı: Select(n = ${items.length}, k = ${k}). Aday bölge [${items.map((x) => x.v).join(', ')}].`,
+            ? tx(`Select(A, n = ${items.length}, k = ${k}): ${k}. en küçük elemanı arıyoruz. Tüm elemanlar aday.`, `Select(A, n = ${items.length}, k = ${k}): we look for the ${k}-th smallest element. Every element is a candidate.`)
+            : tx(`Özyinelemeli çağrı: Select(n = ${items.length}, k = ${k}). Aday bölge [${items.map((x) => x.v).join(', ')}].`, `Recursive call: Select(n = ${items.length}, k = ${k}). Candidate region [${items.map((x) => x.v).join(', ')}].`),
         vars: { n: items.length, k, derinlik: depth },
       },
     )
     if (items.length === 1) {
       roles[items[0].id] = 'found'
-      push({ k, depth, current: ids, result: items[0].v }, { line: 2, explain: `n = 1: tek aday ${items[0].v}. k = 1 olmak zorunda olduğundan cevap budur.`, vars: { sonuç: items[0].v } })
+      push({ k, depth, current: ids, result: items[0].v }, { line: 2, explain: tx(`n = 1: tek aday ${items[0].v}. k = 1 olmak zorunda olduğundan cevap budur.`, `n = 1: the only candidate is ${items[0].v}. Since k must be 1, this is the answer.`), vars: { [tx('sonuç', 'result')]: items[0].v } })
       break
     }
     let pivot: Item
@@ -156,7 +157,7 @@ export function selectTrace(A: readonly number[], kIn: number, strategy: PivotSt
         {
           line: 3,
           phase: 'ChoosePivot',
-          explain: `Medyanların medyanı: ${items.length} aday ${groups.length} gruba (en fazla 5'li) ayrıldı ve her grup sıralandı. Grup medyanları C = [${r.medians.map((x) => x.v).join(', ')}].`,
+          explain: tx(`Medyanların medyanı: ${items.length} aday ${groups.length} gruba (en fazla 5'li) ayrıldı ve her grup sıralandı. Grup medyanları C = [${r.medians.map((x) => x.v).join(', ')}].`, `Median of medians: the ${items.length} candidates were split into ${groups.length} groups (of at most 5) and each group was sorted. Group medians C = [${r.medians.map((x) => x.v).join(', ')}].`),
           vars: { g: groups.length },
         },
       )
@@ -165,7 +166,7 @@ export function selectTrace(A: readonly number[], kIn: number, strategy: PivotSt
         {
           line: 3,
           phase: 'ChoosePivot',
-          explain: `p = Select(C, ${medianIds.length}, ${Math.ceil(medianIds.length / 2)}) = ${pivot.v} (bu iç özyinelemeli çağrı burada tek adımda gösteriliyor). Lemma: |A<| ve |A>| en fazla 7n/10 + 5 olur.`,
+          explain: tx(`p = Select(C, ${medianIds.length}, ${Math.ceil(medianIds.length / 2)}) = ${pivot.v} (bu iç özyinelemeli çağrı burada tek adımda gösteriliyor). Lemma: |A<| ve |A>| en fazla 7n/10 + 5 olur.`, `p = Select(C, ${medianIds.length}, ${Math.ceil(medianIds.length / 2)}) = ${pivot.v} (this inner recursive call is shown here as a single step). Lemma: |A<| and |A>| are at most 7n/10 + 5.`),
           vars: { p: pivot.v },
         },
       )
@@ -178,8 +179,8 @@ export function selectTrace(A: readonly number[], kIn: number, strategy: PivotSt
           phase: 'ChoosePivot',
           explain:
             strategy === 'first'
-              ? `Pivot olarak aday bölgenin ilk elemanı seçildi: p = ${pivot.v}. (Rastgele değil; en kötü durumda Θ(n²) sürer.)`
-              : `Pivot, adaylar arasından düzgün (uniform) rastgele seçildi: p = ${pivot.v}.`,
+              ? tx(`Pivot olarak aday bölgenin ilk elemanı seçildi: p = ${pivot.v}. (Rastgele değil; en kötü durumda Θ(n²) sürer.)`, `The first element of the candidate region was chosen as the pivot: p = ${pivot.v}. (Not random; takes Θ(n²) in the worst case.)`)
+              : tx(`Pivot, adaylar arasından düzgün (uniform) rastgele seçildi: p = ${pivot.v}.`, `The pivot was chosen uniformly at random among the candidates: p = ${pivot.v}.`),
           vars: { p: pivot.v },
         },
       )
@@ -198,19 +199,19 @@ export function selectTrace(A: readonly number[], kIn: number, strategy: PivotSt
       { k, depth, current: ids, pivotId: pivot.id, sizes },
       {
         line: 4,
-        phase: 'Bölümleme',
-        explain: `Her aday p = ${pivot.v} ile karşılaştırıldı (${items.length - 1} karşılaştırma): |A<| = ${less.length}, |A=| = ${equal.length}${equal.length > 1 ? ' (tekrarlı değerler)' : ''}, |A>| = ${greater.length}.`,
+        phase: tx('Bölümleme', 'Partition'),
+        explain: tx(`Her aday p = ${pivot.v} ile karşılaştırıldı (${items.length - 1} karşılaştırma): |A<| = ${less.length}, |A=| = ${equal.length}${equal.length > 1 ? ' (tekrarlı değerler)' : ''}, |A>| = ${greater.length}.`, `Every candidate was compared with p = ${pivot.v} (${items.length - 1} comparisons): |A<| = ${less.length}, |A=| = ${equal.length}${equal.length > 1 ? ' (repeated values)' : ''}, |A>| = ${greater.length}.`),
         vars: { p: pivot.v, '|A<|': less.length, '|A=|': equal.length, '|A>|': greater.length, k },
         predict: {
-          question: `|A<| = ${less.length}, |A=| = ${equal.length}, |A>| = ${greater.length} ve k = ${k}. Algoritma şimdi ne yapar?`,
-          options: ['A< içinde k ile özyinele', 'p\'yi döndür', `A> içinde k − |A<| − |A=| ile özyinele`],
+          question: tx(`|A<| = ${less.length}, |A=| = ${equal.length}, |A>| = ${greater.length} ve k = ${k}. Algoritma şimdi ne yapar?`, `|A<| = ${less.length}, |A=| = ${equal.length}, |A>| = ${greater.length} and k = ${k}. What does the algorithm do now?`),
+          options: [tx('A< içinde k ile özyinele', 'Recurse into A< with k'), tx('p\'yi döndür', 'Return p'), tx(`A> içinde k − |A<| − |A=| ile özyinele`, `Recurse into A> with k − |A<| − |A=|`)],
           answer: where,
           why:
             where === 0
-              ? `${less.length} ≥ k = ${k}: p'den küçük en az k eleman var, aranan eleman A< içinde.`
+              ? tx(`${less.length} ≥ k = ${k}: p'den küçük en az k eleman var, aranan eleman A< içinde.`, `${less.length} ≥ k = ${k}: at least k elements are smaller than p, so the target is in A<.`)
               : where === 1
-                ? `|A<| = ${less.length} < k ≤ |A<| + |A=| = ${less.length + equal.length}: aranan sıra p'nin kopyalarından birine düşüyor.`
-                : `|A<| + |A=| = ${less.length + equal.length} < k = ${k}: aranan eleman p'den büyük; A> içinde sırası k − ${less.length + equal.length} = ${k - less.length - equal.length} olur.`,
+                ? tx(`|A<| = ${less.length} < k ≤ |A<| + |A=| = ${less.length + equal.length}: aranan sıra p'nin kopyalarından birine düşüyor.`, `|A<| = ${less.length} < k ≤ |A<| + |A=| = ${less.length + equal.length}: the target rank falls on one of the copies of p.`)
+                : tx(`|A<| + |A=| = ${less.length + equal.length} < k = ${k}: aranan eleman p'den büyük; A> içinde sırası k − ${less.length + equal.length} = ${k - less.length - equal.length} olur.`, `|A<| + |A=| = ${less.length + equal.length} < k = ${k}: the target is larger than p; its rank in A> is k − ${less.length + equal.length} = ${k - less.length - equal.length}.`),
         },
       },
     )
@@ -220,7 +221,7 @@ export function selectTrace(A: readonly number[], kIn: number, strategy: PivotSt
       roles[pivot.id] = 'found'
       push(
         { k, depth, current: ids, pivotId: pivot.id, sizes, result: pivot.v },
-        { line: 6, explain: `|A<| = ${less.length} < k = ${k} ≤ |A<| + |A=| = ${less.length + equal.length}: tam olarak k − 1'den az eleman p'den küçük, p'nin kopyaları k. sırayı kapsıyor. Cevap p = ${pivot.v}.`, vars: { sonuç: pivot.v } },
+        { line: 6, explain: tx(`|A<| = ${less.length} < k = ${k} ≤ |A<| + |A=| = ${less.length + equal.length}: tam olarak k − 1'den az eleman p'den küçük, p'nin kopyaları k. sırayı kapsıyor. Cevap p = ${pivot.v}.`, `|A<| = ${less.length} < k = ${k} ≤ |A<| + |A=| = ${less.length + equal.length}: fewer than k elements are smaller than p, and the copies of p cover rank k. The answer is p = ${pivot.v}.`), vars: { [tx('sonuç', 'result')]: pivot.v } },
       )
       break
     }
@@ -229,7 +230,7 @@ export function selectTrace(A: readonly number[], kIn: number, strategy: PivotSt
       for (const x of less) roles[x.id] = 'candidate'
       push(
         { k, depth, current: less.map((x) => x.id), sizes },
-        { line: 5, explain: `|A<| = ${less.length} ≥ k = ${k}: en küçük k eleman tamamen A< içinde. p dahil p'ye eşit ya da p'den büyük ${equal.length + greater.length} eleman elendi; k değişmez.`, vars: { k } },
+        { line: 5, explain: tx(`|A<| = ${less.length} ≥ k = ${k}: en küçük k eleman tamamen A< içinde. p dahil p'ye eşit ya da p'den büyük ${equal.length + greater.length} eleman elendi; k değişmez.`, `|A<| = ${less.length} ≥ k = ${k}: the k smallest elements are entirely in A<. The ${equal.length + greater.length} elements equal to or larger than p (p included) are eliminated; k is unchanged.`), vars: { k } },
       )
       items = less
     } else {
@@ -240,7 +241,7 @@ export function selectTrace(A: readonly number[], kIn: number, strategy: PivotSt
         { k: newK, depth, current: greater.map((x) => x.id), sizes },
         {
           line: 7,
-          explain: `|A<| + |A=| = ${less.length + equal.length} < k = ${k}: aranan eleman A> içinde. Elenen ${less.length + equal.length} eleman, aranandan küçük olduğu için yeni sıra k' = ${k} − ${less.length + equal.length} = ${newK}.`,
+          explain: tx(`|A<| + |A=| = ${less.length + equal.length} < k = ${k}: aranan eleman A> içinde. Elenen ${less.length + equal.length} eleman, aranandan küçük olduğu için yeni sıra k' = ${k} − ${less.length + equal.length} = ${newK}.`, `|A<| + |A=| = ${less.length + equal.length} < k = ${k}: the target is in A>. The ${less.length + equal.length} eliminated elements are smaller than the target, so the new rank is k' = ${k} − ${less.length + equal.length} = ${newK}.`),
           vars: { "k'": newK },
         },
       )
@@ -251,7 +252,7 @@ export function selectTrace(A: readonly number[], kIn: number, strategy: PivotSt
   }
   push(
     { k, depth, current: [], result: trace[trace.length - 1].state.result },
-    { line: 1, explain: `Sonuç: A'nın ${kIn}. en küçük elemanı ${trace[trace.length - 1].state.result}. (Kontrol: sıralı dizide ${kIn}. eleman ${[...A].sort((x, y) => x - y)[kIn - 1]}.) Toplam ${comparisons} pivot karşılaştırması, ${calls} Select çağrısı (n = ${n}).` },
+    { line: 1, explain: tx(`Sonuç: A'nın ${kIn}. en küçük elemanı ${trace[trace.length - 1].state.result}. (Kontrol: sıralı dizide ${kIn}. eleman ${[...A].sort((x, y) => x - y)[kIn - 1]}.) Toplam ${comparisons} pivot karşılaştırması, ${calls} Select çağrısı (n = ${n}).`, `Result: the ${kIn}-th smallest element of A is ${trace[trace.length - 1].state.result}. (Check: element ${kIn} of the sorted array is ${[...A].sort((x, y) => x - y)[kIn - 1]}.) In total ${comparisons} pivot comparisons, ${calls} Select calls (n = ${n}).`) },
   )
   return trace
 }

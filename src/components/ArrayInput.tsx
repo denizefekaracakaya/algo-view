@@ -1,6 +1,7 @@
 import { useId, useState } from 'react'
 import { Shuffle } from 'lucide-react'
 import { parseNumberList, type NumberListOptions } from '../engines/parse'
+import { tx } from '../i18n/lang'
 
 export interface Preset {
   label: string
@@ -18,7 +19,7 @@ interface Props {
 }
 
 /** Editable list of numbers with presets, a random generator and validation messages. */
-export function ArrayInput({ value, onChange, presets, options, random, label = 'Girdi dizisi', hint }: Props) {
+export function ArrayInput({ value, onChange, presets, options, random, label = tx('Girdi dizisi', 'Input array'), hint }: Props) {
   const [text, setText] = useState(value.join(', '))
   const [error, setError] = useState<string | null>(null)
   const id = useId()
@@ -57,14 +58,14 @@ export function ArrayInput({ value, onChange, presets, options, random, label = 
           />
         </label>
         <button className="btn primary" type="submit" style={{ alignSelf: 'flex-end' }}>
-          Uygula
+          {tx('Uygula', 'Apply')}
         </button>
-        <button className="btn" type="button" style={{ alignSelf: 'flex-end' }} onClick={() => set(random())} aria-label="Rastgele dizi üret">
-          <Shuffle size={15} aria-hidden /> Rastgele
+        <button className="btn" type="button" style={{ alignSelf: 'flex-end' }} onClick={() => set(random())} aria-label={tx('Rastgele dizi üret', 'Generate a random array')}>
+          <Shuffle size={15} aria-hidden /> {tx('Rastgele', 'Random')}
         </button>
       </form>
-      <div className="row" role="group" aria-label="Hazır örnekler">
-        <span className="small muted">Örnekler:</span>
+      <div className="row" role="group" aria-label={tx('Hazır örnekler', 'Preset examples')}>
+        <span className="small muted">{tx('Örnekler:', 'Examples:')}</span>
         {presets.map((p) => (
           <button key={p.label} className="btn sm" type="button" onClick={() => set(p.values)}>
             {p.label}
@@ -77,7 +78,7 @@ export function ArrayInput({ value, onChange, presets, options, random, label = 
         </div>
       ) : (
         <div className="small muted" id={id + '-hint'}>
-          {hint ?? `Virgül veya boşlukla ayrılmış en fazla ${options.maxLength ?? 32} sayı.`}
+          {hint ?? tx(`Virgül veya boşlukla ayrılmış en fazla ${options.maxLength ?? 32} sayı.`, `Up to ${options.maxLength ?? 32} numbers separated by commas or spaces.`)}
         </div>
       )}
     </div>

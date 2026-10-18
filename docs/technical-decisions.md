@@ -11,6 +11,15 @@ The workspace was empty, so the default stack from the brief was used: React 19 
 5. **Content** (`src/content`): typed lesson data; prose in a tiny markup (`$…$`, `$$…$$`, `**`, lists) rendered by `Rich`. Visualizers are referenced by string keys (`viz: 'select'`) resolved by `src/viz/registry.tsx`, so adding a lecture means adding data + (optionally) a visualizer — no layout changes.
 6. **App UI** (`src/pages`): dashboard (progress, continue, search, status filter), lesson page (fixed section order, numbered; sidebar TOC that collapses on mobile), sources, settings.
 
+## Languages (Turkish / English)
+- `src/i18n/lang.ts` keeps the active language in a module variable and exposes `tx(tr, en)`. Pure engines call `tx` for trace explanations, so no React context has to reach them.
+- The language is a persisted preference (`prefs.lang`). `ProgressProvider` sets the module variable synchronously during render, and `App` keys the page tree on the language, so switching remounts the pages and every memoized trace is regenerated in the new language (visualizer state resets, which is acceptable).
+- Lesson content is duplicated per language (`src/content/lecture*.ts` and `src/content/en/lecture*.ts`) rather than interleaved, so each file reads naturally. `content.test.ts` asserts that both languages have identical structure (ids, section kinds, visualizers, pseudocode, quiz answers, sources) and that the English files contain no Turkish text.
+- Section labels are language-neutral keys (`intuition`, `formal`, `proofIdea`, `formalProof`) rendered via a lookup; source links carry `label` and `labelEn`.
+
+## Theme
+The header button toggles between light and dark based on the *effective* theme (an explicit choice, or the system setting while the preference is `system`). Settings still offer “follow system”. An inline script in `index.html` applies the saved theme and language before first paint.
+
 ## Algorithmic choices
 - **InsertionSort / MergeSort** follow the Lecture 2 Python code. Merge handles exhausted lists (the notes leave this as an exercise) and uses `<=` (stable).
 - **Karatsuba** uses BigInt and splits at m = ⌊n/2⌋ low digits; cost = one-digit multiplications, matching the Lecture 1 cost model.
@@ -24,7 +33,7 @@ The workspace was empty, so the default stack from the brief was used: React 19 
 - **Substitution tool** uses exact rational arithmetic (`Frac`) so D = c/(1 − Σ kαᵖ) is printed exactly; floors/ceilings are ignored as in the notes.
 
 ## Persistence
-`localStorage` key `algoview:progress:v1`, versioned JSON: lesson status (in-progress on visit, completed on explicit click), quiz records (correct once ⇒ stays correct, attempts counted), last lesson, preferences (theme, speed, prediction mode). All access is wrapped in try/catch; corrupt or foreign-version data falls back to an empty state. Reset requires confirmation in a modal dialog and keeps preferences.
+`localStorage` key `algoview:progress:v1`, versioned JSON: lesson status (in-progress on visit, completed on explicit click), quiz records (correct once ⇒ stays correct, attempts counted), last lesson, preferences (theme, speed, prediction mode). All access is wrapped in try/catch; corrupt or foreign-version data falls back to an empty state. Reset requires confirmation in a modal dialog and keeps preferences (language, theme, speed, prediction mode).
 
 ## Accessibility
 Semantic landmarks, skip link, visible focus rings, labelled controls, `aria-live` explanations and quiz feedback, keyboard stepping, keyboard-operable tree nodes in the color playground, `prefers-reduced-motion` disables transitions, all algorithm states carry glyphs/labels in addition to color, light/dark themes with separately chosen tokens. Code fonts disable ligatures so `<|`, `>=` render literally.
@@ -33,4 +42,4 @@ Semantic landmarks, skip link, visible focus rings, labelled controls, `aria-liv
 - `src/engines/*.test.ts`: correctness on edge cases (empty, single, duplicates, negatives, extreme values) and hundreds of seeded random inputs; trace-consistency checks (final snapshot sorted, loop/partition invariants at the right lines, counters equal to the untraced versions, prediction answers equal the branch actually taken); RB invariants after **every** insertion for sorted, reversed, zig-zag and random orders, plus height ≤ 2 log₂(n+1); BST delete across all cases; decision trees have n! leaves and height ≥ ⌈log₂ n!⌉; Master/substitution results for every example used in the lessons.
 - `src/content/content.test.ts`: curriculum integrity (lectures 1–7 only, unique ids, valid answers, registered viz keys, official links) and every computed number quoted in practice solutions.
 - `src/ui.test.tsx`: player reducer, persistence round-trip, TraceViewer next/prev/reset/end/keyboard/auto-play/prediction mode, quiz feedback for all question kinds, input validation, lesson page and dashboard state.
-- `e2e/smoke.spec.ts` (Playwright, desktop 1366×900 and Pixel 7): navigation, controls, invalid input, quiz + persistence across reload, reset confirmation, RB insert, and every lesson renders without console errors or horizontal overflow.
+- `e2e/smoke.spec.ts` (Playwright, desktop 1366×900 and Pixel 7): navigation, controls, invalid input, quiz + persistence across reload, reset confirmation, RB insert, every lesson renders without console errors or horizontal overflow (in both languages), and the theme toggle survives a reload.

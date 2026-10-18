@@ -1,5 +1,6 @@
 import type { Trace, TraceStep } from '../trace/types'
 import { MNode, snap, fromSnap, type TNode } from './tree'
+import { tx } from '../i18n/lang'
 
 /** Binary search tree operations from the Lecture 7 notes (distinct keys). */
 export const BST_SEARCH_CODE = [
@@ -49,7 +50,7 @@ interface Ctx {
 }
 
 function pushT(ctx: Ctx, root: MNode | null, roles: Record<number, NodeRole>, step: Omit<TraceStep<TreeState>, 'state' | 'counters'>, probe: TreeState['probe'] = null) {
-  ctx.trace.push({ ...step, state: { root: snap(root, false), roles: { ...roles }, probe }, counters: { 'karşılaştırma': ctx.comparisons } })
+  ctx.trace.push({ ...step, state: { root: snap(root, false), roles: { ...roles }, probe }, counters: { [tx('karşılaştırma', 'comparisons')]: ctx.comparisons } })
 }
 
 /** Descends like search(i); returns the node where search stops. Records one step per comparison. */
@@ -59,7 +60,7 @@ function descend(ctx: Ctx, root: MNode, key: number, roles: Record<number, NodeR
     ctx.comparisons++
     roles[x.key] = 'current'
     if (key === x.key) {
-      pushT(ctx, root, roles, { line: line0 + 1, explain: `key(x) = ${x.key} = ${key}: anahtar bulundu.`, vars: { 'key(x)': x.key, i: key } }, { key, at: x.key })
+      pushT(ctx, root, roles, { line: line0 + 1, explain: tx(`key(x) = ${x.key} = ${key}: anahtar bulundu.`, `key(x) = ${x.key} = ${key}: key found.`), vars: { 'key(x)': x.key, i: key } }, { key, at: x.key })
       return x
     }
     const goLeft = key < x.key
@@ -70,15 +71,15 @@ function descend(ctx: Ctx, root: MNode, key: number, roles: Record<number, NodeR
       roles,
       {
         line: goLeft ? line0 + 2 : line0 + 5,
-        explain: `${key} ${goLeft ? '<' : '>'} ${x.key}: ${goLeft ? 'sol' : 'sağ'} alt ağaca ${next ? 'iniyoruz' : 'bakıyoruz, ama orası NIL; arama bu düğümde durur'}.`,
+        explain: tx(`${key} ${goLeft ? '<' : '>'} ${x.key}: ${goLeft ? 'sol' : 'sağ'} alt ağaca ${next ? 'iniyoruz' : 'bakıyoruz, ama orası NIL; arama bu düğümde durur'}.`, `${key} ${goLeft ? '<' : '>'} ${x.key}: ${next ? `we go down into the ${goLeft ? 'left' : 'right'} subtree` : `we look at the ${goLeft ? 'left' : 'right'} subtree, but it is NIL; the search stops at this node`}.`),
         vars: { 'key(x)': x.key, i: key },
         predict: {
-          question: `${key} aranıyor ve şu anki düğüm ${x.key}. Arama hangi yöne devam eder?`,
-          options: ['Sol çocuğa', 'Sağ çocuğa'],
+          question: tx(`${key} aranıyor ve şu anki düğüm ${x.key}. Arama hangi yöne devam eder?`, `Searching for ${key}; the current node is ${x.key}. Which way does the search continue?`),
+          options: [tx('Sol çocuğa', 'To the left child'), tx('Sağ çocuğa', 'To the right child')],
           answer: goLeft ? 0 : 1,
           why: goLeft
-            ? `${key} < ${x.key}; BST özelliğine göre ${x.key}'den küçük tüm anahtarlar sol alt ağaçtadır.`
-            : `${key} > ${x.key}; BST özelliğine göre ${x.key}'den büyük tüm anahtarlar sağ alt ağaçtadır.`,
+            ? tx(`${key} < ${x.key}; BST özelliğine göre ${x.key}'den küçük tüm anahtarlar sol alt ağaçtadır.`, `${key} < ${x.key}; by the BST property all keys smaller than ${x.key} are in the left subtree.`)
+            : tx(`${key} > ${x.key}; BST özelliğine göre ${x.key}'den büyük tüm anahtarlar sağ alt ağaçtadır.`, `${key} > ${x.key}; by the BST property all keys larger than ${x.key} are in the right subtree.`),
         },
       },
       { key, at: x.key },
@@ -104,21 +105,21 @@ export function bstOperationTrace(start: TNode | null, op: TreeOp, key: number):
 
   if (op === 'min' || op === 'max') {
     if (!ref.root) {
-      pushT(ctx, null, roles, { explain: 'Ağaç boş.' })
-      return { trace: ctx.trace, result: null, message: 'Ağaç boş.' }
+      pushT(ctx, null, roles, { explain: tx('Ağaç boş.', 'The tree is empty.') })
+      return { trace: ctx.trace, result: null, message: tx('Ağaç boş.', 'The tree is empty.') }
     }
     let x = ref.root
     for (;;) {
       roles[x.key] = 'current'
       const next = op === 'min' ? x.left : x.right
-      pushT(ctx, ref.root, roles, { explain: next ? `${x.key}: ${op === 'min' ? 'sol' : 'sağ'} çocuk var, daha ${op === 'min' ? 'küçük' : 'büyük'} anahtarlar orada.` : `${x.key}: ${op === 'min' ? 'sol' : 'sağ'} çocuk NIL. ${op === 'min' ? 'En küçük' : 'En büyük'} anahtar ${x.key}.` })
+      pushT(ctx, ref.root, roles, { explain: next ? tx(`${x.key}: ${op === 'min' ? 'sol' : 'sağ'} çocuk var, daha ${op === 'min' ? 'küçük' : 'büyük'} anahtarlar orada.`, `${x.key}: there is a ${op === 'min' ? 'left' : 'right'} child; ${op === 'min' ? 'smaller' : 'larger'} keys are there.`) : tx(`${x.key}: ${op === 'min' ? 'sol' : 'sağ'} çocuk NIL. ${op === 'min' ? 'En küçük' : 'En büyük'} anahtar ${x.key}.`, `${x.key}: the ${op === 'min' ? 'left' : 'right'} child is NIL. The ${op === 'min' ? 'smallest' : 'largest'} key is ${x.key}.`) })
       if (!next) break
       roles[x.key] = 'path'
       x = next
     }
     roles[x.key] = 'found'
-    message = `${op === 'min' ? 'Minimum' : 'Maksimum'}: ${x.key}`
-    pushT(ctx, ref.root, roles, { explain: `${message}. Yol uzunluğu ağacın yüksekliğini aşamaz: O(h).` })
+    message = tx(`${op === 'min' ? 'Minimum' : 'Maksimum'}: ${x.key}`, `${op === 'min' ? 'Minimum' : 'Maximum'}: ${x.key}`)
+    pushT(ctx, ref.root, roles, { explain: tx(`${message}. Yol uzunluğu ağacın yüksekliğini aşamaz: O(h).`, `${message}. The path length cannot exceed the tree height: O(h).`) })
     return { trace: ctx.trace, result: snap(ref.root, false), message }
   }
 
@@ -126,21 +127,21 @@ export function bstOperationTrace(start: TNode | null, op: TreeOp, key: number):
     if (op === 'insert') {
       ref.root = new MNode(key)
       roles[key] = 'new'
-      pushT(ctx, ref.root, roles, { line: 3, explain: `Ağaç boştu: ${key} kök olarak eklendi.` })
-      return { trace: ctx.trace, result: snap(ref.root, false), message: `${key} eklendi.` }
+      pushT(ctx, ref.root, roles, { line: 3, explain: tx(`Ağaç boştu: ${key} kök olarak eklendi.`, `The tree was empty: ${key} was inserted as the root.`) })
+      return { trace: ctx.trace, result: snap(ref.root, false), message: tx(`${key} eklendi.`, `${key} inserted.`) }
     }
-    pushT(ctx, null, roles, { explain: 'Ağaç boş; aranacak ya da silinecek düğüm yok.' })
-    return { trace: ctx.trace, result: null, message: 'Ağaç boş.' }
+    pushT(ctx, null, roles, { explain: tx('Ağaç boş; aranacak ya da silinecek düğüm yok.', 'The tree is empty; there is no node to search for or delete.') })
+    return { trace: ctx.trace, result: null, message: tx('Ağaç boş.', 'The tree is empty.') }
   }
 
   const x = descend(ctx, ref.root, key, roles, 1)
   if (op === 'search') {
     if (x.key === key) {
       roles[x.key] = 'found'
-      message = `${key} bulundu.`
+      message = tx(`${key} bulundu.`, `${key} found.`)
     } else {
       roles[x.key] = 'focus'
-      message = `${key} ağaçta yok; search, ${key} eklenseydi ebeveyni olacak düğümü (${x.key}) döndürür.`
+      message = tx(`${key} ağaçta yok; search, ${key} eklenseydi ebeveyni olacak düğümü (${x.key}) döndürür.`, `${key} is not in the tree; search returns the node that would be its parent if ${key} were inserted (${x.key}).`)
     }
     pushT(ctx, ref.root, roles, { line: 1, explain: message }, { key, at: x.key })
     return { trace: ctx.trace, result: snap(ref.root, false), message }
@@ -149,7 +150,7 @@ export function bstOperationTrace(start: TNode | null, op: TreeOp, key: number):
   if (op === 'insert') {
     if (x.key === key) {
       roles[x.key] = 'found'
-      message = `${key} zaten ağaçta. Ders notlarında anahtarlar farklı varsayıldığı için ekleme yapılmadı.`
+      message = tx(`${key} zaten ağaçta. Ders notlarında anahtarlar farklı varsayıldığı için ekleme yapılmadı.`, `${key} is already in the tree. Since the lecture notes assume distinct keys, nothing was inserted.`)
       pushT(ctx, ref.root, roles, { line: 2, explain: message })
       return { trace: ctx.trace, result: snap(ref.root, false), message }
     }
@@ -159,56 +160,56 @@ export function bstOperationTrace(start: TNode | null, op: TreeOp, key: number):
     else x.right = y
     roles[x.key] = 'path'
     roles[key] = 'new'
-    message = `${key}, ${x.key} düğümünün ${key < x.key ? 'sol' : 'sağ'} çocuğu olarak eklendi.`
-    pushT(ctx, ref.root, roles, { line: key < x.key ? 4 : 5, explain: `${message} search'ün durduğu düğümün o tarafı NIL olmak zorundaydı.` })
+    message = tx(`${key}, ${x.key} düğümünün ${key < x.key ? 'sol' : 'sağ'} çocuğu olarak eklendi.`, `${key} was inserted as the ${key < x.key ? 'left' : 'right'} child of ${x.key}.`)
+    pushT(ctx, ref.root, roles, { line: key < x.key ? 4 : 5, explain: tx(`${message} search'ün durduğu düğümün o tarafı NIL olmak zorundaydı.`, `${message} That side of the node where search stopped had to be NIL.`) })
     return { trace: ctx.trace, result: snap(ref.root, false), message }
   }
 
   // delete
   if (x.key !== key) {
     roles[x.key] = 'focus'
-    message = `${key} ağaçta yok; silinecek bir şey yok.`
+    message = tx(`${key} ağaçta yok; silinecek bir şey yok.`, `${key} is not in the tree; there is nothing to delete.`)
     pushT(ctx, ref.root, roles, { line: 2, explain: message })
     return { trace: ctx.trace, result: snap(ref.root, false), message }
   }
   roles[x.key] = 'removed'
   if (!x.left && !x.right) {
-    pushT(ctx, ref.root, roles, { line: 3, phase: '1. durum', explain: `${key} bir yaprak (çocuğu yok): ebeveynindeki işaretçi NIL yapılır.` })
+    pushT(ctx, ref.root, roles, { line: 3, phase: tx('1. durum', 'Case 1'), explain: tx(`${key} bir yaprak (çocuğu yok): ebeveynindeki işaretçi NIL yapılır.`, `${key} is a leaf (no children): the pointer in its parent is set to NIL.`) })
     replaceChild(x.parent, x, null, ref)
     delete roles[key]
-    message = `${key} silindi (yaprak).`
+    message = tx(`${key} silindi (yaprak).`, `${key} deleted (leaf).`)
   } else if (!x.left || !x.right) {
     const c = (x.left ?? x.right)!
     roles[c.key] = 'focus'
-    pushT(ctx, ref.root, roles, { line: 4, phase: '2. durum', explain: `${key} yalnızca bir çocuğa (${c.key}) sahip: ${c.key} alt ağacı ${key}'in yerine yükseltilir.` })
+    pushT(ctx, ref.root, roles, { line: 4, phase: tx('2. durum', 'Case 2'), explain: tx(`${key} yalnızca bir çocuğa (${c.key}) sahip: ${c.key} alt ağacı ${key}'in yerine yükseltilir.`, `${key} has only one child (${c.key}): the subtree of ${c.key} is promoted into ${key}'s place.`) })
     replaceChild(x.parent, x, c, ref)
     delete roles[key]
-    message = `${key} silindi; yerine ${c.key} geçti.`
+    message = tx(`${key} silindi; yerine ${c.key} geçti.`, `${key} deleted; ${c.key} took its place.`)
   } else {
     let z = x.right!
     roles[z.key] = 'path'
-    pushT(ctx, ref.root, roles, { line: 6, phase: '3. durum', explain: `${key} iki çocuğa sahip. Ardılını (successor) arıyoruz: sağ alt ağaçtaki en küçük anahtar. Önce sağ çocuk ${z.key}.` })
+    pushT(ctx, ref.root, roles, { line: 6, phase: tx('3. durum', 'Case 3'), explain: tx(`${key} iki çocuğa sahip. Ardılını (successor) arıyoruz: sağ alt ağaçtaki en küçük anahtar. Önce sağ çocuk ${z.key}.`, `${key} has two children. We look for its successor: the smallest key in the right subtree. First the right child ${z.key}.`) })
     while (z.left) {
       ctx.comparisons++
       z = z.left
       roles[z.key] = 'path'
-      pushT(ctx, ref.root, roles, { line: 6, phase: '3. durum', explain: `Sol çocuk var: ${z.key}'e iniyoruz.` })
+      pushT(ctx, ref.root, roles, { line: 6, phase: tx('3. durum', 'Case 3'), explain: tx(`Sol çocuk var: ${z.key}'e iniyoruz.`, `There is a left child: we go down to ${z.key}.`) })
     }
     roles[z.key] = 'successor'
-    pushT(ctx, ref.root, roles, { line: 6, phase: '3. durum', explain: `Ardıl z = ${z.key} (sol çocuğu yok). ${key}'ten büyük en küçük anahtar bu.` })
+    pushT(ctx, ref.root, roles, { line: 6, phase: tx('3. durum', 'Case 3'), explain: tx(`Ardıl z = ${z.key} (sol çocuğu yok). ${key}'ten büyük en küçük anahtar bu.`, `Successor z = ${z.key} (it has no left child). It is the smallest key larger than ${key}.`) })
     if (z.parent !== x) {
       replaceChild(z.parent, z, z.right, ref)
       z.right = x.right
       z.right!.parent = z
-      pushT(ctx, ref.root, roles, { line: 7, phase: '3. durum', explain: `z'nin ${z.right ? 'sağ alt ağacı' : 'boş sağ tarafı'} z'nin eski yerine bağlandı; z artık ${key}'in yerine geçmeye hazır.` })
+      pushT(ctx, ref.root, roles, { line: 7, phase: tx('3. durum', 'Case 3'), explain: tx(`z'nin ${z.right ? 'sağ alt ağacı' : 'boş sağ tarafı'} z'nin eski yerine bağlandı; z artık ${key}'in yerine geçmeye hazır.`, `z's ${z.right ? 'right subtree' : 'empty right side'} was linked into z's old place; z is now ready to take ${key}'s place.`) })
     }
     z.left = x.left
     z.left!.parent = z
     replaceChild(x.parent, x, z, ref)
     delete roles[key]
     roles[z.key] = 'found'
-    message = `${key} silindi; yerine ardılı ${z.key} geçti.`
-    pushT(ctx, ref.root, roles, { line: 8, phase: '3. durum', explain: `${message} BST özelliği korunur: ${z.key}, ${key}'in sol alt ağacındaki her şeyden büyük, sağ alt ağaçta kalan her şeyden küçük.` })
+    message = tx(`${key} silindi; yerine ardılı ${z.key} geçti.`, `${key} deleted; its successor ${z.key} took its place.`)
+    pushT(ctx, ref.root, roles, { line: 8, phase: tx('3. durum', 'Case 3'), explain: tx(`${message} BST özelliği korunur: ${z.key}, ${key}'in sol alt ağacındaki her şeyden büyük, sağ alt ağaçta kalan her şeyden küçük.`, `${message} The BST property is preserved: ${z.key} is larger than everything in ${key}'s left subtree and smaller than everything left in the right subtree.`) })
     return { trace: ctx.trace, result: snap(ref.root, false), message }
   }
   pushT(ctx, ref.root, roles, { line: 1, explain: message })

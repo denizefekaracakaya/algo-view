@@ -26,7 +26,7 @@ export const lecture6: Lecture = {
         {
           kind: 'intuition',
           title: 'Sezgi: “StickSort” ve hesaplama modeli',
-          label: 'Sezgi',
+          label: 'intuition',
           body: `Slaytlardaki şaka: çubukları masaya dikine bırakırsanız uzunluklarına göre “sıralanırlar” — $O(1)$! Bu bize bir şey öğretir: bir alt sınır yalnızca belirli bir **hesaplama modelinde** anlamlıdır.
 
 **Karşılaştırma tabanlı model:** öğelerin değerlerine doğrudan erişemezsiniz; yalnızca bir “cine” (genie) “$x$, $y$’den büyük mü?” diye sorabilirsiniz. InsertionSort, MergeSort ve QuickSort bu modeldedir.`,
@@ -35,7 +35,7 @@ export const lecture6: Lecture = {
           kind: 'formal',
           title: 'Teorem (Ders 6 slaytları)',
           box: 'formal',
-          label: 'Biçimsel',
+          label: 'formal',
           body: `- Her **deterministik** karşılaştırma tabanlı sıralama algoritması en kötü durumda $\\Omega(n\\log n)$ adım atar.
 - Her **rastgele** karşılaştırma tabanlı sıralama algoritması **beklenti olarak** $\\Omega(n\\log n)$ adım atar. (Kanıtı bu dersin kapsamında değil.)
 
@@ -50,7 +50,7 @@ Sonuç: karşılaştırma modelinde MergeSort **asimptotik olarak optimaldir**.`
         {
           kind: 'correctness',
           title: 'Kanıt',
-          label: 'Biçimsel kanıt',
+          label: 'formalProof',
           proof: [
             { title: 'Algoritma = karar ağacı', body: 'Deterministik bir algoritma, şimdiye kadarki cevaplara göre bir sonraki soruyu seçer. İç düğümler sorular, iki çocuk EVET/HAYIR cevapları, yapraklar çıktılardır. Bir girdide çalışmak, kökten bir yaprağa giden bir yoldur.' },
             { title: 'Çalışma süresi ≥ yol uzunluğu', body: 'Her soru en az bir adımdır; dolayısıyla en kötü durum çalışma süresi ≥ en uzun yol = ağacın yüksekliği $h$.' },
@@ -139,7 +139,7 @@ Sonuç: karşılaştırma modelinde MergeSort **asimptotik olarak optimaldir**.`
         {
           kind: 'intuition',
           title: 'Sezgi: doğum ayına göre sıralamak',
-          label: 'Sezgi',
+          label: 'intuition',
           body: `Ön alıştırma: $n$ öğrenciyi doğum ayına göre sıralayın. MergeSort $O(n\\log n)$ alır. Ama 12 kutu açıp her öğrenciyi doğum ayının kutusuna atar, sonra kutuları Ocak’tan Aralık’a birleştirirseniz $O(n + 12) = O(n)$! Hiç karşılaştırma yapmadık: **değeri doğrudan indeks olarak** kullandık.
 
 Ders başlığındaki “BucketSort” bu kova fikridir; notlar ve slaytlar onu **CountingSort** ve onun üstüne kurulan **RadixSort** olarak işler.`,
@@ -148,7 +148,7 @@ Ders başlığındaki “BucketSort” bu kova fikridir; notlar ve slaytlar onu 
           kind: 'formal',
           title: 'Algoritmalar ve varsayımlar',
           box: 'formal',
-          label: 'Biçimsel',
+          label: 'formal',
           body: `**CountingSort** (anahtarlar $\\{0, \\dots, r-1\\}$): $r$ boş FIFO kova (bağlı liste) oluştur; her öğeyi anahtarının kovasının **sonuna** ekle; kovaları $0, 1, \\dots, r-1$ sırasıyla birleştir. **En kötü durum** $O(n + r)$.
 
 **Kararlılık:** aynı anahtarlı $x$ girdide $y$’den önceyse çıktıda da önce gelir. FIFO kovalar bunu garanti eder.
@@ -166,7 +166,7 @@ Ders başlığındaki “BucketSort” bu kova fikridir; notlar ve slaytlar onu 
         {
           kind: 'correctness',
           title: 'RadixSort’un doğruluğu',
-          label: 'Biçimsel kanıt',
+          label: 'formalProof',
           proof: [
             { title: 'Hipotez', body: '$k$. iterasyondan sonra dizi, en anlamsız $k$ basamağa göre sıralıdır.' },
             { title: 'Taban', body: '$k = 0$: “0 basamağa göre sıralı” her dizi için doğrudur.' },

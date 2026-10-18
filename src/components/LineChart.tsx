@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { tx } from '../i18n/lang'
 
 export interface Series {
   name: string
@@ -33,7 +34,7 @@ export function LineChart({ series, logY = false, xLabel, yLabel, title, height 
   const m = { l: 56, r: 14, t: 12, b: 40 }
   const xs = series.flatMap((s) => s.points.map((p) => p.x))
   const ys = series.flatMap((s) => s.points.map((p) => p.y)).filter((y) => Number.isFinite(y) && (!logY || y > 0))
-  if (!xs.length || !ys.length) return <p className="muted">Gösterilecek veri yok.</p>
+  if (!xs.length || !ys.length) return <p className="muted">{tx('Gösterilecek veri yok.', 'No data to show.')}</p>
   const x0 = Math.min(...xs)
   const x1 = Math.max(...xs)
   const tY = (y: number) => (logY ? Math.log10(Math.max(y, 1e-9)) : y)
