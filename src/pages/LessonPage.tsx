@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, CheckCircle2, ExternalLink, ListTree, RotateCcw } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CheckCircle2, Circle, ExternalLink, ListChecks, ListTree, RotateCcw } from 'lucide-react'
 import { allLessons, lectures, findLesson } from '../content/curriculum'
 import { tx } from '../i18n/lang'
-import type { Section, SourceRef } from '../content/types'
+import type { Lesson, Lecture, Section, SourceRef } from '../content/types'
 import { useProgress } from '../state/ProgressContext'
 import { lessonStatus } from '../state/progress'
 import { Inline, Rich } from '../components/Tex'
 import { Pseudocode } from '../components/Pseudocode'
 import { ProofStepper } from '../components/ProofStepper'
-import { PracticeList, Quiz } from '../components/Quiz'
+import { CheckBlock, PracticeList, Quiz, type CheckResult } from '../components/Quiz'
 import { VIZ } from '../viz/registry'
 import { StatusIcon } from './Dashboard'
 
@@ -34,17 +34,11 @@ const sectionLabel = (l: NonNullable<Section['label']>): string =>
     formalProof: tx('Biçimsel kanıt', 'Formal proof'),
   })[l]
 
+const plain = (s: string) => s.replace(/\$([^$]*)\$/g, '$1').replace(/\\[a-z]+/g, '').replace(/[{}]/g, '')
+
 export function LessonPage() {
   const { lessonId = '' } = useParams()
   const found = findLesson(lessonId)
-  const { progress, dispatch } = useProgress()
-  const [tocOpen, setTocOpen] = useState(false)
-
-  useEffect(() => {
-    if (found) dispatch({ type: 'visit', lessonId: found.lesson.id, now: Date.now() })
-    setTocOpen(false)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lessonId])
 
   useEffect(() => {
     if (found) document.title = `${found.lesson.title} · Algo View`
@@ -62,19 +56,92 @@ export function LessonPage() {
         </p>
       </div>
     )
+  // Keyed by lesson so the ungraded check results and the TOC state start fresh per lesson.
+  return <LessonBody key={found.lesson.id} lesson={found.lesson} lecture={found.lecture} index={found.index} />
+}
 
-  const { lesson, lecture, index } = found
+function LessonBody({ lesson, lecture, index }: { lesson: Lesson; lecture: Lecture; index: number }) {
+  const { progress, dispatch } = useProgress()
+  const [tocOpen, setTocOpen] = useState(false)
+  const [checks, setChecks] = useState<Record<string, CheckResult>>({})
+  const articleRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    dispatch({ type: 'visit', lessonId: lesson.id, now: Date.now() })
+  }, [dispatch, lesson.id])
+
+  // A section counts as read once its end has scrolled into view.
+  useEffect(() => {
+    const root = articleRef.current
+    if (!root || typeof IntersectionObserver === 'undefined') return
+    const obs = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries)
+          if (e.isIntersecting) {
+            const idx = Number((e.target as HTMLElement).dataset.readIdx)
+            dispatch({ type: 'read', lessonId: lesson.id, section: idx })
+            obs.unobserve(e.target)
+          }
+      },
+      { rootMargin: '0px 0px -10% 0px' },
+    )
+    root.querySelectorAll('[data-read-idx]').forEach((el) => obs.observe(el))
+    return () => obs.disconnect()
+  }, [dispatch, lesson.id])
+
   const status = lessonStatus(progress, lesson.id)
   const ALL_LESSONS = allLessons()
   const LECTURES = lectures()
   const prev = ALL_LESSONS[index - 1]
   const next = ALL_LESSONS[index + 1]
   const quizSolved = lesson.quiz.filter((q) => progress.quiz[`${lesson.id}:${q.id}`]?.correct).length
+  const read = new Set(progress.read[lesson.id] ?? [])
+  const readCount = lesson.sections.filter((_, i) => read.has(i)).length
+  const checkTotal = lesson.sections.reduce((s, sec) => s + (sec.check?.length ?? 0), 0)
+  const checkSolved = Object.values(checks).filter((c) => c.correct).length
+  const checkFirst = Object.values(checks).filter((c) => c.firstTry).length
+
+  const onCheck = (qid: string, correct: boolean) =>
+    setChecks((c) => {
+      const prevRec = c[qid]
+      if (prevRec?.correct) return c
+      const attempts = (prevRec?.attempts ?? 0) + 1
+      return { ...c, [qid]: { correct, attempts, firstTry: correct && attempts === 1 } }
+    })
+
+  const checkOffsets = lesson.sections.reduce<number[]>((acc, _sec, i) => [...acc, i === 0 ? 0 : acc[i - 1] + (lesson.sections[i - 1].check?.length ?? 0)], [])
   let n = 0
 
   return (
     <div className="lesson-layout">
       <nav className={'sidebar' + (tocOpen ? ' open' : '')} aria-label={tx('Ders listesi', 'Lesson list')} id="lesson-toc">
+        <div className="in-lesson">
+          <h2>{tx('Bu derste', 'In this lesson')}</h2>
+          <ol className="sec-toc">
+            {lesson.sections.map((s, i) => (
+              <li key={i} className={read.has(i) ? 'read' : ''}>
+                <a href={`#sec-${i + 1}`} onClick={(e) => (e.preventDefault(), document.getElementById(`sec-${i + 1}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }))}>
+                  {read.has(i) ? <CheckCircle2 size={14} aria-hidden className="sec-done" /> : <Circle size={14} aria-hidden />}
+                  <span>{plain(s.title)}</span>
+                  {s.check && <span className="sec-q" aria-label={tx(`${s.check.length} deneme sorusu`, `${s.check.length} practice questions`)}>?</span>}
+                </a>
+              </li>
+            ))}
+          </ol>
+          <div className="toc-meter">
+            <div className="progressbar" role="progressbar" aria-valuenow={readCount} aria-valuemin={0} aria-valuemax={lesson.sections.length} aria-label={tx('Okunan bölümler', 'Sections read')}>
+              <span style={{ width: `${(readCount / Math.max(1, lesson.sections.length)) * 100}%` }} />
+            </div>
+            <span className="small muted">
+              {tx(`${readCount} / ${lesson.sections.length} bölüm okundu`, `${readCount} / ${lesson.sections.length} sections read`)}
+            </span>
+            {checkTotal > 0 && (
+              <span className="small muted">
+                {tx(`Kendini dene: ${checkSolved} / ${checkTotal}`, `Try it yourself: ${checkSolved} / ${checkTotal}`)}
+              </span>
+            )}
+          </div>
+        </div>
         {LECTURES.map((lec) => (
           <div key={lec.n}>
             <h2>
@@ -96,7 +163,7 @@ export function LessonPage() {
         ))}
       </nav>
 
-      <article aria-labelledby="lesson-title">
+      <article aria-labelledby="lesson-title" ref={articleRef}>
         <button className="btn sm toc-toggle" onClick={() => setTocOpen((o) => !o)} aria-expanded={tocOpen} aria-controls="lesson-toc" style={{ marginBottom: 12 }}>
           <ListTree size={15} aria-hidden /> {tx('Ders listesi', 'Lesson list')}
         </button>
@@ -116,6 +183,14 @@ export function LessonPage() {
               {status === 'completed' ? tx('Tamamlandı', 'Completed') : tx('Devam ediyor', 'In progress')}
             </span>
             <span className="badge">~{lesson.minutes} {tx('dk', 'min')}</span>
+            <span className="badge">
+              {lesson.sections.length} {tx('bölüm', 'sections')}
+            </span>
+            {checkTotal > 0 && (
+              <span className="badge">
+                {tx('Kendini dene', 'Try it yourself')} {checkTotal}
+              </span>
+            )}
             <span className="badge">
               Quiz {quizSolved}/{lesson.quiz.length}
             </span>
@@ -146,8 +221,36 @@ export function LessonPage() {
         </section>
 
         {lesson.sections.map((s, i) => (
-          <SectionView key={i} s={s} num={++n} />
+          <SectionView key={i} s={s} num={++n} idx={i}>
+            {s.check && <CheckBlock lessonId={lesson.id} questions={s.check} offset={checkOffsets[i]} total={checkTotal} results={checks} onResult={onCheck} />}
+          </SectionView>
         ))}
+
+        {checkTotal > 0 && (
+          <section className="section card card-pad check-summary" aria-labelledby="check-sum-h">
+            <h2 id="check-sum-h" style={{ fontSize: '1.05rem' }}>
+              <ListChecks size={18} aria-hidden style={{ verticalAlign: '-3px' }} /> {tx('Kendini dene özeti', 'Try-it-yourself summary')}
+            </h2>
+            <p className="small" style={{ margin: '0 0 8px' }} aria-live="polite">
+              {tx(
+                `${checkSolved} / ${checkTotal} soru çözüldü, ${checkFirst} tanesi ilk denemede doğru. Bu cevaplar kaydedilmez.`,
+                `${checkSolved} / ${checkTotal} questions solved, ${checkFirst} correct on the first try. These answers are not saved.`,
+              )}
+            </p>
+            <ol className="sum-list">
+              {lesson.sections.map((s, i) =>
+                s.check ? (
+                  <li key={i}>
+                    <a href={`#sec-${i + 1}`}>{plain(s.title)}</a>
+                    <span className={'mono small ' + (s.check.every((q) => checks[q.id]?.correct) ? 'ok-text' : 'muted')}>
+                      {s.check.filter((q) => checks[q.id]?.correct).length} / {s.check.length}
+                    </span>
+                  </li>
+                ) : null,
+              )}
+            </ol>
+          </section>
+        )}
 
         <section className="section" aria-labelledby="quiz-h">
           <h2 id="quiz-h">
@@ -236,7 +339,28 @@ export function LessonPage() {
   )
 }
 
-function SectionView({ s, num }: { s: Section; num: number }) {
+function Tasks({ items }: { items: string[] }) {
+  const [done, setDone] = useState<boolean[]>(() => items.map(() => false))
+  return (
+    <div className="tasks callout">
+      <span className="label-tag">{tx('Uygulamaya hazırlık — şunları dene', 'Before you start — try these')}</span>
+      <ol>
+        {items.map((t, i) => (
+          <li key={i} className={done[i] ? 'done' : ''}>
+            <label>
+              <input type="checkbox" checked={done[i]} onChange={(e) => setDone((d) => d.map((x, j) => (j === i ? e.target.checked : x)))} />
+              <span>
+                <Inline src={t} />
+              </span>
+            </label>
+          </li>
+        ))}
+      </ol>
+    </div>
+  )
+}
+
+function SectionView({ s, num, idx, children }: { s: Section; num: number; idx: number; children?: ReactNode }) {
   const Viz = s.viz ? VIZ[s.viz] : null
   const id = `sec-${num}`
   return (
@@ -255,11 +379,14 @@ function SectionView({ s, num }: { s: Section; num: number }) {
         ))}
       {s.code && <Pseudocode lines={s.code} />}
       {s.proof && <ProofStepper steps={s.proof} />}
+      {s.tasks && <Tasks items={s.tasks} />}
       {Viz && (
         <div style={{ marginTop: 10 }}>
           <Viz />
         </div>
       )}
+      {children}
+      <div data-read-idx={idx} className="read-sentinel" aria-hidden />
     </section>
   )
 }

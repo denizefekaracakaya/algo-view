@@ -31,11 +31,13 @@ describe.each(['tr', 'en'] as const)('curriculum integrity (%s)', (lang) => {
   it('every viz key is registered', () => {
     for (const l of ALL_LESSONS) for (const s of l.sections) if (s.viz) expect(VIZ[s.viz], `${l.id}: ${s.viz}`).toBeDefined()
   })
-  it('quiz questions are well-formed (answers in range, unique ids, hints and explanations present)', () => {
+  it('quiz and in-text check questions are well-formed (answers in range, unique ids, hints and explanations present)', () => {
     for (const l of ALL_LESSONS) {
       const qids = l.quiz.map((q) => q.id)
       expect(new Set(qids).size).toBe(qids.length)
-      for (const q of l.quiz) {
+      const cids = l.sections.flatMap((s) => (s.check ?? []).map((q) => q.id))
+      expect(new Set(cids).size).toBe(cids.length)
+      for (const q of [...l.quiz, ...l.sections.flatMap((s) => s.check ?? [])]) {
         expect(q.hint.length).toBeGreaterThan(5)
         expect(q.explanation.length).toBeGreaterThan(5)
         if (q.kind === 'mcq') {
@@ -65,7 +67,17 @@ describe('English content mirrors the Turkish content', () => {
     minutes: l.minutes,
     objectives: l.objectives.length,
     prerequisites: l.prerequisites.length,
-    sections: l.sections.map((s) => [s.kind, s.viz ?? null, s.box ?? null, s.label ?? null, s.code?.join('|') ?? null, s.proof?.length ?? 0, !!s.body]),
+    sections: l.sections.map((s) => [
+      s.kind,
+      s.viz ?? null,
+      s.box ?? null,
+      s.label ?? null,
+      s.code?.join('|') ?? null,
+      s.proof?.length ?? 0,
+      !!s.body,
+      s.tasks?.length ?? 0,
+      (s.check ?? []).map((q) => [q.id, q.kind, q.kind === 'mcq' ? [q.answer, q.options.length] : q.kind === 'numeric' ? q.answer : q.items.length]),
+    ]),
     quiz: l.quiz.map((q) => [q.id, q.kind, q.kind === 'mcq' ? [q.answer, q.options.length, Object.keys(q.feedback ?? {})] : q.kind === 'numeric' ? [q.answer, q.tolerance ?? null] : q.items.length]),
     practice: l.practice.map((p) => [p.id, p.hints.length]),
     sources: l.sources.map((s) => s.url),

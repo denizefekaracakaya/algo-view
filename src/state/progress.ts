@@ -13,6 +13,8 @@ export interface ProgressData {
   version: 1
   lessons: Record<string, { status: Exclude<LessonStatus, 'not-started'>; visitedAt: number; completedAt?: number }>
   quiz: Record<string, QuizRecord>
+  /** Section indices the learner has scrolled through, per lesson. */
+  read: Record<string, number[]>
   lastLesson: string | null
   prefs: { theme: ThemePref; speed: number; predict: boolean; lang: Lang }
 }
@@ -23,6 +25,7 @@ export const emptyProgress = (): ProgressData => ({
   version: 1,
   lessons: {},
   quiz: {},
+  read: {},
   lastLesson: null,
   prefs: { theme: 'system', speed: 1, predict: false, lang: 'tr' },
 })
@@ -39,6 +42,7 @@ export function loadProgress(): ProgressData {
       ...parsed,
       lessons: parsed.lessons ?? {},
       quiz: parsed.quiz ?? {},
+      read: parsed.read ?? {},
       prefs: { ...base.prefs, ...(parsed.prefs ?? {}) },
     } as ProgressData
   } catch {
@@ -59,6 +63,7 @@ export type ProgressAction =
   | { type: 'complete'; lessonId: string; now: number }
   | { type: 'uncomplete'; lessonId: string }
   | { type: 'quiz'; key: string; correct: boolean }
+  | { type: 'read'; lessonId: string; section: number }
   | { type: 'prefs'; prefs: Partial<ProgressData['prefs']> }
   | { type: 'reset' }
 
@@ -83,6 +88,11 @@ export function progressReducer(s: ProgressData, a: ProgressAction): ProgressDat
       const prev = s.quiz[a.key]
       // Once answered correctly it stays correct; attempts keep counting.
       return { ...s, quiz: { ...s.quiz, [a.key]: { correct: (prev?.correct ?? false) || a.correct, attempts: (prev?.attempts ?? 0) + 1 } } }
+    }
+    case 'read': {
+      const cur = s.read[a.lessonId] ?? []
+      if (cur.includes(a.section)) return s
+      return { ...s, read: { ...s.read, [a.lessonId]: [...cur, a.section].sort((x, y) => x - y) } }
     }
     case 'prefs':
       return { ...s, prefs: { ...s.prefs, ...a.prefs } }

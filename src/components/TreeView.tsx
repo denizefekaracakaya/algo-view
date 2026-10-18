@@ -1,5 +1,6 @@
 import type { TNode } from '../engines/tree'
 import type { NodeRole } from '../engines/bst'
+import type { CSSProperties } from 'react'
 import { tx } from '../i18n/lang'
 
 interface Laid {
@@ -68,7 +69,9 @@ export function TreeView({ root, roles = {}, labels = {}, bad = [], label, onNod
         const a = pos.get(n.parent)!
         const b = pos.get(n.key)!
         const onPath = (roles[n.key] && roles[n.key] !== 'removed') && (roles[n.parent] === 'path' || roles[n.parent] === 'current')
-        return <line key={'e' + n.key} className={'edge' + (onPath ? ' path' : '')} x1={a.x} y1={a.y} x2={b.x} y2={b.y} />
+        // A path (not a line) so the CSS `d` transition can glide edges together with the nodes during rotations.
+        const d = `M ${a.x} ${a.y} L ${b.x} ${b.y}`
+        return <path key={'e' + n.key} className={'edge' + (onPath ? ' path' : '')} d={d} style={{ d: `path('${d}')` } as CSSProperties} />
       })}
       {nodes.map((n) => {
         const p = pos.get(n.key)!

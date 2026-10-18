@@ -71,6 +71,10 @@ export interface Section {
   code?: string[]
   /** For proofs: steps revealed one by one. */
   proof?: { title: string; body: string }[]
+  /** Ungraded “try it yourself” questions shown right after this section. */
+  check?: Question[]
+  /** Guided tasks shown before the visualizer (“try this, predict that”). */
+  tasks?: string[]
   /** Marks content as intuitive vs. formal so the two are never confused. */
   label?: 'intuition' | 'formal' | 'proofIdea' | 'formalProof'
 }

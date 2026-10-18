@@ -20,6 +20,14 @@ The workspace was empty, so the default stack from the brief was used: React 19 
 ## Theme
 The header button toggles between light and dark based on the *effective* theme (an explicit choice, or the system setting while the preference is `system`). Settings still offer “follow system”. An inline script in `index.html` applies the saved theme and language before first paint.
 
+## Lesson structure: in-text checks, guided tasks, read tracking
+- A section may carry `check` (ungraded “try it yourself” questions shown right after it) and `tasks` (guided instructions before its visualizer). Check results live only in page state and feed a per-section summary at the end of the lesson; the graded mini quiz is unchanged.
+- Sections count as read when a sentinel at their end scrolls into view (IntersectionObserver); read sections are persisted per lesson (`progress.read`) and shown in the in-lesson table of contents with a progress bar.
+- Select is the first lesson using the full format (motivation, lower bound, pivot-quality chart, median-of-medians grid, group-size trees, “in practice”); the computations behind the new figures live in `src/engines/selectAnalysis.ts` and are unit-tested.
+
+## Animation
+Movement is slower than UI feedback (`--move: 560ms` vs `--dur`), and TraceViewer sets `--anim-ms` from the playback speed so fast playback never queues animations. `ArrayView` diffs consecutive snapshots: a value that moved glides from its old index along a small arc (swaps and shifts read as movement), a new value pops in, a state change pulses once. Tree nodes glide to new positions and edges are `<path>`s whose `d` transitions with them; new nodes pop in and the current node’s ring pulses. The explanation text and the active pseudocode line animate on every step. Everything is disabled under `prefers-reduced-motion`.
+
 ## Algorithmic choices
 - **InsertionSort / MergeSort** follow the Lecture 2 Python code. Merge handles exhausted lists (the notes leave this as an exercise) and uses `<=` (stable).
 - **Karatsuba** uses BigInt and splits at m = ⌊n/2⌋ low digits; cost = one-digit multiplications, matching the Lecture 1 cost model.

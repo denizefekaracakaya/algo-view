@@ -78,7 +78,7 @@ export function TraceViewer<S>({ trace, label, render, code, codeTitle, legend, 
 
   if (!step) return null
   return (
-    <section className="card viz" aria-label={label} onKeyDown={onKey}>
+    <section className="card viz" aria-label={label} onKeyDown={onKey} style={{ ['--anim-ms' as string]: `${Math.round(Math.min(620, (1000 / speed) * 0.85))}ms` }}>
       {toolbar && <div className="viz-toolbar">{toolbar}</div>}
       <div className="viz-body">
         <div className="viz-stage">
@@ -120,9 +120,15 @@ export function TraceViewer<S>({ trace, label, render, code, codeTitle, legend, 
             </div>
           ) : (
             <div>
-              {step.phase && <div className="phase">{step.phase}</div>}
+              {step.phase && (
+                <div className="phase" key={'ph' + step.phase}>
+                  {step.phase}
+                </div>
+              )}
               <div className="explain" aria-live="polite" aria-atomic="true">
-                {step.explain}
+                <span key={p.index} className="explain-text">
+                  {step.explain}
+                </span>
               </div>
             </div>
           )}

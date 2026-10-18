@@ -6,6 +6,7 @@ import { locale, tx } from '../i18n/lang'
 import { useProgress } from '../state/ProgressContext'
 import { lessonStatus, type LessonStatus } from '../state/progress'
 import { Inline } from '../components/Tex'
+import { LessonThumb } from '../components/LessonThumb'
 
 export function StatusIcon({ status }: { status: LessonStatus }) {
   if (status === 'completed') return <CheckCircle2 size={16} color="var(--st-sorted)" aria-label={tx('tamamlandı', 'completed')} />
@@ -137,6 +138,7 @@ export function Dashboard() {
                 {lessons.map((l) => (
                   <li key={l.id}>
                     <Link to={`/ders/${l.id}`}>
+                      <LessonThumb id={l.id} />
                       <span className="status-dot">
                         <StatusIcon status={lessonStatus(progress, l.id)} />
                       </span>

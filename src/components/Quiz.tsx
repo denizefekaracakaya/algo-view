@@ -5,6 +5,56 @@ import { useProgress } from '../state/ProgressContext'
 import { Inline, Rich } from './Tex'
 import { tx } from '../i18n/lang'
 
+export interface CheckResult {
+  correct: boolean
+  /** Correct on the very first attempt. */
+  firstTry: boolean
+  attempts: number
+}
+
+/**
+ * Ungraded “try it yourself” questions placed inside the lesson text. Results live only in
+ * the page (they are not saved), and feed the per-section summary at the end of the lesson.
+ */
+export function CheckBlock({
+  lessonId,
+  questions,
+  offset,
+  total,
+  results,
+  onResult,
+}: {
+  lessonId: string
+  questions: Question[]
+  offset: number
+  total: number
+  results: Record<string, CheckResult>
+  onResult: (qid: string, correct: boolean) => void
+}) {
+  return (
+    <aside className="check-block" aria-label={tx('Kendini dene', 'Try it yourself')}>
+      <div className="check-head">
+        <span className="check-icon" aria-hidden>
+          ?
+        </span>
+        <strong>{tx('KENDİNİ DENE', 'TRY IT YOURSELF')}</strong>
+        <span className="badge">{tx('Puanlanmaz', 'Not graded')}</span>
+      </div>
+      {questions.map((q, i) => (
+        <QuestionCard
+          key={q.id}
+          q={q}
+          n={offset + i + 1}
+          total={total}
+          storeKey={`${lessonId}:check:${q.id}`}
+          solved={results[q.id]?.correct}
+          onRecord={(c) => onResult(q.id, c)}
+        />
+      ))}
+    </aside>
+  )
+}
+
 export function Quiz({ lessonId, questions }: { lessonId: string; questions: Question[] }) {
   const { progress } = useProgress()
   const solved = questions.filter((q) => progress.quiz[`${lessonId}:${q.id}`]?.correct).length
@@ -20,19 +70,33 @@ export function Quiz({ lessonId, questions }: { lessonId: string; questions: Que
   )
 }
 
-function QuestionCard({ q, n, storeKey }: { q: Question; n: number; storeKey: string }) {
+interface CardProps {
+  q: Question
+  n: number
+  storeKey: string
+  /** Ungraded mode: report results to the caller instead of the persisted quiz record. */
+  onRecord?: (correct: boolean) => void
+  solved?: boolean
+  total?: number
+}
+
+function QuestionCard({ q, n, storeKey, onRecord, solved, total }: CardProps) {
   const { progress, dispatch } = useProgress()
   const rec = progress.quiz[storeKey]
   const [showHint, setShowHint] = useState(false)
   const [reveal, setReveal] = useState(false)
-  const record = (correct: boolean) => dispatch({ type: 'quiz', key: storeKey, correct })
+  const record = onRecord ?? ((correct: boolean) => dispatch({ type: 'quiz', key: storeKey, correct }))
+  const isSolved = onRecord ? solved : rec?.correct
   return (
     <article className="quiz-q" aria-labelledby={`q-${storeKey}`}>
       <div className="q-head">
         <h3 id={`q-${storeKey}`} style={{ fontSize: '0.98rem', margin: 0 }}>
-          <span className="muted mono">{tx('S', 'Q')}{n}.</span> <Inline src={q.prompt} />
+          <span className="muted mono">
+            {total ? `${tx('SORU', 'QUESTION')} ${n} / ${total}` : `${tx('S', 'Q')}${n}.`}
+          </span>{' '}
+          <Inline src={q.prompt} />
         </h3>
-        {rec?.correct && (
+        {isSolved && (
           <span className="badge done">
             <CheckCircle2 size={12} aria-hidden /> {tx('çözüldü', 'solved')}
           </span>
@@ -93,7 +157,7 @@ function McqBody({ q, onAnswer }: { q: MCQ; onAnswer: (c: boolean) => void }) {
         ))}
       </fieldset>
       <button className="btn sm primary" type="submit" disabled={choice === null}>
-        Kontrol et
+        {tx('Kontrol et', 'Check')}
       </button>
       {checked !== null && (
         <div className={'feedback ' + (correct ? 'ok' : 'no')} role="status">
@@ -128,7 +192,7 @@ function NumericBody({ q, onAnswer }: { q: NumericQ; onAnswer: (c: boolean) => v
     >
       <input className="input mono" style={{ width: 140 }} inputMode="decimal" value={val} onChange={(e) => setVal(e.target.value)} aria-label={tx('Cevabınız', 'Your answer')} aria-invalid={!!err} />
       <button className="btn sm primary" type="submit">
-        Kontrol et
+        {tx('Kontrol et', 'Check')}
       </button>
       {err && <span className="error-msg">{err}</span>}
       {res !== null && (

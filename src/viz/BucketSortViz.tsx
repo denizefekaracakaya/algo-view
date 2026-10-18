@@ -103,7 +103,7 @@ function Item({ x, hl, digit, r }: { x: Tagged; hl: boolean; digit: number | nul
   const pos = digit === null ? -1 : s.length - 1 - digit
   return (
     <span
-      className="mono"
+      className="mono bucket-item"
       aria-label={tx(`${x.key} (giriş sırası ${x.tag + 1})`, `${x.key} (input position ${x.tag + 1})`)}
       style={{
         display: 'inline-block',
