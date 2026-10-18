@@ -8,7 +8,10 @@ import { radixSort } from '../engines/bucketSort'
 import { select } from '../engines/select'
 import { inorder } from '../engines/tree'
 import { makeRng, randomPermutation } from '../engines/random'
-import { emptyProgress, progressReducer } from '../state/progress'
+import { emptyProgress, MAX_EXAMS, progressReducer } from '../state/progress'
+import { EXERCISES } from './coding'
+import { harnessInline } from './runner'
+import { buildExam, grade, initialOrder, isAnswered, scoreByLesson, staticPool } from './exam'
 import { setCurrentLang, type Lang } from '../i18n/lang'
 import { LECTURES_BY_LANG } from '../content/curriculum'
 import type { Question } from '../content/types'
@@ -141,5 +144,101 @@ describe('progress records practice', () => {
     p = progressReducer(p, { type: 'gen', id: 'master', solved: true })
     expect(p.gen.master).toEqual({ solved: 1, attempts: 2 })
     expect(progressReducer(p, { type: 'reset' }).drills).toEqual({})
+  })
+})
+
+describe('coding exercises', () => {
+  const harness = harnessInline()
+  it.each(EXERCISES.map((e) => [e.id, e] as const))('%s: the sample solution passes every test and the starter does not', (_, ex) => {
+    const tests = ex.tests()
+    expect(tests.length).toBeGreaterThanOrEqual(4)
+    expect(JSON.parse(JSON.stringify(tests))).toEqual(tests)
+    const good = harness(ex.solution, ex.fnName, tests, ex.mode)
+    expect(good.error).toBeUndefined()
+    expect(good.results.filter((r) => !r.ok).map((r, i) => [i, r])).toEqual([])
+    const starter = harness(ex.starter(), ex.fnName, tests, ex.mode)
+    expect(starter.results.every((r) => r.ok)).toBe(false)
+  })
+  it('reports syntax errors, missing functions, thrown errors and console output', () => {
+    const ex = EXERCISES.find((e) => e.id === 'merge')!
+    const tests = ex.tests()
+    expect(harness('function merge(L, R) {', 'merge', tests, 'return').error).toBe('syntax')
+    expect(harness('function other() {}', 'merge', tests, 'return').error).toBe('missing')
+    const thrown = harness('function merge() { throw new Error("boom") }', 'merge', tests, 'return')
+    expect(thrown.results[0]).toMatchObject({ ok: false, error: 'boom' })
+    const logged = harness('function merge(L, R) { console.log("L", L); return [] }', 'merge', tests.slice(0, 1), 'return')
+    expect(logged.logs).toEqual(['L []'])
+  })
+  it('the learner cannot change the expected values by mutating the arguments', () => {
+    const ex = EXERCISES.find((e) => e.id === 'insertion-sort')!
+    const r = harness('function insertionSort(A) { A.length = 0; return A }', ex.fnName, ex.tests(), ex.mode)
+    expect(r.results.some((x) => !x.ok)).toBe(true)
+  })
+  it('prompts are translated and every exercise belongs to a lesson', () => {
+    const ids = new Set(LECTURES_BY_LANG.tr.flatMap((l) => l.lessons.map((x) => x.id)))
+    setCurrentLang('en')
+    for (const e of EXERCISES) {
+      expect(ids.has(e.lessonId)).toBe(true)
+      for (const t of [e.prompt(), e.starter(), ...e.hints()]) expect(t).not.toMatch(/[çğışöüÇĞİŞÖÜ]/)
+    }
+    expect(new Set(EXERCISES.map((e) => e.id)).size).toBe(EXERCISES.length)
+  })
+})
+
+describe('exam mode', () => {
+  it('builds the requested number of distinct questions from the chosen lessons', () => {
+    for (const ids of [['l3-master'], ['l1-why'], ['l2-insertion', 'l7-redblack'], LECTURES_BY_LANG.tr.flatMap((l) => l.lessons.map((x) => x.id))]) {
+      for (const count of [5, 10, 20]) {
+        const items = buildExam(ids, count, count * 7)
+        expect(items.length).toBe(Math.min(count, ids.includes('l1-why') && ids.length === 1 ? staticPool(ids).length : count))
+        expect(new Set(items.map((i) => i.key)).size).toBe(items.length)
+        for (const it of items) expect(ids).toContain(it.lessonId)
+      }
+    }
+  })
+  it('mixes generated and fixed questions', () => {
+    const items = buildExam(['l5-quicksort', 'l5-expected'], 10, 3)
+    expect(items.some((i) => i.source === 'gen')).toBe(true)
+    expect(items.some((i) => i.source !== 'gen')).toBe(true)
+  })
+  it('grades every question kind', () => {
+    const mcq: Question = { id: 'a', kind: 'mcq', prompt: '', hint: '', explanation: '', options: ['x', 'y'], answer: 1 }
+    const num: Question = { id: 'b', kind: 'numeric', prompt: '', hint: '', explanation: '', answer: 0.25, tolerance: 0.01 }
+    const ord: Question = { id: 'c', kind: 'order', prompt: '', hint: '', explanation: '', items: ['p', 'q', 'r'] }
+    expect(grade(mcq, 1)).toBe(true)
+    expect(grade(mcq, 0)).toBe(false)
+    expect(grade(num, '0,25')).toBe(true)
+    expect(grade(num, ' 0.255 ')).toBe(true)
+    expect(grade(num, 'abc')).toBe(false)
+    expect(grade(num, null)).toBe(false)
+    expect(grade(ord, ['p', 'q', 'r'])).toBe(true)
+    expect(grade(ord, ['q', 'p', 'r'])).toBe(false)
+    expect(initialOrder(['p', 'q', 'r'], 1)).not.toEqual(['p', 'q', 'r'])
+    expect(isAnswered('  ')).toBe(false)
+  })
+  it('scores by lesson', () => {
+    const items = buildExam(['l3-master', 'l7-bst'], 6, 11)
+    const answers = Object.fromEntries(items.map((it) => [it.key, it.q.kind === 'mcq' ? it.q.answer : it.q.kind === 'numeric' ? String(it.q.answer) : it.q.kind === 'order' ? it.q.items : null]))
+    const s = scoreByLesson(items, answers)
+    expect(s.reduce((t, x) => t + x.total, 0)).toBe(6)
+    expect(s.every((x) => x.correct === x.total)).toBe(true)
+  })
+})
+
+describe('notes, exams and code in progress', () => {
+  it('saves and deletes notes, keeps them on reset, caps the exam history', () => {
+    let p = progressReducer(emptyProgress(), { type: 'note', lessonId: 'l2-insertion', text: 'ters çift = kaydırma', now: 5 })
+    expect(p.notes['l2-insertion']).toEqual({ text: 'ters çift = kaydırma', updatedAt: 5 })
+    for (let i = 0; i < 25; i++) p = progressReducer(p, { type: 'exam', record: { at: i, total: 5, correct: 3, seconds: 60, lessons: [] } })
+    expect(p.exams).toHaveLength(MAX_EXAMS)
+    expect(p.exams[0].at).toBe(24)
+    p = progressReducer(p, { type: 'code', id: 'merge', src: 'x', solved: true })
+    p = progressReducer(p, { type: 'code', id: 'merge', src: 'y' })
+    expect(p.code.merge).toEqual({ src: 'y', solved: true })
+    const r = progressReducer(p, { type: 'reset' })
+    expect(r.notes['l2-insertion']).toBeDefined()
+    expect(r.exams).toEqual([])
+    expect(r.code).toEqual({})
+    expect(progressReducer(p, { type: 'note', lessonId: 'l2-insertion', text: '  ', now: 6 }).notes).toEqual({})
   })
 })

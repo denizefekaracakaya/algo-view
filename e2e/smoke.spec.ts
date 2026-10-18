@@ -170,3 +170,40 @@ test('practice lab: every hand-tracing drill can be completed, and the generator
   await noHorizontalOverflow(page)
   expect(errors).toEqual([])
 })
+
+test('code exercises run in a worker: an infinite loop is stopped, a correct solution passes', async ({ page }) => {
+  await page.goto('/#/alistirma?mod=kod&ders=l5-quicksort')
+  const editor = page.getByRole('textbox', { name: /partition fonksiyonunun kodu/ })
+  await editor.fill('function partition(A, lo, hi) {\n  while (true) {}\n}\n')
+  await page.getByRole('button', { name: /Çalıştır ve test et/ }).click()
+  await expect(page.getByText(/Süre sınırı \(5 sn\) aşıldı/)).toBeVisible({ timeout: 10_000 })
+  await editor.fill(
+    'function partition(A, lo, hi) {\n  const pivot = A[hi]\n  let i = lo\n  for (let j = lo; j < hi; j++) {\n    if (A[j] < pivot) { [A[i], A[j]] = [A[j], A[i]]; i++ }\n  }\n  [A[i], A[hi]] = [A[hi], A[i]]\n  return i\n}\n',
+  )
+  await page.getByRole('button', { name: /Çalıştır ve test et/ }).click()
+  await expect(page.getByText(/^(\d+) \/ \1 test geçti\./)).toBeVisible()
+  await page.reload()
+  await expect(page.getByRole('button', { name: /Partition/ }).getByLabel('çözüldü')).toBeVisible()
+  await noHorizontalOverflow(page)
+})
+
+test('exam mode and notes', async ({ page }) => {
+  await page.goto('/#/alistirma?mod=sinav')
+  await page.getByRole('button', { name: 'Hiçbiri' }).click()
+  await page.getByRole('checkbox', { name: /MergeSort/ }).first().check()
+  await page.getByRole('group', { name: 'Soru sayısı' }).getByRole('button', { name: '5' }).click()
+  await page.getByRole('button', { name: /Sınavı başlat/ }).click()
+  await expect(page.getByRole('timer')).toContainText(/19:5\d|20:00/)
+  await noHorizontalOverflow(page)
+  await page.getByRole('button', { name: /Sınavı bitir/ }).click()
+  await page.getByRole('button', { name: 'Bitir', exact: true }).click()
+  await expect(page.getByRole('heading', { name: /Sonuç: 0 \/ 5/ })).toBeVisible()
+  await expect(page.locator('.katex-error')).toHaveCount(0)
+
+  await page.goto('/#/ders/l7-bst')
+  await page.getByRole('textbox', { name: /Bu ders için notların/ }).fill('BST: inorder = sıralı')
+  await expect(page.getByText(/Kaydedildi/)).toBeVisible()
+  await page.goto('/#/notlar')
+  await expect(page.getByRole('textbox')).toHaveValue('BST: inorder = sıralı')
+  await noHorizontalOverflow(page)
+})

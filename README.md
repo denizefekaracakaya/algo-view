@@ -22,10 +22,16 @@ Her ders: öğrenme hedefleri, ön koşullar, bölüm bölüm okuma takibi, böl
 
 ## Alıştırma laboratuvarı
 
-Üst menüdeki **Alıştırma** sayfası (`#/alistirma`) iki mod sunar; her dersin sonunda da o derse filtrelenmiş bağlantılar vardır.
+Üst menüdeki **Alıştırma** sayfası (`#/alistirma`) dört sekmeden oluşur; her dersin sonunda da o derse filtrelenmiş bağlantılar vardır.
 
-- **Elle iz sür:** InsertionSort, Merge, medyanların medyanı, Partition, RadixSort ve BST ekleme için algoritmanın her kararını öğrenci verir (indeks seç, L/R seç, kovaya tıkla, sola/sağa in…). Yanlış seçim ipucu gösterir ve hata sayılır; “Bu adımı göster” adımı açar. Kararlar `src/practice/drills.ts` içinde algoritma çalıştırılarak üretilir.
-- **Soru üreteci:** 14 derse yayılmış 21 soru türü (Master teoremi, ters çift sayısı, Merge karşılaştırmaları, pivot konumu, karar ağacı alt sınırı, RadixSort geçişleri, BST yüksekliği, kırmızı-siyah sınırlar…). Her soru rastgele bir tohumla yeni girdi alır; cevap motorlarla hesaplanır (`src/practice/generators.ts`). Oturum skoru, seri ve soru türü başına toplam çözüm tutulur.
+- **Elle iz sür:** InsertionSort, Merge, medyanların medyanı, Partition, RadixSort ve BST ekleme için algoritmanın her kararını öğrenci verir. Yanlış seçim ipucu gösterir ve hata sayılır; “Bu adımı göster” adımı açar (`src/practice/drills.ts`).
+- **Soru üreteci:** 14 derse yayılmış 21 soru türü; her soru rastgele bir tohumla yeni girdi alır ve cevap motorlarla hesaplanır (`src/practice/generators.ts`). Oturum skoru, seri ve tür başına toplam tutulur.
+- **Kod:** 13 JavaScript alıştırması (InsertionSort, Merge, MergeSort, ters çift sayma, Master durumu, Select, Partition, QuickSort, RadixSort, BST ekleme, BST doğrulama, sola rotasyon, Karatsuba). Kod tarayıcıda ayrı bir Web Worker’da çalışır, 5 saniyede bitmezse durdurulur; beklenen çıktılar referans uygulamalarla hesaplanır, `console.log` çıktısı gösterilir, taslak otomatik kaydedilir (`src/practice/coding.ts`, `runner.ts`).
+- **Sınav:** Ders seçimi, 5/10/20 soru ve süre sınırı (yok/10/20/30 dk). Quiz, “kendini dene” ve üretilen sorulardan karışık set; sınav boyunca geri bildirim yok, sonunda ders bazında skor ve her sorunun çözümü. Son 20 sınav saklanır (`src/practice/exam.ts`).
+
+## Notlar
+
+Her dersin sonunda **Notlarım** kutusu vardır; yazılanlar otomatik kaydedilir. **Notlar** sayfası (`#/notlar`) tüm notları toplar ve Markdown olarak indirmeye izin verir. Notlar ilerleme sıfırlanınca silinmez.
 
 ## Dil ve tema
 
@@ -62,9 +68,9 @@ src/
   viz/          Derslere özgü görselleştiriciler ve registry (içerikteki `viz` anahtarları)
   content/      Ders verisi (lecture1..7.ts; İngilizcesi en/), kaynaklar, curriculum + içerik testleri
   i18n/         Etkin dil ve tx(tr, en) yardımcısı
-  practice/     Elle iz sürme alıştırmaları ve soru üreteçleri (+ testleri)
+  practice/     Elle iz sürme, soru üreteçleri, kod alıştırmaları, sınav modu (+ testleri)
   state/        İlerleme modeli, reducer, localStorage kalıcılığı
-  pages/        Panel, Ders, Alıştırma, Kaynaklar, Ayarlar
+  pages/        Panel, Ders, Alıştırma, Notlar, Kaynaklar, Ayarlar
 e2e/            Playwright testleri
 docs/           Kaynak envanteri, müfredat haritası, teknik kararlar
 ```

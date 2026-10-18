@@ -13,6 +13,7 @@ import { Pseudocode } from '../components/Pseudocode'
 import { ProofStepper } from '../components/ProofStepper'
 import { CheckBlock, PracticeList, Quiz, type CheckResult } from '../components/Quiz'
 import { VIZ } from '../viz/registry'
+import { LessonNotes } from '../components/LessonNotes'
 import { StatusIcon } from './Dashboard'
 
 const DRILLS_BY_LESSON = new Set(Object.values(DRILL_LESSON))
@@ -291,6 +292,13 @@ function LessonBody({ lesson, lecture, index }: { lesson: Lesson; lecture: Lectu
             )}
           </section>
         )}
+
+        <section className="section" aria-labelledby="notes-h">
+          <h2 id="notes-h">
+            <span className="section-num">{++n}</span> {tx('Notlarım', 'My notes')}
+          </h2>
+          <LessonNotes lessonId={lesson.id} />
+        </section>
 
         <section className="section" aria-labelledby="src-h">
           <h2 id="src-h">

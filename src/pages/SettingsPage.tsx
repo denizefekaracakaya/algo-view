@@ -85,8 +85,8 @@ export function SettingsPage() {
             <h2 id="reset-title">{tx('İlerleme sıfırlansın mı?', 'Reset progress?')}</h2>
             <p id="reset-desc">
               {tx(
-                'Tamamlanan dersler, quiz sonuçları ve son ziyaret edilen ders silinecek. Dil, tema ve oynatma tercihleri korunur. Bu işlem geri alınamaz.',
-                'Completed lessons, quiz results and the last visited lesson will be deleted. Language, theme and playback preferences are kept. This cannot be undone.',
+                'Tamamlanan dersler, quiz sonuçları, alıştırma istatistikleri, sınav geçmişi, kod alıştırmaları ve son ziyaret edilen ders silinecek. Kişisel notlarınız ile dil, tema ve oynatma tercihleri korunur. Bu işlem geri alınamaz.',
+                'Completed lessons, quiz results, practice statistics, exam history, coding exercises and the last visited lesson will be deleted. Your personal notes and language, theme and playback preferences are kept. This cannot be undone.',
               )}
             </p>
             <div className="row" style={{ justifyContent: 'flex-end' }}>

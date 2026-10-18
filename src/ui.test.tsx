@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { act, render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { playerReducer } from './trace/player'
@@ -13,6 +13,7 @@ import { LessonPage } from './pages/LessonPage'
 import { Dashboard } from './pages/Dashboard'
 import { PracticePage } from './pages/PracticePage'
 import { drillInput, insertionDrill } from './practice/drills'
+import { EXERCISES } from './practice/coding'
 import type { Question } from './content/types'
 import App from './App'
 import { setCurrentLang } from './i18n/lang'
@@ -272,6 +273,55 @@ describe('practice lab', () => {
     expect(screen.getByText(/^S1\./)).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /Yeni soru/ }))
     expect(screen.getByText(/^S2\./)).toBeInTheDocument()
+  })
+})
+
+describe('exam, code and notes', () => {
+  const renderPractice = (entry: string) =>
+    wrap(
+      <MemoryRouter initialEntries={[entry]}>
+        <Routes>
+          <Route path="/alistirma" element={<PracticePage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+  it('runs an exam end to end and stores it in the history', async () => {
+    const user = userEvent.setup()
+    renderPractice('/alistirma?mod=sinav&ders=l3-master')
+    await user.click(screen.getByRole('button', { name: '5' }))
+    await user.click(screen.getByRole('button', { name: /Sınavı başlat/ }))
+    expect(screen.getByText(/SORU 1 \/ 5/)).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Sonraki/ }))
+    expect(screen.getByText(/SORU 2 \/ 5/)).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Sınavı bitir/ }))
+    expect(screen.getByRole('alert')).toHaveTextContent('5 soru boş')
+    await user.click(screen.getByRole('button', { name: 'Bitir' }))
+    expect(screen.getByRole('heading', { name: /Sonuç: 0 \/ 5/ })).toBeInTheDocument()
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).exams[0]).toMatchObject({ total: 5, correct: 0, lessons: ['l3-master'] })
+  })
+  it('runs the learner’s code against the tests', async () => {
+    const user = userEvent.setup()
+    renderPractice('/alistirma?mod=kod&ders=l2-mergesort')
+    const ex = EXERCISES.find((e) => e.id === 'merge')!
+    const n = ex.tests().length
+    await user.click(screen.getByRole('button', { name: /Çalıştır ve test et/ }))
+    expect(await screen.findByText(new RegExp(`^[0-9]+ / ${n} test geçti`))).not.toHaveTextContent(`${n} / ${n}`)
+    fireEvent.change(screen.getByRole('textbox', { name: /merge fonksiyonunun kodu/ }), { target: { value: ex.solution } })
+    await user.click(screen.getByRole('button', { name: /Çalıştır ve test et/ }))
+    expect(await screen.findByText(`${n} / ${n} test geçti.`)).toBeInTheDocument()
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).code.merge.solved).toBe(true)
+  })
+  it('lesson notes are saved automatically', async () => {
+    const user = userEvent.setup()
+    wrap(
+      <MemoryRouter initialEntries={['/ders/l2-insertion']}>
+        <Routes>
+          <Route path="/ders/:lessonId" element={<LessonPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+    await user.type(screen.getByRole('textbox', { name: /Bu ders için notların/ }), 'ters çift')
+    await waitFor(() => expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).notes['l2-insertion']?.text).toBe('ters çift'), { timeout: 2000 })
   })
 })
 

@@ -43,8 +43,17 @@ Movement is slower than UI feedback (`--move: 560ms` vs `--dur`), and TraceViewe
 ## Practice lab
 `src/practice/drills.ts` turns an algorithm run into a list of decisions (`answer`, `hint`, `why`, plus the state to draw before the decision); `HandTrace.tsx` only compares the learner's choice to `answer`, so the UI never re-implements an algorithm. `src/practice/generators.ts` builds questions from a seed (mulberry32), computing answers with the engines; tests run every generator over 150 seeds in both languages (no NaN/undefined, balanced `$`, distinct MCQ options, no Turkish letters in English) and cross-check answers against the engines (QuickSort comparisons, Select, RadixSort, Merge).
 
+## Coding exercises
+The learner's code runs in a throwaway Web Worker built from a Blob (`runner.ts`); the worker is terminated after 5 s, which stops infinite loops and rejects algorithms that are far too slow for the large tests. The harness is kept as source text (`HARNESS_SRC`) so the same code runs in the worker and, in unit tests, through `new Function`. Arguments are deep-copied per test so mutating them cannot affect the expected values; expected outputs come from reference implementations (the engines where possible). Tests check that every sample solution passes and every starter fails.
+
+## Exam mode
+`exam.ts` mixes fixed questions (lesson quiz + in-text checks) and generated ones, about half each; grading is pure (`grade`) and per-lesson scores feed the result page. Only a summary of each exam is stored (time, score, duration, lessons), newest first, capped at 20.
+
+## Notes
+Per-lesson plain-text notes, autosaved 600 ms after typing stops, collected on `#/notlar` with a Markdown export. A progress reset keeps them, since they are the learner's own writing.
+
 ## Persistence
-`localStorage` key `algoview:progress:v1`, versioned JSON: lesson status (in-progress on visit, completed on explicit click), quiz records (correct once ⇒ stays correct, attempts counted), last lesson, practice stats (`drills`: runs / perfect runs per drill; `gen`: solved / attempts per generator), preferences (theme, speed, prediction mode). All access is wrapped in try/catch; corrupt or foreign-version data falls back to an empty state. Reset requires confirmation in a modal dialog and keeps preferences (language, theme, speed, prediction mode).
+`localStorage` key `algoview:progress:v1`, versioned JSON: lesson status (in-progress on visit, completed on explicit click), quiz records (correct once ⇒ stays correct, attempts counted), last lesson, practice stats (`drills`: runs / perfect runs per drill; `gen`: solved / attempts per generator), notes, exam history, coding drafts and solved flags, preferences (theme, speed, prediction mode). All access is wrapped in try/catch; corrupt or foreign-version data falls back to an empty state. Reset requires confirmation in a modal dialog and keeps preferences (language, theme, speed, prediction mode).
 
 ## Accessibility
 Semantic landmarks, skip link, visible focus rings, labelled controls, `aria-live` explanations and quiz feedback, keyboard stepping, keyboard-operable tree nodes in the color playground, `prefers-reduced-motion` disables transitions, all algorithm states carry glyphs/labels in addition to color, light/dark themes with separately chosen tokens. Code fonts disable ligatures so `<|`, `>=` render literally.

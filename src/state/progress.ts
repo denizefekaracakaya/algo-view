@@ -19,9 +19,25 @@ export interface ProgressData {
   drills: Record<string, { runs: number; perfect: number }>
   /** Generated questions per generator: solved questions and checks made. */
   gen: Record<string, { solved: number; attempts: number }>
+  /** Personal notes per lesson (kept on progress reset: they are the learner's own writing). */
+  notes: Record<string, { text: string; updatedAt: number }>
+  /** Finished exams, newest first (at most MAX_EXAMS). */
+  exams: ExamRecord[]
+  /** Coding exercises: the learner's latest code and whether all tests ever passed. */
+  code: Record<string, { src: string; solved: boolean }>
   lastLesson: string | null
   prefs: { theme: ThemePref; speed: number; predict: boolean; lang: Lang }
 }
+
+export interface ExamRecord {
+  at: number
+  total: number
+  correct: number
+  seconds: number
+  lessons: string[]
+}
+
+export const MAX_EXAMS = 20
 
 export const STORAGE_KEY = 'algoview:progress:v1'
 
@@ -32,6 +48,9 @@ export const emptyProgress = (): ProgressData => ({
   read: {},
   drills: {},
   gen: {},
+  notes: {},
+  exams: [],
+  code: {},
   lastLesson: null,
   prefs: { theme: 'system', speed: 1, predict: false, lang: 'tr' },
 })
@@ -51,6 +70,9 @@ export function loadProgress(): ProgressData {
       read: parsed.read ?? {},
       drills: parsed.drills ?? {},
       gen: parsed.gen ?? {},
+      notes: parsed.notes ?? {},
+      exams: Array.isArray(parsed.exams) ? parsed.exams : [],
+      code: parsed.code ?? {},
       prefs: { ...base.prefs, ...(parsed.prefs ?? {}) },
     } as ProgressData
   } catch {
@@ -74,6 +96,9 @@ export type ProgressAction =
   | { type: 'read'; lessonId: string; section: number }
   | { type: 'drill'; id: string; mistakes: number }
   | { type: 'gen'; id: string; solved: boolean }
+  | { type: 'note'; lessonId: string; text: string; now: number }
+  | { type: 'exam'; record: ExamRecord }
+  | { type: 'code'; id: string; src?: string; solved?: boolean }
   | { type: 'prefs'; prefs: Partial<ProgressData['prefs']> }
   | { type: 'reset' }
 
@@ -112,10 +137,22 @@ export function progressReducer(s: ProgressData, a: ProgressAction): ProgressDat
       const cur = s.gen[a.id] ?? { solved: 0, attempts: 0 }
       return { ...s, gen: { ...s.gen, [a.id]: { solved: cur.solved + (a.solved ? 1 : 0), attempts: cur.attempts + 1 } } }
     }
+    case 'note': {
+      const notes = { ...s.notes }
+      if (a.text.trim()) notes[a.lessonId] = { text: a.text, updatedAt: a.now }
+      else delete notes[a.lessonId]
+      return { ...s, notes }
+    }
+    case 'exam':
+      return { ...s, exams: [a.record, ...s.exams].slice(0, MAX_EXAMS) }
+    case 'code': {
+      const cur = s.code[a.id] ?? { src: '', solved: false }
+      return { ...s, code: { ...s.code, [a.id]: { src: a.src ?? cur.src, solved: cur.solved || !!a.solved } } }
+    }
     case 'prefs':
       return { ...s, prefs: { ...s.prefs, ...a.prefs } }
     case 'reset':
-      return { ...emptyProgress(), prefs: s.prefs }
+      return { ...emptyProgress(), prefs: s.prefs, notes: s.notes }
   }
 }
 

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Dices, Flame, Hand, Shuffle } from 'lucide-react'
+import { Code2, Dices, Flame, Hand, Shuffle, Timer } from 'lucide-react'
 import { allLessons } from '../content/curriculum'
 import { QuestionCard } from '../components/Quiz'
 import { Inline } from '../components/Tex'
@@ -9,18 +9,23 @@ import { tx } from '../i18n/lang'
 import { GENERATORS, generate, generatorsFor } from '../practice/generators'
 import { DRILL_LESSON, DRILLS, type DrillId } from '../practice/drills'
 import { DrillRunner } from '../practice/HandTrace'
+import { CodePanel } from '../practice/CodePanel'
+import { ExamPanel } from '../practice/ExamPanel'
+import { EXERCISES } from '../practice/coding'
 
-type Mode = 'trace' | 'bank'
+type Mode = 'trace' | 'bank' | 'code' | 'exam'
+
+const MODE_PARAM: Record<Mode, string | null> = { trace: null, bank: 'soru', code: 'kod', exam: 'sinav' }
 
 /** Lessons that have at least one drill or generator, in course order. */
 function practiceLessons() {
-  const ids = new Set([...GENERATORS.map((g) => g.lessonId), ...Object.values(DRILL_LESSON)])
+  const ids = new Set([...GENERATORS.map((g) => g.lessonId), ...Object.values(DRILL_LESSON), ...EXERCISES.map((e) => e.lessonId)])
   return allLessons().filter((l) => ids.has(l.id))
 }
 
 export function PracticePage() {
   const [params, setParams] = useSearchParams()
-  const mode: Mode = params.get('mod') === 'soru' ? 'bank' : 'trace'
+  const mode: Mode = (Object.keys(MODE_PARAM) as Mode[]).find((m) => MODE_PARAM[m] === params.get('mod')) ?? 'trace'
   const lessons = practiceLessons()
   const lessonId = lessons.some((l) => l.id === params.get('ders')) ? params.get('ders') : null
   const set = (patch: Record<string, string | null>) => {
@@ -37,23 +42,29 @@ export function PracticePage() {
     <div className="practice">
       <header className="lesson-head">
         <p className="lecture-num">{tx('Alıştırma laboratuvarı', 'Practice lab')}</p>
-        <h1>{tx('Elle iz sür, sınırsız soru çöz', 'Trace by hand, solve endless questions')}</h1>
+        <h1>{tx('Elle iz sür, kodla, sınava hazırlan', 'Trace, code, get ready for the exam')}</h1>
         <p className="lead" style={{ maxWidth: '70ch', color: 'var(--text-2)' }}>
           {tx(
-            'Elle iz sürmede algoritmanın her kararını sen verirsin; yanlış seçimde ipucu alırsın. Soru üreteci her seferinde yeni bir girdi oluşturur ve cevabı algoritma motorlarıyla hesaplar.',
-            'In hand tracing you make every decision of the algorithm yourself and get a hint after a wrong choice. The question generator builds a fresh input every time and computes the answer with the algorithm engines.',
+            'Elle iz sürmede algoritmanın her kararını sen verirsin. Soru üreteci her seferinde yeni girdiyle soru üretir; Kod bölümünde algoritmaları JavaScript ile yazıp testlerle denersin; Sınav modu süreli, karışık bir set hazırlar.',
+            'In hand tracing you make every decision of the algorithm yourself. The question generator builds questions from a fresh input every time; in Code you write the algorithms in JavaScript and check them against tests; Exam mode builds a timed, mixed set.',
           )}
         </p>
       </header>
 
       <div className="filterbar">
         <div className="seg" role="tablist" aria-label={tx('Alıştırma türü', 'Practice type')}>
-          <button role="tab" aria-selected={mode === 'trace'} onClick={() => set({ mod: null })}>
-            <Hand size={14} aria-hidden style={{ verticalAlign: '-2px' }} /> {tx('Elle iz sür', 'Trace by hand')}
-          </button>
-          <button role="tab" aria-selected={mode === 'bank'} onClick={() => set({ mod: 'soru' })}>
-            <Dices size={14} aria-hidden style={{ verticalAlign: '-2px' }} /> {tx('Soru üreteci', 'Question generator')}
-          </button>
+          {(
+            [
+              ['trace', <Hand key="i" size={14} aria-hidden style={{ verticalAlign: '-2px' }} />, tx('Elle iz sür', 'Trace by hand')],
+              ['bank', <Dices key="i" size={14} aria-hidden style={{ verticalAlign: '-2px' }} />, tx('Soru üreteci', 'Question generator')],
+              ['code', <Code2 key="i" size={14} aria-hidden style={{ verticalAlign: '-2px' }} />, tx('Kod', 'Code')],
+              ['exam', <Timer key="i" size={14} aria-hidden style={{ verticalAlign: '-2px' }} />, tx('Sınav', 'Exam')],
+            ] as const
+          ).map(([m, icon, label]) => (
+            <button key={m} role="tab" aria-selected={mode === m} onClick={() => set({ mod: MODE_PARAM[m] })}>
+              {icon} {label}
+            </button>
+          ))}
         </div>
         <label className="row" style={{ gap: 6 }}>
           <span className="small muted">{tx('Ders', 'Lesson')}</span>
@@ -73,7 +84,10 @@ export function PracticePage() {
         )}
       </div>
 
-      {mode === 'trace' ? <TracePanel key={lessonId ?? 'all'} lessonId={lessonId} /> : <BankPanel key={lessonId ?? 'all'} lessonId={lessonId} />}
+      {mode === 'trace' && <TracePanel key={lessonId ?? 'all'} lessonId={lessonId} />}
+      {mode === 'bank' && <BankPanel key={lessonId ?? 'all'} lessonId={lessonId} />}
+      {mode === 'code' && <CodePanel key={lessonId ?? 'all'} lessonId={lessonId} />}
+      {mode === 'exam' && <ExamPanel key={lessonId ?? 'all'} lessonId={lessonId} />}
     </div>
   )
 }
