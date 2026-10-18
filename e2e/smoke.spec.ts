@@ -145,3 +145,28 @@ test('Select lesson: in-text check question feeds the summary; sections get mark
   await expect(page.locator('.toc-meter')).not.toContainText('0 / 14')
   await expect(page.locator('.mom-grid')).toBeVisible()
 })
+
+test('practice lab: every hand-tracing drill can be completed, and the generator keeps producing questions', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (e) => errors.push(e.message))
+  page.on('console', (m) => m.type() === 'error' && errors.push(m.text()))
+  await page.goto('/#/alistirma')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Elle iz sür')
+  const cards = page.locator('.drill-card')
+  await expect(cards).toHaveCount(6)
+  for (let c = 0; c < 6; c++) {
+    await cards.nth(c).click()
+    const show = page.getByRole('button', { name: 'Bu adımı göster' })
+    for (let i = 0; i < 40 && (await show.count()); i++) await show.click()
+    await expect(page.locator('.drill-done')).toBeVisible()
+    await noHorizontalOverflow(page)
+  }
+  await page.getByRole('tab', { name: /Soru üreteci/ }).click()
+  for (let i = 0; i < 12; i++) {
+    await expect(page.locator('.quiz-q')).toBeVisible()
+    await page.getByRole('button', { name: /Yeni soru/ }).click()
+  }
+  await expect(page.locator('.quiz-q .katex-error')).toHaveCount(0)
+  await noHorizontalOverflow(page)
+  expect(errors).toEqual([])
+})

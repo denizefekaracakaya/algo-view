@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, CheckCircle2, Circle, CircleDot, Search } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Circle, CircleDot, Dices, Hand, Search } from 'lucide-react'
 import { allLessons, lectures, findLesson } from '../content/curriculum'
 import { locale, tx } from '../i18n/lang'
 import { useProgress } from '../state/ProgressContext'
@@ -88,6 +88,26 @@ export function Dashboard() {
             {tx('İlerleme yalnızca bu tarayıcıda saklanır. Ayarlar sayfasından sıfırlayabilirsiniz.', 'Progress is stored only in this browser. You can reset it on the Settings page.')}
           </p>
         </div>
+      </section>
+
+      <section className="card card-pad practice-cta" aria-labelledby="practice-cta-h">
+        <div className="grow">
+          <h2 id="practice-cta-h" style={{ fontSize: '1.05rem', margin: 0 }}>
+            {tx('Alıştırma laboratuvarı', 'Practice lab')}
+          </h2>
+          <p className="small" style={{ margin: '4px 0 0', color: 'var(--text-2)' }}>
+            {tx(
+              'Algoritmaların kararlarını kendin ver (elle iz sürme) ya da her seferinde yeni girdiyle üretilen sorular çöz.',
+              'Make the algorithms’ decisions yourself (hand tracing) or solve questions generated with a fresh input every time.',
+            )}
+          </p>
+        </div>
+        <Link className="btn" to="/alistirma">
+          <Hand size={16} aria-hidden /> {tx('Elle iz sür', 'Trace by hand')}
+        </Link>
+        <Link className="btn" to="/alistirma?mod=soru">
+          <Dices size={16} aria-hidden /> {tx('Soru üreteci', 'Question generator')}
+        </Link>
       </section>
 
       <div className="filterbar" role="search">

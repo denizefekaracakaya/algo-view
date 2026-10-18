@@ -20,6 +20,13 @@ Ders 8 (Hashing) ve sonrası bu sürümün kapsamı dışındadır.
 
 Her ders: öğrenme hedefleri, ön koşullar, bölüm bölüm okuma takibi, bölümlerin arasında puanlanmayan “Kendini dene” soruları (toplam 75) ve ders sonu özeti, görselleştiricilerden önce “Uygulamaya hazırlık” görevleri, “Pratikte” bölümleri, sezgi, biçimsel tanım, etkileşimli görselleştirme, sözde kod, doğruluk (adım adım açılan kanıt), karmaşıklık (varsayımlarıyla), sık hatalar, mini quiz (çoktan seçmeli / sayısal / sıralama; ipucu, geri bildirim, çözüm), özgün alıştırmalar, resmî kaynak bağlantıları ve tamamlama düğmesi.
 
+## Alıştırma laboratuvarı
+
+Üst menüdeki **Alıştırma** sayfası (`#/alistirma`) iki mod sunar; her dersin sonunda da o derse filtrelenmiş bağlantılar vardır.
+
+- **Elle iz sür:** InsertionSort, Merge, medyanların medyanı, Partition, RadixSort ve BST ekleme için algoritmanın her kararını öğrenci verir (indeks seç, L/R seç, kovaya tıkla, sola/sağa in…). Yanlış seçim ipucu gösterir ve hata sayılır; “Bu adımı göster” adımı açar. Kararlar `src/practice/drills.ts` içinde algoritma çalıştırılarak üretilir.
+- **Soru üreteci:** 14 derse yayılmış 21 soru türü (Master teoremi, ters çift sayısı, Merge karşılaştırmaları, pivot konumu, karar ağacı alt sınırı, RadixSort geçişleri, BST yüksekliği, kırmızı-siyah sınırlar…). Her soru rastgele bir tohumla yeni girdi alır; cevap motorlarla hesaplanır (`src/practice/generators.ts`). Oturum skoru, seri ve soru türü başına toplam çözüm tutulur.
+
 ## Dil ve tema
 
 - **Türkçe / English:** Üst çubuktaki **TR | EN** düğmesi (veya Ayarlar → Dil) tüm arayüzü, ders içeriğini, quizleri ve algoritma adım açıklamalarını değiştirir. Seçim `localStorage`’da saklanır. İngilizce içerik `src/content/en/` altındadır; `content.test.ts` iki dilin aynı ders/soru/cevap/görselleştirici yapısına sahip olduğunu denetler.
@@ -55,8 +62,9 @@ src/
   viz/          Derslere özgü görselleştiriciler ve registry (içerikteki `viz` anahtarları)
   content/      Ders verisi (lecture1..7.ts; İngilizcesi en/), kaynaklar, curriculum + içerik testleri
   i18n/         Etkin dil ve tx(tr, en) yardımcısı
+  practice/     Elle iz sürme alıştırmaları ve soru üreteçleri (+ testleri)
   state/        İlerleme modeli, reducer, localStorage kalıcılığı
-  pages/        Panel, Ders, Kaynaklar, Ayarlar
+  pages/        Panel, Ders, Alıştırma, Kaynaklar, Ayarlar
 e2e/            Playwright testleri
 docs/           Kaynak envanteri, müfredat haritası, teknik kararlar
 ```

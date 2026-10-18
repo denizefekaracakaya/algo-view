@@ -80,7 +80,7 @@ interface CardProps {
   total?: number
 }
 
-function QuestionCard({ q, n, storeKey, onRecord, solved, total }: CardProps) {
+export function QuestionCard({ q, n, storeKey, onRecord, solved, total }: CardProps) {
   const { progress, dispatch } = useProgress()
   const rec = progress.quiz[storeKey]
   const [showHint, setShowHint] = useState(false)

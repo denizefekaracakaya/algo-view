@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { act, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
@@ -11,6 +11,8 @@ import { ArrayInput } from './components/ArrayInput'
 import { insertionSortTrace } from './engines/insertionSort'
 import { LessonPage } from './pages/LessonPage'
 import { Dashboard } from './pages/Dashboard'
+import { PracticePage } from './pages/PracticePage'
+import { drillInput, insertionDrill } from './practice/drills'
 import type { Question } from './content/types'
 import App from './App'
 import { setCurrentLang } from './i18n/lang'
@@ -237,6 +239,39 @@ describe('pages', () => {
     )
     expect(screen.getAllByLabelText('tamamlandı').length).toBe(1)
     expect(screen.getByRole('link', { name: /Kaldığın yerden devam et/ })).toHaveAttribute('href', '/ders/l1-karatsuba')
+  })
+})
+
+describe('practice lab', () => {
+  const renderPractice = (entry: string) =>
+    wrap(
+      <MemoryRouter initialEntries={[entry]}>
+        <Routes>
+          <Route path="/alistirma" element={<PracticePage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+  it('an InsertionSort drill can be traced by hand; mistakes give a hint and are counted', async () => {
+    const user = userEvent.setup()
+    const rnd = vi.spyOn(Math, 'random').mockReturnValue(0.5)
+    renderPractice('/alistirma?ders=l2-insertion')
+    const { steps } = insertionDrill(drillInput('insertion', 1 + Math.floor(0.5 * 1e6)))
+    rnd.mockRestore()
+    const wrong = steps[0].answer === 0 ? 1 : 0
+    await user.click(screen.getByRole('button', { name: `İndeks ${wrong}` }))
+    expect(screen.getByText('Olmadı.')).toBeInTheDocument()
+    expect(screen.getByText('1 hata')).toBeInTheDocument()
+    for (const st of steps) await user.click(screen.getByRole('button', { name: `İndeks ${st.answer}` }))
+    expect(screen.getByRole('status')).toHaveTextContent(`Tamamlandı: ${steps.length} adımda 1 hata.`)
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).drills.insertion).toEqual({ runs: 1, perfect: 0 })
+  })
+  it('the question generator shows a question and draws a new one on demand', async () => {
+    const user = userEvent.setup()
+    renderPractice('/alistirma?mod=soru&ders=l3-master')
+    expect(screen.getByRole('checkbox', { name: /Master teoremi/ })).toBeChecked()
+    expect(screen.getByText(/^S1\./)).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Yeni soru/ }))
+    expect(screen.getByText(/^S2\./)).toBeInTheDocument()
   })
 })
 

@@ -9,6 +9,7 @@ import { LANGS, tx } from './i18n/lang'
 
 // Lesson pages carry the visualizers, KaTeX-heavy content and engines: load them on demand.
 const LessonPage = lazy(() => import('./pages/LessonPage').then((m) => ({ default: m.LessonPage })))
+const PracticePage = lazy(() => import('./pages/PracticePage').then((m) => ({ default: m.PracticePage })))
 
 export function Logo() {
   return (
@@ -87,6 +88,7 @@ function Shell() {
             <NavLink to="/" end>
               {tx('Panel', 'Dashboard')}
             </NavLink>
+            <NavLink to="/alistirma">{tx('Alıştırma', 'Practice')}</NavLink>
             <NavLink to="/kaynaklar">{tx('Kaynaklar', 'Sources')}</NavLink>
             <NavLink to="/ayarlar">{tx('Ayarlar', 'Settings')}</NavLink>
           </nav>
@@ -104,6 +106,14 @@ function Shell() {
             element={
               <Suspense fallback={<p className="muted">{tx('Ders yükleniyor…', 'Loading lesson…')}</p>}>
                 <LessonPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/alistirma"
+            element={
+              <Suspense fallback={<p className="muted">{tx('Yükleniyor…', 'Loading…')}</p>}>
+                <PracticePage />
               </Suspense>
             }
           />

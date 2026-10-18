@@ -15,6 +15,10 @@ export interface ProgressData {
   quiz: Record<string, QuizRecord>
   /** Section indices the learner has scrolled through, per lesson. */
   read: Record<string, number[]>
+  /** Hand-tracing drills: completed runs, runs without a mistake. */
+  drills: Record<string, { runs: number; perfect: number }>
+  /** Generated questions per generator: solved questions and checks made. */
+  gen: Record<string, { solved: number; attempts: number }>
   lastLesson: string | null
   prefs: { theme: ThemePref; speed: number; predict: boolean; lang: Lang }
 }
@@ -26,6 +30,8 @@ export const emptyProgress = (): ProgressData => ({
   lessons: {},
   quiz: {},
   read: {},
+  drills: {},
+  gen: {},
   lastLesson: null,
   prefs: { theme: 'system', speed: 1, predict: false, lang: 'tr' },
 })
@@ -43,6 +49,8 @@ export function loadProgress(): ProgressData {
       lessons: parsed.lessons ?? {},
       quiz: parsed.quiz ?? {},
       read: parsed.read ?? {},
+      drills: parsed.drills ?? {},
+      gen: parsed.gen ?? {},
       prefs: { ...base.prefs, ...(parsed.prefs ?? {}) },
     } as ProgressData
   } catch {
@@ -64,6 +72,8 @@ export type ProgressAction =
   | { type: 'uncomplete'; lessonId: string }
   | { type: 'quiz'; key: string; correct: boolean }
   | { type: 'read'; lessonId: string; section: number }
+  | { type: 'drill'; id: string; mistakes: number }
+  | { type: 'gen'; id: string; solved: boolean }
   | { type: 'prefs'; prefs: Partial<ProgressData['prefs']> }
   | { type: 'reset' }
 
@@ -93,6 +103,14 @@ export function progressReducer(s: ProgressData, a: ProgressAction): ProgressDat
       const cur = s.read[a.lessonId] ?? []
       if (cur.includes(a.section)) return s
       return { ...s, read: { ...s.read, [a.lessonId]: [...cur, a.section].sort((x, y) => x - y) } }
+    }
+    case 'drill': {
+      const cur = s.drills[a.id] ?? { runs: 0, perfect: 0 }
+      return { ...s, drills: { ...s.drills, [a.id]: { runs: cur.runs + 1, perfect: cur.perfect + (a.mistakes === 0 ? 1 : 0) } } }
+    }
+    case 'gen': {
+      const cur = s.gen[a.id] ?? { solved: 0, attempts: 0 }
+      return { ...s, gen: { ...s.gen, [a.id]: { solved: cur.solved + (a.solved ? 1 : 0), attempts: cur.attempts + 1 } } }
     }
     case 'prefs':
       return { ...s, prefs: { ...s.prefs, ...a.prefs } }
