@@ -14,7 +14,7 @@ export const lecture1: Lecture = {
       title: 'Algoritmalar ve çalışma süresini ölçmek',
       titleEn: 'Algorithms and how we measure running time',
       summary: 'Bir algoritmayı “daha iyi” yapan nedir? Saniye yerine büyüme hızını neden ölçeriz?',
-      minutes: 15,
+      minutes: 20,
       objectives: [
         'Algoritma tasarımı ve analizinin bilgisayar biliminin her alanında neden yer aldığını açıklamak.',
         'Bir algoritmanın çalışma süresini milisaniyeyle değil, girdi büyüklüğüne göre ölçeklenmesiyle ifade etmenin nedenini anlamak.',
@@ -25,6 +25,17 @@ export const lecture1: Lecture = {
         {
           kind: 'intuition',
           title: 'Sezgi: neden algoritmalar?',
+          check: [
+            {
+              id: 'c1',
+              kind: 'mcq',
+              prompt: 'Bilgisayarlar 1000 kat hızlansa, $n^2$ adımlık bir algoritmayla **aynı sürede** çözebileceğimiz problemin boyu kaç kat büyür?',
+              options: ['1000 kat', 'Yaklaşık 31.6 kat', '10 kat', '2 kat'],
+              answer: 1,
+              hint: '$(cn)^2 = 1000\\,n^2$ için $c$ nedir?',
+              explanation: '$c^2 = 1000 \\Rightarrow c = \\sqrt{1000} \\approx 31.6$. Donanım 1000 kat hızlansa da $n^2$ algoritma ancak ~32 kat büyük problem çözer; bu yüzden algoritmanın büyüme hızı donanımdan daha belirleyicidir.',
+            },
+          ],
           label: 'intuition',
           body: `Ders 1 notları üç neden sayar: algoritmalar bilgisayar biliminin **temelidir** (işletim sistemleri, ağlar, makine öğrenmesi, kriptografi ve hesaplamalı biyoloji hep algoritmik fikirlere dayanır), **faydalıdır** (donanım hızlandıkça hızlı ve yavaş algoritma arasındaki fark _büyür_) ve **eğlencelidir** (yaratıcılık ile matematiksel kesinliğin birleşimi; “daha iyi bir algoritma var mı?” sorusu sürekli sürprizler doğurur).
 
@@ -36,6 +47,16 @@ Bu derste algoritmayı yalnızca “çalışan kod” olarak değil, **iki soruy
         {
           kind: 'formal',
           title: 'Çalışma süresini nasıl ölçeriz?',
+          check: [
+            {
+              id: 'c2',
+              kind: 'numeric',
+              prompt: 'Okul yöntemiyle iki 12 basamaklı sayı çarpılırken kaç tek basamaklı çarpma yapılır?',
+              answer: 144,
+              hint: 'Her basamak çifti bir kez çarpılır.',
+              explanation: '$12 \\cdot 12 = 144$: $n$ basamak için $n^2$.',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `Çalışma süresini milisaniye ile ölçmek, algoritmayı değil **algoritma + gerçekleştirim + donanım** üçlüsünü ölçer. Okul yöntemiyle çarpma elle de bilgisayarda da aynı algoritmadır.
@@ -45,6 +66,22 @@ Bunun yerine, işin girdi büyüklüğü $n$ ile **nasıl ölçeklendiğine** ba
         {
           kind: 'viz',
           title: 'Etkileşim: sabit çarpan mı, üs mü?',
+          tasks: [
+            'Yavaşlamayı $10^4$, üssü $1.6$ yap ve kesişme noktasını oku. Bu kaç basamaklı sayılara karşılık geliyor?',
+            'Üssü $1.9$’a çıkar: kesişme nereye kaydı? Neden bu kadar büyük bir sıçrama oldu?',
+            'Yavaşlamayı $10^8$’e çıkar ve üssü $1.2$ yap. Sabit çarpan büyüdüğünde kesişme hâlâ var mı?',
+          ],
+          check: [
+            {
+              id: 'c3',
+              kind: 'mcq',
+              prompt: '$10^4 \\cdot n^{1.6} < n^2$ eşitsizliği hangi $n$’den itibaren sağlanır?',
+              options: ['$n > 10^4$', '$n > 10^{10}$', '$n > 10^{6.4}$', 'Hiçbir zaman'],
+              answer: 1,
+              hint: '$n^{0.4} > 10^4$.',
+              explanation: '$n^{0.4} > 10^4 \\iff n > 10^{4/0.4} = 10^{10}$.',
+            },
+          ],
           viz: 'handVsComputer',
           body: `Ders notlarındaki düşünce deneyi: elle çalışmak bilgisayardan $10^4$ kat yavaş olsun. $n^{1.6}$ ölçeğinde bir algoritmayı elle, $n^2$ ölçeğindekini bilgisayarda çalıştıralım. Kaydırıcılarla yavaşlama katsayısını ve üssü değiştirin; kesişme noktası nereye kayıyor?`,
         },
@@ -54,6 +91,28 @@ Bunun yerine, işin girdi büyüklüğü $n$ ile **nasıl ölçeklendiğine** ba
           body: `Akla gelen bir “hile”: tüm $n$ basamaklı çarpımları bir tabloda saklamak. Notların belirttiği gibi bu, $10^{2n}$ girdi demektir; $n = 100$ için $10^{200}$ satır — evrendeki atom sayısının (yaklaşık $10^{80}$) çok ötesinde. Gerçekten daha akıllı bir **algoritma** gerekir.
 
 **“Algoritma” kelimesi** 9. yüzyılda Bağdat’taki Beytü’l-Hikme’de çalışan Harezmî’nin (al-Khwarizmi) adından gelir; onun Hint-Arap rakamlarıyla hesap yapmayı anlatan kitabı, bugün kullandığımız konumsal sayı sistemini Avrupa’ya taşımıştır. İyi bir **veri gösterimi** (Roma rakamları yerine onluk sistem) çarpmayı kolaylaştırır — veri yapısı seçiminin önemine dair erken bir örnek.`,
+        },
+        {
+          kind: 'text',
+          title: 'Gerçek hayatta: ölçeklenme neden önemli?',
+          body: `Saniyede $10^9$ temel işlem yapan bir bilgisayar düşünelim ve $n = 10^9$ kayıt işleyelim (ör. bir arama motorunun dizinindeki sayfalar ya da bir genomdaki bazlar).
+
+- $n\\log_2 n \\approx 3\\cdot 10^{10}$ işlem: yaklaşık **30 saniye**.
+- $n^2 = 10^{18}$ işlem: yaklaşık $10^9$ saniye, yani **31 yıldan fazla**.
+
+Aynı makine, aynı veri; fark yalnızca algoritmanın büyüme hızında. Bu yüzden büyük veride çalışan her sistem (veritabanları, arama, harita uygulamalarında yol bulma, kriptografi) önce algoritmanın ölçeklenmesine bakar.
+
+Çarpma da gündelik bir örnektir: banka uygulamalarındaki şifreleme (RSA) yüzlerce basamaklı sayıları sürekli çarpar. Python gibi diller büyük tam sayıları çarparken belirli bir boyuttan sonra okul yöntemi yerine Karatsuba’ya geçer — bir sonraki dersin konusu.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'Saniyede $10^9$ işlem yapan bir bilgisayar, $n = 10^6$ için $n^2$ işlem yapan bir algoritmayı kaç saniyede bitirir?',
+              answer: 1000,
+              hint: '$n^2 = 10^{12}$.',
+              explanation: '$10^{12} / 10^9 = 1000$ saniye (yaklaşık 17 dakika). $n\\log_2 n \\approx 2\\cdot 10^7$ işlemlik bir algoritma ise 0.02 saniyede biter.',
+            },
+          ],
         },
         {
           kind: 'mistakes',
@@ -119,7 +178,7 @@ Bunun yerine, işin girdi büyüklüğü $n$ ile **nasıl ölçeklendiğine** ba
       title: 'Böl ve fethet: Karatsuba çarpımı',
       titleEn: 'Divide and conquer: Karatsuba integer multiplication',
       summary: 'Dört alt çarpım yerine üç: küçük bir cebirsel gözlem, büyük bir asimptotik kazanç.',
-      minutes: 30,
+      minutes: 40,
       objectives: [
         'Böl-ve-fethet (divide and conquer) paradigmasını tamsayı çarpımına uygulamak.',
         'Dört alt problemli Mult1 algoritmasının okul yönteminden asimptotik olarak daha iyi olmadığını görmek.',
@@ -130,6 +189,16 @@ Bunun yerine, işin girdi büyüklüğü $n$ ile **nasıl ölçeklendiğine** ba
         {
           kind: 'intuition',
           title: 'Sezgi',
+          check: [
+            {
+              id: 'c1',
+              kind: 'numeric',
+              prompt: '$y = 5678$ ($n = 4$) için $y = 10^{2} c + d$ yazılıyor. $c + d$ kaçtır?',
+              answer: 134,
+              hint: '$c = 56$, $d = 78$.',
+              explanation: '$5678 = 56 \\cdot 100 + 78$; $c + d = 134$. Karatsuba’nın üçüncü çarpımı $(a+b)(c+d)$ tam olarak bu toplamları kullanır.',
+            },
+          ],
           label: 'intuition',
           body: `$1234 \\times 5678$’i $\\big((12\\cdot 100) + 34\\big)\\big((56 \\cdot 100) + 78\\big)$ olarak yazabiliriz. Genel olarak $x = 10^{n/2} a + b$, $y = 10^{n/2} c + d$ ise
 
@@ -140,6 +209,16 @@ Bu, $n/2$ basamaklı **dört** çarpım ($ac, ad, bc, bd$) ve birkaç ucuz topla
         {
           kind: 'formal',
           title: 'İki algoritma',
+          check: [
+            {
+              id: 'c2',
+              kind: 'numeric',
+              prompt: '$T(n) = 3T(n/2)$, $T(1) = 1$ için $T(8)$ kaçtır? (Karatsuba’nın 8 basamaklı sayılarda yaptığı tek basamaklı çarpma sayısı, ideal durumda.)',
+              answer: 27,
+              hint: '$8 = 2^3$, yani üç seviye açılım.',
+              explanation: '$T(8) = 3^3 = 27$. Mult1 ise $4^3 = 64$, okul yöntemi $8^2 = 64$ yapar.',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `**Mult1:** $ac, ad, bc, bd$’yi özyinelemeli hesapla. Yalnızca tek basamaklı çarpmaları sayarsak (notlardaki maliyet modeli) $T(n) = 4\\,T(n/2)$, $T(1) = 1$.
@@ -153,6 +232,11 @@ Mult1 için aynı açılım $4^{\\log_2 n} = n^2$ verir — okul yöntemiyle ayn
         {
           kind: 'viz',
           title: 'Görselleştirme: özyineleme ağacı',
+          tasks: [
+            '1234 × 5678 için önce **Mult1**, sonra **Karatsuba** çalıştır; sayaçlardaki tek basamaklı çarpma sayılarını karşılaştır.',
+            '99 × 99’u dene. $z_3 = (a+b)(c+d)$ neden kendisi de bölünmek zorunda kalıyor?',
+            'Grafikte $n = 64$ için Mult1 ve Karatsuba noktalarını oku. Fark kaç kat? Kuram ne söylüyordu?',
+          ],
           viz: 'karatsuba',
           body: `Kendi sayılarınızı girin ve iki algoritmayı karşılaştırın. Ağaçtaki her kutu bir özyinelemeli çağrıdır; yapraklar tek basamaklı çarpmalardır. Sayaçlar ve aşağıdaki grafik, işlem sayısının basamak sayısıyla nasıl büyüdüğünü gösterir.`,
         },
@@ -173,6 +257,17 @@ Mult1 için aynı açılım $4^{\\log_2 n} = n^2$ verir — okul yöntemiyle ayn
         {
           kind: 'correctness',
           title: 'Neden doğru?',
+          check: [
+            {
+              id: 'c3',
+              kind: 'mcq',
+              prompt: '$z_3 - z_1 - z_2$ neye eşittir?',
+              options: ['$ad + bc$', '$ac + bd$', '$(a+b)(c+d)$', '$ad - bc$'],
+              answer: 0,
+              hint: '$(a+b)(c+d)$’yi açın.',
+              explanation: '$(a+b)(c+d) = ac + ad + bc + bd$; $ac$ ve $bd$ çıkarılınca $ad + bc$ kalır.',
+            },
+          ],
           label: 'proofIdea',
           body: `Cebirsel özdeşlik: $(a+b)(c+d) = ac + ad + bc + bd$, dolayısıyla $z_3 - z_1 - z_2 = ad + bc$. Özyinelemeli çağrıların doğru çarptığını varsayarsak (tümevarım hipotezi), döndürülen değer tam olarak $10^{2m}ac + 10^m(ad+bc) + bd = xy$ olur. Özyineleme sonlanır çünkü alt problemlerdeki sayıların değeri küçülür ve sonunda tek basamaklı sayılara ulaşılır.`,
         },
@@ -183,6 +278,42 @@ Mult1 için aynı açılım $4^{\\log_2 n} = n^2$ verir — okul yöntemiyle ayn
 - **Mult1:** $n^2$ — okul yönteminden iyi değil. **Karatsuba:** $n^{\\log_2 3} \\approx n^{1.585}$.
 - Notlardaki analiz bilerek “özensiz”dir: $(a+b)$ ve $(c+d)$ aslında $n/2 + 1$ basamaklı olabilir ve toplama maliyeti yok sayıldı. Ders 3’te $T(n) = 3T(n/2) + O(n)$ bağıntısını Master Teoremi ile titizlikle çözeceğiz; sonuç değişmez: $O(n^{\\log_2 3})$.
 - Tarihçe (notlardan): Toom–Cook $O(n^{1.465})$, Schönhage–Strassen $O(n \\log n \\log\\log n)$, Harvey–van der Hoeven (2019) $O(n \\log n)$.`,
+        },
+        {
+          kind: 'text',
+          title: 'Pratikte: kütüphaneler hangi yöntemi kullanır?',
+          body: `Asimptotik olarak daha iyi bir algoritma, küçük girdilerde daha yavaş olabilir: Karatsuba her seviyede ek toplama, çıkarma ve özyineleme yükü taşır. Bu yüzden gerçek kütüphaneler **karma (hibrit)** çalışır:
+
+- **CPython** büyük tam sayıları çarparken, sayılar yeterince uzunsa (dahili olarak birkaç düzine “basamak”tan sonra) Karatsuba’ya geçer; küçük sayılarda okul yöntemini kullanır.
+- **GMP** gibi yüksek başarımlı kütüphaneler boyuta göre sırayla okul yöntemi → Karatsuba → Toom-Cook → FFT tabanlı (Schönhage–Strassen türü) yöntemlere geçer.
+- Aynı fikir matrislerde de var: **Strassen** iki $n\\times n$ matrisi 8 yerine **7** alt çarpımla çarpar: $T(n) = 7T(n/2) + O(n^2) = O(n^{\\log_2 7}) \\approx O(n^{2.81})$.
+
+Ders 3’teki Master Teoremi bu tür “alt problem sayısını azalt” kazançlarını tek satırda hesaplamamızı sağlayacak.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'mcq',
+              prompt: 'Kütüphaneler neden küçük sayılar için okul yöntemine geri döner?',
+              options: [
+                'Karatsuba küçük sayılarda yanlış sonuç verir.',
+                'Küçük girdilerde Karatsuba’nın ek toplama ve özyineleme yükü, kazandırdığı çarpmalardan pahalıdır.',
+                'Okul yöntemi asimptotik olarak daha hızlıdır.',
+                'Karatsuba yalnızca 2’nin kuvveti uzunluktaki sayılarda çalışır.',
+              ],
+              answer: 1,
+              hint: 'Asimptotik analiz sabit çarpanları yok sayar.',
+              explanation: 'Kazanç büyük $n$ içindir; küçük $n$’de sabit çarpanlar ve yük baskındır. Bu yüzden belirli bir eşiğin altında basit yönteme geçilir.',
+            },
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'Strassen’in $T(n) = 7T(n/2) + O(n^2)$ bağıntısındaki üs $\\log_2 7$ yaklaşık kaçtır? (İki ondalık.)',
+              answer: 2.81,
+              tolerance: 0.01,
+              hint: '$2^{2.8} \\approx 6.96$.',
+              explanation: '$\\log_2 7 \\approx 2.807$, yani $O(n^{2.81})$ — standart $n^3$ yönteminden asimptotik olarak hızlı.',
+            },
+          ],
         },
         {
           kind: 'mistakes',

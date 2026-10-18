@@ -6,6 +6,7 @@ import { BigOWitness, EmpiricalSorting, GrowthExplorer } from './GrowthExplorer'
 import { MasterLab } from './MasterLab'
 import { SubstitutionLab } from './SubstitutionLab'
 import { SelectViz } from './SelectViz'
+import { InversionArcs, RotationDemo } from './Extras'
 import { GroupSizeTree, MedianOfMediansGrid, PivotCompare } from './SelectAnalysis'
 import { PairProbability, QuickSortExperiment, QuickSortViz } from './QuickSortViz'
 import { DecisionTreeViz } from './DecisionTreeViz'
@@ -25,6 +26,8 @@ export const VIZ: Record<string, ComponentType> = {
   master: MasterLab,
   substitution: SubstitutionLab,
   select: SelectViz,
+  inversions: InversionArcs,
+  rotation: RotationDemo,
   pivotCompare: PivotCompare,
   momGrid: MedianOfMediansGrid,
   groupTree: GroupSizeTree,

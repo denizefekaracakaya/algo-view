@@ -14,7 +14,7 @@ export const lecture3: Lecture = {
       title: 'Recursion trees and the Master Theorem',
       titleEn: 'Recursion trees and the Master Theorem',
       summary: 'A geometric series of level sums: constant, decreasing or increasing?',
-      minutes: 35,
+      minutes: 45,
       objectives: [
         'Write the running time of divide-and-conquer algorithms as a recurrence relation.',
         'Compute the number of subproblems, their size and the total work per level of a recursion tree.',
@@ -26,6 +26,17 @@ export const lecture3: Lecture = {
         {
           kind: 'intuition',
           title: 'Intuition: a race between forces',
+          check: [
+            {
+              id: 'c1',
+              kind: 'mcq',
+              prompt: 'For $T(n) = 4T(n/2) + n^2$, what is the total work on level $j$ of the recursion tree?',
+              options: ['$n^2$ (the same on every level)', '$n^2 / 2^j$', '$4^j n^2$', '$n^2 \\log n$'],
+              answer: 0,
+              hint: 'Compute $a^j \\cdot (n/b^j)^d$ with $a = 4$, $b = 2$, $d = 2$.',
+              explanation: '$4^j (n/2^j)^2 = n^2$: the ratio $a/b^d = 1$, every level does equal work and the result is $O(n^2\\log n)$.',
+            },
+          ],
           label: 'intuition',
           body: `In an algorithm of the form $T(n) = a\\,T(n/b) + O(n^d)$ two forces compete:
 
@@ -37,6 +48,17 @@ The total work on level $j$ is $c\\,n^d (a/b^d)^j$. If the ratio is $1$, every l
         {
           kind: 'formal',
           title: 'The Master Theorem (Lecture 3 notes, Theorem 1)',
+          check: [
+            {
+              id: 'c2',
+              kind: 'mcq',
+              prompt: 'Which one is **not** a condition of the Master Theorem (Theorem 1)?',
+              options: ['$a \\ge 1$ is an integer', '$b > 1$', 'All subproblems have the same size ($n/b$)', '$d$ must be an integer'],
+              answer: 3,
+              hint: 'Think of recurrences like $T(n) = 4T(n/2) + n^{1.5}$.',
+              explanation: '$d \\ge 0$ can be any real number (e.g. $d = 1/4$ or $2.5$). $a$ is an integer because it counts subproblems.',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `Let $a \\ge 1$ (an integer), $b > 1$, $d \\ge 0$ be constants and $T(n) = a\\cdot T\\!\\left(\\frac{n}{b}\\right) + O(n^d)$, $T(1) = O(1)$. Then
@@ -49,12 +71,28 @@ $$T(n) = \\begin{cases} O(n^d \\log n) & a = b^d \\\\ O(n^d) & a < b^d \\\\ O(n^
         {
           kind: 'viz',
           title: 'Master Theorem explorer and recurrence playground',
+          tasks: [
+            'In the **Parameters** tab start with $a = 2$, $b = 2$; set $d$ to $0.5$, $1$ and $2$. Which case is picked each time and how does the level table change?',
+            'In the **Write a recurrence** tab, try the “Select (MoM)” and “T(n−1)” examples. Why does the tool refuse to solve them, and what does it suggest?',
+            'Run the “Gap case” example: what does the general version (Theorem 3) say?',
+            'Grow $n$ with the tree-depth slider: how does the “Relative” column show which level dominates?',
+          ],
           viz: 'master',
           body: `In the **Parameters** tab enter $a$, $b$, $d$ separately; in the **Write a recurrence** tab type your own recurrence. The tool checks the conditions, picks the case, shows why, and lists the level sums of the recursion tree. If the conditions fail (different-size subproblems, $T(n-1)$, the log-factor gap case) it does not silently make up an answer; it explains why.`,
         },
         {
           kind: 'correctness',
           title: 'Proof idea: the recursion tree',
+          check: [
+            {
+              id: 'c3',
+              kind: 'numeric',
+              prompt: 'For $a = 8$, $b = 2$, $d = 2$, what is the ratio $a/b^d$ between consecutive level sums?',
+              answer: 2,
+              hint: '$b^d = 4$.',
+              explanation: '$8/4 = 2 > 1$: the level work doubles on every level and the leaves dominate: $O(n^{\\log_2 8}) = O(n^3)$.',
+            },
+          ],
           label: 'formalProof',
           proof: [
             { title: 'Setup', body: 'Assume $T(1) = 1$ and that $n$ is a power of $b$. For some $c > 0$, $T(n) \\le a\\,T(n/b) + c\\,n^d$.' },
@@ -75,6 +113,35 @@ $$T(n) = \\begin{cases} O(n^d \\log n) & a = b^d \\\\ O(n^d) & a < b^d \\\\ O(n^
 - **Karatsuba:** $T(n) = 3T(n/2) + O(n)$, $a = 3 > 2$ → $O(n^{\\log_2 3}) \\approx O(n^{1.59})$.
 - **MergeSort:** $T(n) = 2T(n/2) + O(n)$, $a = 2 = 2^1$ → $O(n\\log n)$.
 - **Example:** $T(n) = 2T(n/2) + O(n^2)$, $a = 2 < 4$ → $O(n^2)$.`,
+        },
+        {
+          kind: 'text',
+          title: 'In practice: familiar algorithms through the Master Theorem',
+          body: `- **Binary search:** $T(n) = T(n/2) + O(1)$; $a = 1 = 2^0 = b^d$ → $O(\\log n)$.
+- **Strassen matrix multiplication:** $T(n) = 7T(n/2) + O(n^2)$; $7 > 4$ → $O(n^{\\log_2 7}) \\approx O(n^{2.81})$. Plain recursive matrix multiplication is $8T(n/2) + O(n^2) = O(n^3)$.
+- **FFT** (polynomial multiplication, signal processing) and **closest pair of points:** $T(n) = 2T(n/2) + O(n)$ → $O(n\\log n)$.
+- **Tree-based aggregation** (e.g. visiting every node of a complete binary tree once): $T(n) = 2T(n/2) + O(1)$ → $O(n)$.
+
+If the subproblems have different sizes the Master Theorem is not enough; use the substitution method or the more general **Akra–Bazzi** theorem. As a quick sanity check, computing the recurrence numerically with a small program and looking at $T(n)/f(n)$ is a good habit.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'mcq',
+              prompt: 'Which case of the Master Theorem does binary search’s recurrence $T(n) = T(n/2) + O(1)$ fall into?',
+              options: ['$a = b^d$ → $O(\\log n)$', '$a < b^d$ → $O(1)$', '$a > b^d$ → $O(n)$', 'It does not apply'],
+              answer: 0,
+              hint: '$a = 1$, $b = 2$, $d = 0$.',
+              explanation: '$b^d = 2^0 = 1 = a$: $O(n^0\\log n) = O(\\log n)$.',
+            },
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'Plain recursive matrix multiplication $T(n) = 8T(n/2) + O(n^2)$ solves to $O(n^k)$. What is $k$?',
+              answer: 3,
+              hint: '$\\log_2 8$.',
+              explanation: '$8 > 2^2$ → $O(n^{\\log_2 8}) = O(n^3)$: splitting alone gains nothing; Strassen lowers the exponent with 7 sub-products.',
+            },
+          ],
         },
         {
           kind: 'mistakes',
@@ -153,7 +220,7 @@ $$T(n) = \\begin{cases} O(n^d \\log n) & a = b^d \\\\ O(n^d) & a < b^d \\\\ O(n^
       title: 'The substitution method',
       titleEn: 'The substitution method',
       summary: 'Guess a bound, verify it by induction — when the Master Theorem doesn’t help.',
-      minutes: 25,
+      minutes: 35,
       objectives: [
         'List the steps of the substitution method: guess, base case, inductive hypothesis, substitute, simplify, choose the constant.',
         'Prove a linear (or polynomial) bound for recurrences with subproblems of different sizes.',
@@ -164,12 +231,33 @@ $$T(n) = \\begin{cases} O(n^d \\log n) & a = b^d \\\\ O(n^d) & a < b^d \\\\ O(n^
         {
           kind: 'intuition',
           title: 'Intuition',
+          check: [
+            {
+              id: 'c1',
+              kind: 'mcq',
+              prompt: 'When is the constant $D$ fixed in the substitution method?',
+              options: ['At the very start, chosen at random', 'At the end, from the conditions that come up while writing the proof', 'Separately on every level', 'It is never needed'],
+              answer: 1,
+              hint: 'First we look at what the step requires.',
+              explanation: 'The inductive step gives a condition on $D$ (e.g. $D \\ge 10c$); we combine it with the base case and pick one constant. It cannot change with $n$ or with the level.',
+            },
+          ],
           label: 'intuition',
           body: `When the recursion tree gets messy (subproblems of different sizes) we **guess** the answer and verify it by induction. The guess has the form $T(n) \\le D\\cdot g(n)$; we don’t know $D$ in advance — we **discover** which condition $D$ must satisfy while writing the proof.`,
         },
         {
           kind: 'formal',
           title: 'The method (Lecture 3–4 notes)',
+          check: [
+            {
+              id: 'c2',
+              kind: 'numeric',
+              prompt: 'For $T(n) \\le T(n/2) + T(n/4) + n$, $T(1) = 1$, with which smallest $D$ does the inductive step of the guess $T(n) \\le Dn$ work?',
+              answer: 4,
+              hint: '$\\tfrac{D}{2} + \\tfrac{D}{4} + 1 \\le D$.',
+              explanation: '$\\tfrac34 D + 1 \\le D \\iff D \\ge 4$; together with the base $D \\ge 1$, $D = 4$.',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `For $T(n) \\le f(n) + \\sum_{i=1}^k T(n_i)$, guess $T(n) \\le D\\,g(n)$ ($n \\ge n_0$).
@@ -183,6 +271,11 @@ First derive the condition on $D$ from the inductive step, then combine it with 
         {
           kind: 'viz',
           title: 'Step-by-step substitution',
+          tasks: [
+            'In the “Original example”, reveal the steps one at a time and try to solve the condition in step 6 yourself before comparing with step 7.',
+            'In the “Failed guess: 2T(n/2)+n” example, read the contradiction step. Why is the guess too small?',
+            'Enter your own terms: $T(n/2) + T(n/3) + T(n/6) + n$. What is the sum of the ratios? What does the tool say?',
+          ],
           viz: 'substitution',
           body: `Pick one of the ready-made examples or enter your own terms. For the guess $T(n) \\le D\\,n^p$ the tool shows every algebraic step and either finds a valid $D$ or explains why the guess fails.`,
         },
@@ -197,6 +290,33 @@ First derive the condition on $D$ from the inductive step, then combine it with 
             { title: 'Substitute', body: '$T(n) \\le D\\frac{n}{3} + D\\frac{n}{2} + n = \\left(\\frac{5}{6}D + 1\\right) n$.' },
             { title: 'Condition', body: '$\\left(\\frac{5}{6}D + 1\\right)n \\le D\\,n \\iff 1 \\le \\frac{D}{6} \\iff D \\ge 6$.' },
             { title: 'Conclusion', body: '$D = \\max(1, 6) = 6$ satisfies both the base and the step: $T(n) \\le 6n$, i.e. $T(n) = O(n)$.' },
+          ],
+        },
+        {
+          kind: 'text',
+          title: 'In practice: which method for which recurrence?',
+          body: `When you meet a recurrence, it helps to think in this order:
+
+1. **Are all subproblems the same size ($aT(n/b)$)?** Master Theorem; if the work term has a log factor, the general version.
+2. **Different sizes, ratios summing to $< 1$?** (e.g. $T(n/5) + T(7n/10)$) Substitution with a linear guess: $D = c/(1 - \\sum)$.
+3. **Ratios summing to exactly $1$?** (e.g. $T(n/4) + T(3n/4) + n$) Every level does $\\approx n$ work: guess $n\\log n$ and substitute, or use a recursion tree.
+4. **Does the size drop by a constant ($T(n-1)$)?** Unroll the recurrence and sum.
+5. **Not sure?** Compute the recurrence numerically with a small program and see whether $T(n)/g(n)$ stays bounded; then prove it.`,
+          check: [
+            {
+              id: 'c3',
+              kind: 'mcq',
+              prompt: 'Which approach suits $T(n) = T(n/4) + T(3n/4) + n$ best?',
+              options: [
+                'The Master Theorem',
+                'Substitution with $T(n) \\le Dn$',
+                'Substitution with the guess $T(n) \\le Dn\\log n$ (or a recursion tree)',
+                'Unrolling it like $T(n-1)$',
+              ],
+              answer: 2,
+              hint: '$\\tfrac14 + \\tfrac34 = 1$.',
+              explanation: 'The ratios sum to 1, so every full level does $n$ work and there are $\\Theta(\\log n)$ levels: $\\Theta(n\\log n)$. A linear guess needs $\\tfrac{D}{4}n + \\tfrac{3D}{4}n + n \\le Dn$ — impossible.',
+            },
           ],
         },
         {

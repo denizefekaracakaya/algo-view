@@ -1714,3 +1714,83 @@ td.hl-cell {
   background: var(--accent-soft);
   font-weight: 700;
 }
+
+/* ───────────────────────── Inversions and rotation figures ───────────────────────── */
+.inv-svg,
+.rot-svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.inv-arc {
+  fill: none;
+  stroke: var(--st-greater);
+  stroke-width: 2;
+  opacity: 0.8;
+  transition: d var(--move) var(--ease-move);
+}
+.inv-arc.removed {
+  stroke: var(--st-bad);
+  stroke-dasharray: 5 4;
+  animation: arc-out calc(var(--move) * 1.6) ease-in forwards;
+}
+@keyframes arc-out {
+  0% {
+    opacity: 1;
+    stroke-width: 3.5;
+  }
+  100% {
+    opacity: 0;
+    stroke-width: 1;
+  }
+}
+.inv-node,
+.rot-node {
+  transition: transform var(--move) var(--ease-move);
+}
+.inv-node rect {
+  fill: var(--surface);
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+  transition: fill var(--dur), stroke var(--dur);
+}
+.inv-node rect.moved {
+  fill: var(--st-compare-bg);
+  stroke: var(--st-compare);
+  stroke-width: 2.5;
+}
+.inv-node text,
+.rot-node text {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 15px;
+  fill: var(--text);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.rot-node circle {
+  fill: var(--accent-soft);
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+.rot-sub {
+  fill: var(--surface-2);
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+  transition: fill var(--dur), stroke var(--dur);
+}
+.rot-sub.moved {
+  fill: var(--st-compare-bg);
+  stroke: var(--st-compare);
+}
+.rot-edge {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 2;
+  transition: d var(--move) var(--ease-move);
+}
+.rot-edge.moved {
+  stroke: var(--st-compare);
+  stroke-width: 2.5;
+}

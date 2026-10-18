@@ -18,7 +18,7 @@
 
 Ders 8 (Hashing) ve sonrası bu sürümün kapsamı dışındadır.
 
-Her ders: öğrenme hedefleri, ön koşullar, sezgi, biçimsel tanım, etkileşimli görselleştirme, sözde kod, doğruluk (adım adım açılan kanıt), karmaşıklık (varsayımlarıyla), sık hatalar, mini quiz (çoktan seçmeli / sayısal / sıralama; ipucu, geri bildirim, çözüm), özgün alıştırmalar, resmî kaynak bağlantıları ve tamamlama düğmesi.
+Her ders: öğrenme hedefleri, ön koşullar, bölüm bölüm okuma takibi, bölümlerin arasında puanlanmayan “Kendini dene” soruları (toplam 75) ve ders sonu özeti, görselleştiricilerden önce “Uygulamaya hazırlık” görevleri, “Pratikte” bölümleri, sezgi, biçimsel tanım, etkileşimli görselleştirme, sözde kod, doğruluk (adım adım açılan kanıt), karmaşıklık (varsayımlarıyla), sık hatalar, mini quiz (çoktan seçmeli / sayısal / sıralama; ipucu, geri bildirim, çözüm), özgün alıştırmalar, resmî kaynak bağlantıları ve tamamlama düğmesi.
 
 ## Dil ve tema
 

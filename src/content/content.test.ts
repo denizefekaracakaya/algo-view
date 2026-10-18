@@ -9,7 +9,11 @@ import { bstFromSequence } from '../engines/bst'
 import { height } from '../engines/tree'
 import { substitution } from '../engines/recurrence'
 import { log2Factorial } from '../engines/decisionTree'
-import { radixSort } from '../engines/bucketSort'
+import { digitCount, radixSort } from '../engines/bucketSort'
+import { mergeSortComparisons } from '../engines/mergeSort'
+import { expectedComparisons, quickSort } from '../engines/quickSort'
+import { buildDecisionTree } from '../engines/decisionTree'
+import { searchCost } from '../engines/bst'
 
 describe.each(['tr', 'en'] as const)('curriculum integrity (%s)', (lang) => {
   const LECTURES = LECTURES_BY_LANG[lang]
@@ -125,5 +129,24 @@ describe('numeric claims made in the lesson content', () => {
     expect(height(bstFromSequence([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]))).toBe(11)
     expect(height(bstFromSequence([4, 2, 6, 1, 3, 5, 7]))).toBe(2)
     expect(height(bstFromSequence([4, 6, 2, 7, 5, 3, 1]))).toBe(2)
+  })
+  it('numbers quoted in the in-text check questions', () => {
+    // L2: inversions of [4, 1, 3, 2] = shifts; merging [2,7] with [3,5] costs 3 comparisons (+1 +1 for the halves)
+    const inv = (a: number[]) => a.reduce((s, x, i) => s + a.slice(i + 1).filter((y) => y < x).length, 0)
+    expect(inv([4, 1, 3, 2])).toBe(4)
+    expect(mergeSortComparisons([2, 7, 3, 5])).toBe(5)
+    // L5: sorted 10 with the last-element pivot; E[C] for n = 3
+    expect(quickSort([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'last').comparisons).toBe(45)
+    expect(expectedComparisons(3)).toBeCloseTo(8 / 3)
+    // L6: decision-tree heights and lower bounds, radix passes
+    expect(buildDecisionTree('merge', 4).height).toBe(5)
+    expect(Math.ceil(log2Factorial(6) - 1e-9)).toBe(10)
+    expect(Math.ceil(Math.log2(1_000_001))).toBe(20)
+    expect(digitCount(999_999, 10)).toBe(6)
+    expect(digitCount(2 ** 32 - 1, 256)).toBe(4)
+    // L7: pre-lecture tree search for 7 visits 3 nodes; sorted 1..12 chain averages 6.5 comparisons
+    expect(searchCost(bstFromSequence([5, 3, 9, 1, 4, 6]), 7)).toBe(3)
+    const chain = bstFromSequence([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+    expect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].reduce((s, k) => s + searchCost(chain, k), 0) / 12).toBe(6.5)
   })
 })

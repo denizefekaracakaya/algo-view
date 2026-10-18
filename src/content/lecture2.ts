@@ -16,7 +16,7 @@ export const lecture2: Lecture = {
       title: 'InsertionSort ve döngü değişmezi',
       titleEn: 'InsertionSort and loop invariants',
       summary: 'Basit bir sıralama algoritmasının doğru olduğunu tümevarımla kanıtlamak.',
-      minutes: 25,
+      minutes: 35,
       objectives: [
         'InsertionSort’un her adımda ne yaptığını izlemek ve tahmin etmek.',
         '“Her iterasyondan sonra A[:i+1] sıralıdır” döngü değişmezini (loop invariant) ifade etmek.',
@@ -28,23 +28,69 @@ export const lecture2: Lecture = {
         {
           kind: 'intuition',
           title: 'Sezgi',
+          check: [
+            {
+              id: 'c1',
+              kind: 'numeric',
+              prompt: 'Elinizde sıralı 2, 5, 9 kartları var ve yeni gelen kart 6. Kartı yerine koymak için kaç kart bir sağa kaydırılır?',
+              answer: 1,
+              hint: '6’dan büyük olan kartlar kayar.',
+              explanation: 'Yalnızca 9 kayar; 6, 5 ile 9 arasına girer: 2, 5, 6, 9.',
+            },
+          ],
           label: 'intuition',
           body: `Elinizdeki iskambil kartlarını sıralar gibi: soldaki kartlar zaten sıralı; sağdan yeni bir kart alıp (\`current\`) solundaki daha büyük kartları birer sağa kaydırarak doğru yere yerleştirirsiniz. Her turda sıralı bölge bir büyür.`,
         },
         {
           kind: 'viz',
           title: 'Sıralama görselleştiricisi (InsertionSort ↔ MergeSort)',
+          tasks: [
+            '“Ders örneği”nde **Tahmin modu**nu aç ve her turda `current`’ın yerleşeceği indeksi tahmin et.',
+            '“Ters sıralı (en kötü)” ile “Neredeyse sıralı”nın karşılaştırma sayılarını kıyasla. Fark neden bu kadar büyük?',
+            '“Tekrarlı” örnekte eşit değerlerin göreli sırasının korunduğunu izle (kararlılık).',
+          ],
           viz: 'sortingLab',
           body: `Kendi dizinizi girin veya örnek seçin. **Tahmin modu**nu açarsanız, her turdan önce \`current\` değerinin nereye yerleşeceğini tahmin etmeniz istenir. Üstteki seçiciden aynı girdiyle MergeSort’a geçip karşılaştırma sayılarını kıyaslayabilirsiniz.`,
         },
         {
           kind: 'pseudocode',
           title: 'Sözde kod (Ders 2 notlarındaki Python sürümü)',
+          check: [
+            {
+              id: 'c2',
+              kind: 'mcq',
+              prompt: 'Python’da döngü koşulundaki `j >= 0` unutulursa (`while A[j] > current`) ne olur?',
+              options: [
+                'Hiçbir şey değişmez.',
+                '`j = -1` olduğunda `A[-1]`, yani dizinin **son** elemanı okunur; karşılaştırmalar yanlış elemanla yapılır ve sonuç bozulabilir.',
+                'Program her zaman hata verip durur.',
+                'Algoritma ters sıralar.',
+              ],
+              answer: 1,
+              hint: 'Python’da negatif indeks diziyi sondan sayar.',
+              explanation: 'Python `A[-1]`’i hata vermeden son eleman olarak okur. Örneğin `[2, 1]`’de `current = 1` başa ulaşınca `A[-1]` ile karşılaştırılır; bu tür hatalar sessizce yanlış çıktı üretir. Sınır koşulları kanıtta da açıkça yer almalıdır.',
+            },
+          ],
           code: INSERTION_SORT_CODE,
         },
         {
           kind: 'correctness',
           title: 'Doğruluk: döngü değişmezi',
+          check: [
+            {
+              id: 'c3',
+              kind: 'order',
+              prompt: 'Bir döngü değişmezi kanıtının parçalarını sıraya koyun.',
+              items: [
+                'Değişmezi açıkça yaz: “$i$. iterasyondan sonra $A[:i+1]$ sıralıdır.”',
+                'Başlangıç: döngüden önce (i = 0) değişmez doğru.',
+                'Koruma: bir iterasyon değişmezi bozmaz (tümevarım adımı).',
+                'Sonlanma: döngü bittiğinde değişmez, istenen sonucu verir.',
+              ],
+              hint: 'Tümevarımın taban–adım–sonuç yapısını düşünün.',
+              explanation: 'Değişmez → başlangıç (taban) → koruma (adım) → sonlanma (değişmezi hedefe bağlama).',
+            },
+          ],
           label: 'formalProof',
           body: `**Değişmez (inductive hypothesis):** $i$. iterasyondan sonra $A[:i+1]$ sıralıdır. Kanıtı adım adım açın; her adımı görmeden önce ne olması gerektiğini düşünün.`,
           proof: [
@@ -70,6 +116,63 @@ export const lecture2: Lecture = {
           body: `$i$. iterasyonda en fazla $i$ eleman kaydırılır: toplam $\\sum_{i=1}^{n-1} i = \\frac{n(n-1)}{2}$ karşılaştırma ve kaydırma — **en kötü durumda** (ters sıralı girdi) yaklaşık $n^2/2$. Ders bunun ötesine geçmek ister: $n^2$’den asimptotik olarak daha hızlı sıralayabilir miyiz? (Cevap: MergeSort, $n\\log n$.)
 
 **Not:** Neredeyse sıralı girdide InsertionSort az iş yapar; ama en kötü durum analizi her girdi için geçerli bir garanti verir.`,
+        },
+        {
+          kind: 'viz',
+          title: 'Ters çiftler: kaydırma sayısının sırrı',
+          viz: 'inversions',
+          body: `$i < j$ iken $A[i] > A[j]$ olan $(i, j)$ çiftine **ters çift** (inversion) denir. Ters çift sayısı $I$, dizinin sıralı olmaktan ne kadar uzak olduğunu ölçer: sıralı dizide $0$, farklı elemanlı ters sıralı dizide $\\frac{n(n-1)}{2}$.
+
+InsertionSort’un her kaydırması, \`current\` ile ondan büyük **komşu** bir elemanın yerini değiştirir: tam olarak **bir** ters çifti yok eder, başka hiçbir çiftin sırasını değiştirmez. Öyleyse
+
+$$\\text{kaydırma sayısı} = I, \\qquad \\text{çalışma süresi} = \\Theta(n + I).$$
+
+Rastgele bir dizide her çift $\\tfrac12$ olasılıkla terstir, yani beklenen $I = \\frac{n(n-1)}{4}$: ortalama durum da $\\Theta(n^2)$. Her elemanın doğru yerinden en fazla $k$ uzakta olduğu “neredeyse sıralı” dizide ise $I = O(nk)$ ve süre $O(nk)$’ya iner.`,
+          tasks: [
+            'Varsayılan dizide **Bir kaydırma yap**’a art arda bas: “kalan + yapılan” toplamı hiç değişiyor mu?',
+            '5, 4, 3, 2, 1 dizisinde toplam kaç kaydırma oldu? $\\frac{n(n-1)}{2}$ ile karşılaştır.',
+            '1, 2, 4, 3, 5 dizisinde kaç ters çift var? InsertionSort bu dizide neden bu kadar hızlı?',
+          ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'InsertionSort $[4, 1, 3, 2]$’yi sıralarken toplam kaç kaydırma yapar? (Ters çiftleri sayarak bulun.)',
+              answer: 4,
+              hint: '4 kendinden sonraki kaç elemandan büyük? 3?',
+              explanation: 'Ters çiftler: (4,1), (4,3), (4,2), (3,2) → $I = 4$, dolayısıyla 4 kaydırma.',
+            },
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'Her elemanın doğru konumundan en fazla $k$ uzakta olduğu bir dizide InsertionSort’un süresi nedir?',
+              options: ['$O(n\\log n)$', '$O(nk)$', '$O(n^2)$ her zaman', '$O(k^2)$'],
+              answer: 1,
+              hint: 'Bir eleman en fazla kaç elemanla ters çift oluşturabilir?',
+              explanation: 'Her eleman yalnızca kendi etrafındaki $O(k)$ elemanla ters çift olabilir: $I = O(nk)$, süre $\\Theta(n + I) = O(nk)$.',
+            },
+          ],
+        },
+        {
+          kind: 'text',
+          title: 'Pratikte: InsertionSort nerede yaşıyor?',
+          body: `$\\Theta(n^2)$ en kötü durumuna rağmen InsertionSort gerçek sistemlerde sıkça kullanılır:
+
+- **Küçük diziler:** döngüsü çok sade, sabit çarpanları küçüktür. Birkaç düzine elemana kadar çoğu zaman “daha iyi” algoritmalardan hızlıdır.
+- **Karma algoritmalar:** Python’un \`sorted\` fonksiyonu ve Java’nın nesne dizileri için kullandığı **Timsort**, kısa parçaları ikili aramalı bir InsertionSort ile sıralayıp sonra MergeSort gibi birleştirir. Yaygın C++ \`std::sort\` uygulamaları da küçük parçalarda InsertionSort’a geçer.
+- **Neredeyse sıralı veri:** süre $\\Theta(n + I)$ olduğu için birkaç kaydı değişmiş bir sıralama tablosunu çok hızlı düzeltir.
+- **Çevrimiçi (online) sıralama:** elemanlar birer birer gelirken her yeni eleman sıralı kısma eklenebilir.`,
+          check: [
+            {
+              id: 'c6',
+              kind: 'mcq',
+              prompt: 'Timsort (Python `sorted`) InsertionSort’u ne için kullanır?',
+              options: ['Tüm diziyi sıralamak için', 'Kısa parçaları (run) sıralamak için; sonra parçalar birleştirilir', 'Yalnızca ters sıralı girdiler için', 'Hiç kullanmaz'],
+              answer: 1,
+              hint: 'Küçük $n$’de sabit çarpanlar önemlidir.',
+              explanation: 'Timsort kısa parçaları InsertionSort (ikili aramalı sürümü) ile sıralar ve parçaları MergeSort gibi birleştirir: iki algoritmanın güçlü yanlarını birleştirir.',
+            },
+          ],
         },
         {
           kind: 'mistakes',
@@ -129,7 +232,7 @@ export const lecture2: Lecture = {
       title: 'MergeSort ve özyineleme ağacı',
       titleEn: 'MergeSort and the recursion tree',
       summary: 'Böl, özyinele, birleştir — ve her seviyede eşit iş: $O(n\\log n)$.',
-      minutes: 30,
+      minutes: 40,
       objectives: [
         'MergeSort’un bölme ve birleştirme aşamalarını adım adım izlemek.',
         'Merge’ün iki sıralı listeyi doğrusal zamanda birleştirdiğini görmek ve tükenen liste durumunu ele almak.',
@@ -141,6 +244,16 @@ export const lecture2: Lecture = {
         {
           kind: 'intuition',
           title: 'Sezgi',
+          check: [
+            {
+              id: 'c1',
+              kind: 'numeric',
+              prompt: '16 elemanlı bir dizide MergeSort kaç **taban durumu** (uzunluğu 1 olan) çağrısı yapar?',
+              answer: 16,
+              hint: 'Özyineleme ağacının yaprakları.',
+              explanation: 'Her eleman sonunda tek başına bir yaprak olur: 16 taban durumu ($2^4$).',
+            },
+          ],
           label: 'intuition',
           body: `Diziyi ikiye bölün, iki yarıyı (sihirli bir şekilde, özyinelemeyle) sıralayın, sonra iki sıralı yarıyı fermuar gibi birleştirin. Birleştirme kolaydır: iki listenin önündeki elemanlardan küçük olanı alırsınız.
 
@@ -149,6 +262,11 @@ Kötümser bakış: her seviyede çağrı sayısı ikiye katlanıyor. İyimser b
         {
           kind: 'viz',
           title: 'MergeSort görselleştiricisi',
+          tasks: [
+            '**Tahmin modu**nda her birleştirme adımından önce S’e eklenecek değeri tahmin et.',
+            '“Ters sıralı” ile “Ders örneği”nin karşılaştırma sayılarını kıyasla. InsertionSort’taki gibi büyük bir fark var mı? Neden?',
+            '“Tekrarlı” örnekte eşit iki değerin birleştirmede hangi sırayla S’e girdiğine bak: eşitlikte L’nin seçilmesi neyi garanti ediyor?',
+          ],
           viz: 'mergeSort',
           body: `Her satır bir özyineleme seviyesidir; kutular alt dizileri orijinal konumlarında gösterir. Merge sırasında alt panelde L, R işaretçileri (i, j) ve oluşan S listesi görünür. Tahmin modunda her birleştirme adımından önce hangi elemanın S’e ekleneceğini tahmin edin.`,
         },
@@ -161,6 +279,16 @@ Kötümser bakış: her seviyede çağrı sayısı ikiye katlanıyor. İyimser b
         {
           kind: 'correctness',
           title: 'Doğruluk: özyineleme değişmezi',
+          check: [
+            {
+              id: 'c2',
+              kind: 'numeric',
+              prompt: '$L = [2, 7]$ ve $R = [3, 5]$ birleştirilirken kaç anahtar karşılaştırması yapılır?',
+              answer: 3,
+              hint: 'Bir liste bittiğinde kalanlar karşılaştırmasız eklenir.',
+              explanation: '2<3 (2 eklenir), 7>3 (3), 7>5 (5); R bitti, 7 karşılaştırmasız eklenir: 3 karşılaştırma. İki listenin toplam boyu $m$ ise en fazla $m - 1$ karşılaştırma.',
+            },
+          ],
           label: 'proofIdea',
           proof: [
             { title: 'Hipotez', body: '“MergeSort, uzunluğu $< i$ olan her girdi için sıralı bir dizi döndürür.”' },
@@ -172,6 +300,16 @@ Kötümser bakış: her seviyede çağrı sayısı ikiye katlanıyor. İyimser b
         {
           kind: 'complexity',
           title: 'Çalışma süresi: özyineleme ağacı',
+          check: [
+            {
+              id: 'c3',
+              kind: 'numeric',
+              prompt: '$n = 32$ için MergeSort özyineleme ağacında kaç seviye vardır?',
+              answer: 6,
+              hint: '$\\log_2 32 + 1$.',
+              explanation: 'Seviyeler $0, 1, \\dots, 5$: toplam 6.',
+            },
+          ],
           label: 'formalProof',
           body: `$n$’nin 2’nin kuvveti olduğunu varsayalım (notlardaki gerekçe: diziyi en yakın 2’nin kuvvetine $\\infty$ ile tamamlamak boyutu en fazla iki katına çıkarır). Boyutu $m$ olan bir çağrı en fazla $11m$ işlem yapar (taban kontrolü, kopyalama, Merge).
 
@@ -182,6 +320,39 @@ Kötümser bakış: her seviyede çağrı sayısı ikiye katlanıyor. İyimser b
 $$\\text{Toplam} \\le 11n(\\log_2 n + 1) = 11n\\log_2 n + 11n = O(n\\log n).$$
 
 Bu bir **en kötü durum** sınırıdır: girdinin ne olduğuna bakılmaksızın geçerlidir. Bağıntı olarak: $T(n) = 2T(n/2) + O(n)$ (Ders 3’te Master Teoremi ile de çözeceğiz).`,
+        },
+        {
+          kind: 'text',
+          title: 'Pratikte: birleştirme fikri her yerde',
+          body: `- **Dış bellek (external) sıralama:** belleğe sığmayan bir dosya (ör. 1 TB kayıt) parçalar hâlinde okunur, her parça bellekte sıralanıp diske yazılır, sonra parçalar **k-yollu birleştirme** ile tek bir sıralı dosyada birleştirilir. Veritabanları büyük \`ORDER BY\` sorgularında bunu yapar.
+- **Bağlı listeler:** rastgele erişim gerekmediği için MergeSort bağlı listeleri sıralamanın doğal yoludur.
+- **Kararlılık:** MergeSort kararlıdır; bu yüzden nesne sıralamada (ör. önce isme, sonra bölüme göre) tercih edilir. Timsort da birleştirmeye dayanır.
+- **Paralel sıralama:** iki yarı birbirinden bağımsız sıralanabilir; MapReduce gibi sistemlerdeki dağıtık sıralama aynı fikre dayanır.
+- **Ters çift sayma:** birleştirme sırasında R’den alınan her eleman, L’de kalanların hepsiyle ters çift oluşturur; böylece ters çift sayısı $O(n\\log n)$’de sayılabilir.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'mcq',
+              prompt: 'Belleğe sığmayan çok büyük bir dosyayı sıralamanın standart yolu hangisidir?',
+              options: [
+                'Dosyayı satır satır InsertionSort ile sıralamak',
+                'Belleğe sığan parçaları ayrı ayrı sıralayıp diske yazmak, sonra parçaları birleştirmek',
+                'Önce dosyayı sıkıştırmak',
+                'Rastgele pivotlu QuickSort’u doğrudan diskte çalıştırmak',
+              ],
+              answer: 1,
+              hint: 'MergeSort’un “birleştir” adımı yalnızca listelerin önüne bakar.',
+              explanation: 'Dış bellek MergeSort’u: Merge yalnızca parçaların baştaki elemanlarına sıralı erişim ister; bu, disk için idealdir.',
+            },
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: '8 sıralı parça, her turda parçaları ikişer ikişer birleştirerek tek parçaya indiriliyor. Kaç tur gerekir?',
+              answer: 3,
+              hint: 'Her turda parça sayısı yarıya iner.',
+              explanation: '8 → 4 → 2 → 1: $\\log_2 8 = 3$ tur.',
+            },
+          ],
         },
         {
           kind: 'mistakes',
@@ -249,7 +420,7 @@ Bu bir **en kötü durum** sınırıdır: girdinin ne olduğuna bakılmaksızın
       title: 'En kötü durum ve asimptotik gösterim',
       titleEn: 'Worst-case analysis and asymptotic notation',
       summary: 'Big-O, Big-Ω ve Big-Θ: sabitleri ve düşük mertebeli terimleri neden ve nasıl yok sayarız?',
-      minutes: 30,
+      minutes: 40,
       objectives: [
         'En kötü durum analizini “rakip (adversary) oyunu” olarak açıklamak.',
         'Big-O, Big-Ω, Big-Θ tanımlarını $c$ ve $n_0$ tanıkları (witness) ile yazmak ve uygulamak.',
@@ -260,6 +431,22 @@ Bu bir **en kötü durum** sınırıdır: girdinin ne olduğuna bakılmaksızın
         {
           kind: 'intuition',
           title: 'En kötü durum analizi',
+          check: [
+            {
+              id: 'c1',
+              kind: 'mcq',
+              prompt: 'Hangisi bir **en kötü durum** garantisidir?',
+              options: [
+                '“Rastgele girdilerde ortalama $n\\log n$ adım.”',
+                '“Her $n$ elemanlı girdide en fazla $11n\\log_2 n + 11n$ adım.”',
+                '“Test ettiğimiz 1000 girdide en fazla 5 saniye.”',
+                '“Sıralı girdide $n - 1$ karşılaştırma.”',
+              ],
+              answer: 1,
+              hint: 'Rakip hangi girdiyi seçerse seçsin geçerli olmalı.',
+              explanation: 'Yalnızca ikinci ifade **her** girdi için konuşuyor. Diğerleri bir dağılıma, sonlu bir teste ya da tek bir girdiye bağlı.',
+            },
+          ],
           label: 'intuition',
           body: `Bir rakiple oyun oynadığımızı düşünün: biz bir algoritma ve bir süre sınırı $T(n)$ söyleriz; rakip, algoritmamızı en çok yavaşlatacak $n$ boyutlu girdiyi seçer. Rakip ne seçerse seçsin süre $T(n)$’yi aşmıyorsa kazanırız. Bu, **her girdi için** geçerli, çok güçlü bir garantidir.
 
@@ -268,6 +455,25 @@ Ortalama durum analizi (girdiler üzerinde bir dağılım varsayar) daha zordur 
         {
           kind: 'formal',
           title: 'Asimptotik gösterim (Ders 2 notları)',
+          check: [
+            {
+              id: 'c2',
+              kind: 'mcq',
+              prompt: '$f(n) = 5n^3 + 2n\\log n + 7$ için hangisi doğrudur?',
+              options: ['$f(n) = \\Theta(n^3)$', '$f(n) = O(n^2)$', '$f(n) = \\Omega(n^4)$', '$f(n) = \\Theta(n\\log n)$'],
+              answer: 0,
+              hint: 'En hızlı büyüyen terim hangisi?',
+              explanation: '$n \\ge 1$ için $5n^3 \\le f(n) \\le 14n^3$: tanıklar $c = 5$ ve $c = 14$, $n_0 = 1$.',
+            },
+            {
+              id: 'c3',
+              kind: 'order',
+              prompt: 'Fonksiyonları büyüme hızına göre yavaştan hızlıya sıralayın.',
+              items: ['$\\log n$', '$\\sqrt{n}$', '$n$', '$n\\log n$', '$n^2$', '$2^n$', '$n!$'],
+              hint: 'Her üstel fonksiyon her polinomu, her polinom her logaritmayı sonunda geçer.',
+              explanation: '$\\log n \\ll \\sqrt n \\ll n \\ll n\\log n \\ll n^2 \\ll 2^n \\ll n!$.',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `$T(n)$ ve $f(n)$ negatif olmayan fonksiyonlar olsun.
@@ -281,12 +487,22 @@ Sezgisel olarak: O bir **üst sınır**, Ω bir **alt sınır**, Θ ise **sıkı
         {
           kind: 'viz',
           title: 'Büyüme hızı gezgini',
+          tasks: [
+            '$n\\log_2 n$ ve $n^2$’yi seç, üst sınırı 1024 yap: oran yaklaşık kaç?',
+            '$2^n$’yi ekle ve logaritmik ekseni kapat. Diğer eğrilere ne oldu?',
+            'Logaritmik eksende $\\log n$ ile $n$’nin arasındaki mesafenin $n$ büyüdükçe nasıl değiştiğine bak.',
+          ],
           viz: 'growth',
           body: `Fonksiyonları seçip $n$ arttıkça nasıl ayrıştıklarını görün. Logaritmik eksen, çok farklı büyüklükleri tek grafikte gösterir.`,
         },
         {
           kind: 'viz',
           title: 'Tanık (c, n₀) denetleyicisi',
+          tasks: [
+            '$3n^2 + 5n + 10 = O(n^2)$ için $c = 4$ seç ve geçen en küçük $n_0$’ı bul.',
+            '$11n\\log_2 n + 11n = O(n)$ iddiasını farklı $c$ değerleriyle “kurtarmaya” çalış. İlk karşı örnek nasıl kayıyor? Neden hiçbir $c$ yetmiyor?',
+            '**Ω** moduna geç ve $100n + 1000 = \\Omega(n)$ için bir tanık bul.',
+          ],
           viz: 'bigO',
           body: `Bir $T(n)$, bir iddia ve $c$, $n_0$ seçin. Araç $n \\le 2000$ için koşulun sağlanıp sağlanmadığını kontrol eder ve ilk karşı örneği gösterir. Örneğin $3n^2 + 5n + 10 = O(n^2)$ için $c = 4$ hangi $n_0$ ile çalışır? $c = 30, n_0 = 1$ (notlardaki $c = (k+1)\\max_i|a_i|$ yöntemi: $k = 2$, $\\max_i|a_i| = 10$) ne olur? $11n\\log_2 n + 11n = O(n)$ iddiasını hangi $c$ kurtarabilir?`,
         },
@@ -308,7 +524,39 @@ Sezgisel olarak: O bir **üst sınır**, Ω bir **alt sınır**, Θ ise **sıkı
         {
           kind: 'viz',
           title: 'Ampirik ölçüm: karşılaştırma sayıları',
+          tasks: ['**Yeni rastgele girdiler**’e birkaç kez bas: InsertionSort noktaları $n^2/4$ eğrisinin etrafında mı kalıyor? Bu bir kanıt mı?'],
           viz: 'empiricalSorting',
+        },
+        {
+          kind: 'text',
+          title: 'Pratikte: sabitler ne zaman önemlidir?',
+          body: `Asimptotik gösterim büyük $n$’de neyin kazanacağını söyler; gerçek bir programda ise $n$ sınırlıdır ve sabitler de rol oynar.
+
+- $100n$ ile $n^2$: $n \\le 100$ iken $n^2$ daha küçüktür. Bu yüzden kütüphaneler küçük girdilerde basit yöntemlere geçer (InsertionSort, okul yöntemiyle çarpma).
+- **Bellek ve önbellek:** aynı sayıda işlem yapan iki algoritmadan belleğe sırayla erişen çoğu zaman çok daha hızlıdır; asimptotik analiz bunu görmez.
+- **“Galaktik” algoritmalar:** Harvey–van der Hoeven’in $O(n\\log n)$ çarpma algoritması kuramsal olarak en iyisidir, ama yalnızca evrendeki atom sayısını aşan boyutlarda kazanır.
+- **Taban önemsizdir:** $\\log_2 n = \\log_{10} n / \\log_{10} 2$; tabanlar arasında yalnızca sabit çarpan farkı vardır, bu yüzden $O(\\log n)$ yazarken taban belirtilmez.
+
+İyi bir mühendis önce asimptotik olarak doğru algoritmayı seçer, sonra ölçerek sabitleri iyileştirir.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: '$n^2 > 100n$ eşitsizliğini sağlayan en küçük pozitif tam sayı $n$ kaçtır?',
+              answer: 101,
+              hint: '$n^2 > 100n \\iff n > 100$.',
+              explanation: '$n = 100$’de eşitlik var; $n = 101$’den itibaren $n^2$ büyüktür.',
+            },
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: '$\\log_2 n$ ile $\\log_{10} n$ arasındaki ilişki için hangisi doğrudur?',
+              options: ['$\\log_2 n = \\Theta(\\log_{10} n)$', '$\\log_2 n = O(\\log_{10} n)$ ama tersi yanlış', 'Karşılaştırılamazlar', '$\\log_2 n = \\Theta(n)$'],
+              answer: 0,
+              hint: 'Taban değiştirme formülü.',
+              explanation: '$\\log_2 n = \\log_{10} n / \\log_{10} 2 \\approx 3.32\\,\\log_{10} n$: yalnızca sabit çarpan farkı.',
+            },
+          ],
         },
         {
           kind: 'mistakes',

@@ -21,6 +21,8 @@ Lesson ids are the URL slugs (`#/ders/<id>`). Content lives in `src/content/lect
 | 7 | `l7-redblack` — Kırmızı-siyah ağaçlar | 5 properties, rotations, insertion cases 1/2/3, black-height proof | h ≤ 2 log₂(n+1) | `rbPlayground` (toggle colors, live invariant checker), `rb` (insert trace with x/p/u/g labels, invariant panel per step, predict case) + proof stepper | 5 Q; 1 practice (10,5,15,3,7,1) | L7 notes, slides, concept, HW4 |
 | 7 | `l7-compare` — BST ve RB karşılaştırması | Same sequence → different heights; proven vs measured | — | `treeCompare` (heights, avg/worst search comparisons, guaranteed bound) | 2 Q; 1 practice (root rank) | L7 notes, slides, concept |
 
-Totals: 7 lectures, 16 lessons, 60 quiz questions, 18 practice problems.
+Totals: 7 lectures, 16 lessons, 60 quiz questions, 75 ungraded in-text “try it yourself” questions, 18 practice problems.
+
+Every lesson also has guided tasks before each visualizer and an “In practice / in real life” section (libraries such as Timsort, introsort, `std::nth_element`, B-trees, RadixSort on GPUs; applications such as percentiles, external sorting, schedulers). Additional figures beyond the table: `inversions` (L2 InsertionSort: each shift removes one inversion arc) and `rotation` (L7 red-black trees: animated rotation with subtrees α, β, γ).
 
 Out of scope by design: Lecture 8 (Hashing) and later (graphs, Dijkstra, DP, greedy, MST, max-flow, stable matching). The test `no out-of-scope topics leak into lesson titles` guards this.

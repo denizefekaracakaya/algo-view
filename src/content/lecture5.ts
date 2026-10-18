@@ -15,7 +15,7 @@ export const lecture5: Lecture = {
       title: 'QuickSort ve pivot seçimi',
       titleEn: 'QuickSort and pivot selection',
       summary: 'Bölümle, pivotu yerine koy, iki tarafa özyinele.',
-      minutes: 30,
+      minutes: 40,
       objectives: [
         'QuickSort’un bölümleme (partition) adımını ve yerinde (in-place) gerçekleştirimi izlemek.',
         'Pivot seçiminin çalışma süresini nasıl belirlediğini görmek: $T(n) \\le cn + T(k-1) + T(n-k)$.',
@@ -27,6 +27,22 @@ export const lecture5: Lecture = {
         {
           kind: 'intuition',
           title: 'Sezgi',
+          check: [
+            {
+              id: 'c1',
+              kind: 'mcq',
+              prompt: 'Bölümleme bittikten hemen sonra pivot için hangisi **her zaman** doğrudur?',
+              options: [
+                'Pivot dizinin ortasındadır.',
+                'Pivot sıralı dizideki son konumundadır; solundakiler küçük, sağındakiler büyük ya da eşittir.',
+                'Sol ve sağ parçalar sıralıdır.',
+                'Sol parça sağ parçadan uzundur.',
+              ],
+              answer: 1,
+              hint: 'Pivotun solunda tam olarak kaç eleman var?',
+              explanation: 'Pivotun solunda ondan küçük olanların hepsi var; bu yüzden konumu sıralı dizideki konumuyla aynıdır ve bir daha hareket etmez. Parçaların kendileri henüz sıralı değildir.',
+            },
+          ],
           label: 'intuition',
           body: `QuickSort, Select’e çok benzer: bir pivot $x$ seç, diziyi $[A_<,\\ x,\\ A_>]$ olarak düzenle. Fark: Select yalnızca bir tarafa özyinelerken QuickSort **iki** tarafı da sıralar. Bölümlemeden sonra pivot **son konumundadır** ve bir daha hareket etmez.
 
@@ -35,18 +51,45 @@ Notlar elemanların farklı olduğunu varsayar (genelliği bozmadan). Buradaki y
         {
           kind: 'viz',
           title: 'QuickSort görselleştiricisi',
+          tasks: [
+            '“Sıralı” örneği **Son eleman** kuralıyla çalıştır ve sona git: özyineleme ağacı nasıl görünüyor, kaç karşılaştırma yapıldı?',
+            'Aynı girdiyi **Rastgele** ile dene ve **Yeni tohum**’a birkaç kez bas. Karşılaştırma sayısı ne kadar değişiyor?',
+            '**Medyan (ideal)** kuralında ağacın şekline bak: neden dengeli?',
+            '**Tahmin modu**nda her elemanın hangi bölgeye gideceğini tahmin et.',
+          ],
           viz: 'quickSort',
           body: `Pivot kuralını ve (rastgele kural için) tohumu seçin. Aynı tohum aynı çalışmayı birebir tekrarlar; “Yeni tohum” ile farklı pivot seçimlerini karşılaştırın. Alttaki ağaçta her düğüm bir çağrının pivotudur — dengesiz ağaç = derin özyineleme = çok karşılaştırma. “Sıralı” örnekte “Son eleman” kuralını deneyin.`,
         },
         {
           kind: 'pseudocode',
           title: 'Sözde kod (yerinde bölümleme)',
+          check: [
+            {
+              id: 'c2',
+              kind: 'numeric',
+              prompt: 'Lomuto bölümlemesi 10 elemanlı bir alt dizide (pivot dahil) kaç anahtar karşılaştırması yapar?',
+              answer: 9,
+              hint: 'Pivot dışındaki her eleman pivotla bir kez karşılaştırılır.',
+              explanation: '$m$ elemanlı alt dizide $m - 1$ karşılaştırma: $10 - 1 = 9$.',
+            },
+          ],
           code: QUICKSORT_CODE,
           body: `Ders 5 slaytlarındaki “daha iyi bölümleme” fikri: pivotu rastgele seç, alt dizinin sonuna taşı, sonra soldan sağa tarayarak küçükleri öne topla. Notlar yerinde sürümün ayrıntısını CLRS’ye bırakır; buradaki sürüm Lomuto bölümlemesidir.`,
         },
         {
           kind: 'correctness',
           title: 'Doğruluk',
+          check: [
+            {
+              id: 'c3',
+              kind: 'mcq',
+              prompt: 'Bölümlemeden sonra pivotu da özyinelemeli çağrılardan birine dahil edersek (ör. `QuickSort(A, lo, i)`) ne olabilir?',
+              options: ['Hiçbir şey; yalnızca biraz yavaşlar.', 'Pivot alt dizinin en büyüğüyse aynı boyutta bir çağrı tekrar tekrar yapılabilir: sonsuz özyineleme.', 'Dizi ters sıralanır.', 'Kararlı hâle gelir.'],
+              answer: 1,
+              hint: 'Alt problemin boyu küçülüyor mu?',
+              explanation: 'Doğruluk kanıtı her çağrının daha kısa bir parçada yapılmasına dayanır. Pivot dahil edilirse parça küçülmeyebilir ve özyineleme sonlanmayabilir.',
+            },
+          ],
           label: 'proofIdea',
           proof: [
             { title: 'Bölümleme değişmezi', body: 'Döngünün her adımında $A[lo..i-1] <$ pivot $\\le A[i..j-1]$. Başta iki bölge de boş; her adım bir elemanı doğru bölgeye ekler.' },
@@ -57,6 +100,16 @@ Notlar elemanların farklı olduğunu varsayar (genelliği bozmadan). Buradaki y
         {
           kind: 'complexity',
           title: 'Pivot seçimi ve çalışma süresi',
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: '“Son eleman” pivotuyla QuickSort, zaten sıralı 10 elemanlı bir dizide toplam kaç karşılaştırma yapar?',
+              answer: 45,
+              hint: '$9 + 8 + \\dots + 1$.',
+              explanation: 'Her çağrıda pivot en büyük eleman olur ve bir eleman eksilir: $\\frac{10 \\cdot 9}{2} = 45$.',
+            },
+          ],
           body: `Pivot $k$. en küçük eleman ise: $T(n) \\le cn + T(k-1) + T(n-k)$.
 
 - **En kötü pivot (min/maks):** $T(n) = T(n-1) + O(n) = \\Theta(n^2)$. Sıralı girdide “ilk/son eleman” kuralı her seferinde bunu yapar.
@@ -64,6 +117,39 @@ Notlar elemanların farklı olduğunu varsayar (genelliği bozmadan). Buradaki y
 - **Rastgele pivot:** en kötü durum yine $\\Theta(n^2)$ (her seferinde en kötü seçim), ama **her girdi için beklenen** süre $O(n\\log n)$ — bir sonraki dersin konusu.
 
 Slaytlardaki karşılaştırma: QuickSort (rastgele pivot) yerinde kolayca uygulanır ve kararlı değildir; MergeSort en kötü durumda $O(n\\log n)$ ve kararlıdır.`,
+        },
+        {
+          kind: 'text',
+          title: 'Pratikte: kütüphanelerdeki QuickSort',
+          body: `- **Introsort** (C++ \`std::sort\` uygulamalarının çoğu): QuickSort ile başlar, özyineleme derinliği yaklaşık $2\\log_2 n$’yi aşarsa **HeapSort**’a geçer (en kötü durumda $O(n\\log n)$ garantisi), küçük parçalarda InsertionSort kullanır.
+- **Java:** ilkel türlerin dizileri için **çift pivotlu QuickSort**, nesne dizileri için kararlı olduğu için **Timsort** kullanılır.
+- **Neden bu kadar yaygın?** Yerinde çalışır (ek dizi gerekmez) ve belleğe sırayla eriştiği için önbellekle çok uyumludur.
+- **Saldırılar:** pivot kuralı sabitse (ör. “ilk eleman” ya da “üçün medyanı”), kuralı bilen biri $\\Theta(n^2)$ süren girdiler üretebilir; bu bir hizmet engelleme (DoS) aracı olarak kullanılmıştır. Rastgele pivot ya da introsort bu riski kaldırır.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'Introsort özyineleme çok derinleşince neden HeapSort’a geçer?',
+              options: [
+                'HeapSort her zaman daha hızlı olduğu için',
+                'En kötü durumda $O(n\\log n)$ garantisi vermek için',
+                'Sıralamayı kararlı yapmak için',
+                'Bellek kullanımını artırmak için',
+              ],
+              answer: 1,
+              hint: 'Derin özyineleme kötü pivotların işaretidir.',
+              explanation: 'Derinlik $O(\\log n)$’yi aşarsa QuickSort kötü pivotlarla $\\Theta(n^2)$’ye gidiyor demektir; HeapSort’a geçmek toplamı $O(n\\log n)$ ile sınırlar.',
+            },
+            {
+              id: 'c6',
+              kind: 'mcq',
+              prompt: 'Java nesne dizileri için neden QuickSort yerine Timsort kullanır?',
+              options: ['Nesneler karşılaştırılamaz.', 'Nesne sıralamada kararlılık istenir ve QuickSort kararlı değildir.', 'QuickSort nesnelerle çalışmaz.', 'Timsort yerinde çalışır.'],
+              answer: 1,
+              hint: 'Önce isme, sonra bölüme göre sıralamayı düşünün.',
+              explanation: 'Eşit anahtarlı nesnelerin önceki sırası korunmalıdır (kararlılık). Timsort kararlıdır; QuickSort değildir. İlkel sayılarda eşit değerler ayırt edilemediği için kararlılık önemsizdir.',
+            },
+          ],
         },
         {
           kind: 'mistakes',
@@ -124,7 +210,7 @@ Slaytlardaki karşılaştırma: QuickSort (rastgele pivot) yerinde kolayca uygul
       title: 'Beklenen çalışma süresi: göstergeç değişkenleri',
       titleEn: 'Expected running time via indicator variables',
       summary: 'Her çift kaç kez karşılaştırılır? Beklentinin doğrusallığı ile $E[C] \\le 2n\\ln n$.',
-      minutes: 35,
+      minutes: 45,
       objectives: [
         'Rastgele değişken, beklenti ve göstergeç (indicator) değişkeni kavramlarını QuickSort’a uygulamak.',
         'Her $(z_i, z_j)$ çiftinin en fazla bir kez karşılaştırıldığını açıklamak.',
@@ -137,6 +223,17 @@ Slaytlardaki karşılaştırma: QuickSort (rastgele pivot) yerinde kolayca uygul
         {
           kind: 'formal',
           title: 'Kurulum (Ders 5 notları)',
+          check: [
+            {
+              id: 'c1',
+              kind: 'mcq',
+              prompt: '$E[X + Y] = E[X] + E[Y]$ eşitliği için $X$ ile $Y$’nin bağımsız olması gerekir mi?',
+              options: ['Evet, her zaman', 'Hayır, beklentinin doğrusallığı her zaman geçerlidir', 'Yalnızca göstergeç değişkenleri için gerekir', 'Yalnızca $X = Y$ ise geçerlidir'],
+              answer: 1,
+              hint: '$X_{i,j}$’ler bağımsız değil ama analiz yine çalışıyor.',
+              explanation: 'Doğrusallık bağımsızlık gerektirmez. Bağımsızlık $E[XY] = E[X]E[Y]$ için gerekir.',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `$z_1 < z_2 < \\dots < z_n$ sıralı dizinin elemanları olsun. $X_{i,j}$: $z_i$ ile $z_j$’nin karşılaştırılma sayısı. Her karşılaştırma pivotla yapılır ve pivot sonraki çağrılara dahil edilmez; bu yüzden $X_{i,j} \\in \\{0, 1\\}$ — bir **göstergeç değişkeni**.
@@ -148,11 +245,27 @@ $$C = \\sum_{i<j} X_{i,j}, \\qquad E[C] = \\sum_{i<j} E[X_{i,j}] = \\sum_{i<j} P
         {
           kind: 'viz',
           title: 'Etkileşim: hangi çiftler ne sıklıkla karşılaştırılır?',
+          tasks: [
+            'Köşegene en yakın hücrelere (komşu çiftler) tıkla: olasılık neden 1?',
+            '$z_1$ ile $z_{10}$’u seç: olasılık neden yalnızca $0.2$?',
+            'Simülasyon oranını formülle karşılaştır. Fark ne kadar? Neden tam aynı değil?',
+          ],
           viz: 'pairProbability',
         },
         {
           kind: 'correctness',
           title: 'Türetme',
+          check: [
+            {
+              id: 'c2',
+              kind: 'numeric',
+              prompt: '$n = 10$ için $z_2$ ile $z_9$’un karşılaştırılma olasılığı nedir? (Ondalık.)',
+              answer: 0.25,
+              tolerance: 0.001,
+              hint: 'Pencerede $9 - 2 + 1$ eleman var.',
+              explanation: '$\\frac{2}{8} = 0.25$.',
+            },
+          ],
           label: 'formalProof',
           proof: [
             { title: 'Pencere fikri', body: '$\\{z_i, \\dots, z_j\\}$ penceresine bakın. Bu penceredeki bir eleman pivot seçilene kadar, hepsi aynı alt dizide kalır.' },
@@ -165,6 +278,11 @@ $$C = \\sum_{i<j} X_{i,j}, \\qquad E[C] = \\sum_{i<j} E[X_{i,j}] = \\sum_{i<j} P
         {
           kind: 'viz',
           title: 'Deney: farklı tohumlarla karşılaştırma sayısı',
+          tasks: [
+            '“Sıralı dizi” girdisinde $n = 100$ için rastgele pivotun ölçülen ortalamasını deterministik “son eleman” pivotuyla karşılaştır.',
+            'Çalıştırma sayısını 1000 yap: histogram teorik değerin etrafında ne kadar yayılıyor?',
+            '$n$’yi büyüt ve ortalamanın $2n\\ln n$ sınırının altında kaldığını kontrol et.',
+          ],
           viz: 'quickExperiment',
         },
         {
@@ -173,6 +291,34 @@ $$C = \\sum_{i<j} X_{i,j}, \\qquad E[C] = \\sum_{i<j} E[X_{i,j}] = \\sum_{i<j} P
           body: `Notlar ikinci bir yol da gösterir: $T(n)$ beklenen karşılaştırma sayısı ise
 $$T(n) = n - 1 + \\frac{2}{n}\\sum_{i=1}^{n-1} T(i)$$
 ve güçlü tümevarımla $T(n) \\le 2n\\ln n$ kanıtlanır (toplamı $\\int 2x\\ln x\\,dx$ ile üstten sınırlayarak).`,
+        },
+        {
+          kind: 'text',
+          title: 'Pratikte: rastgele algoritmalar',
+          body: `- **Las Vegas ve Monte Carlo:** rastgele QuickSort her zaman doğru sonucu verir, yalnızca süresi rastgeledir (**Las Vegas**). Bazı rastgele algoritmalar ise her zaman hızlıdır ama küçük bir olasılıkla yanlış cevap verebilir (**Monte Carlo**; ör. asallık testleri).
+- **Beklenti ne kadar güvenilir?** QuickSort’un karşılaştırma sayısı beklentisinin çevresinde yoğunlaşır: beklentinin birkaç katından fazla sürme olasılığı $n$ büyüdükçe hızla küçülür. Deney panelindeki histogram bunu gösterir.
+- **Rakibi etkisizleştirmek:** rastgelelik, girdiyi seçen kötü niyetli bir rakibe karşı en ucuz savunmadır; Ders 8’deki hash tabloları da aynı fikri kullanır.
+- **Tekrarlanabilirlik:** tohumlu (seeded) üreteçler sayesinde rastgele bir çalışma hata ayıklamak için birebir tekrarlanabilir — bu uygulamadaki tüm rastgele görselleştiriciler böyle çalışır.`,
+          check: [
+            {
+              id: 'c3',
+              kind: 'mcq',
+              prompt: 'Rastgele pivotlu QuickSort hangi tür rastgele algoritmadır?',
+              options: ['Las Vegas: her zaman doğru, süresi rastgele', 'Monte Carlo: her zaman hızlı, bazen yanlış', 'Deterministik', 'Yaklaşık algoritma'],
+              answer: 0,
+              hint: 'Pivot ne olursa olsun çıktı sıralı mı?',
+              explanation: 'Doğruluk pivottan bağımsızdır; yalnızca karşılaştırma sayısı rastgeledir.',
+            },
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: '$n = 3$ için rastgele QuickSort’un beklenen karşılaştırma sayısı $E[C] = \\sum_{i<j} \\frac{2}{j-i+1}$ kaçtır? (İki ondalık.)',
+              answer: 2.67,
+              tolerance: 0.01,
+              hint: 'Uzaklığı 1 olan 2 çift, uzaklığı 2 olan 1 çift.',
+              explanation: '$2 \\cdot 1 + 1 \\cdot \\frac23 = \\frac83 \\approx 2.67$. Kontrol: $2(n+1)H_n - 4n = 8 \\cdot \\frac{11}{6} - 12 = \\frac83$.',
+            },
+          ],
         },
         {
           kind: 'mistakes',

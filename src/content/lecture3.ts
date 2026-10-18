@@ -14,7 +14,7 @@ export const lecture3: Lecture = {
       title: 'Özyineleme ağaçları ve Master Teoremi',
       titleEn: 'Recursion trees and the Master Theorem',
       summary: 'Seviye toplamlarının geometrik dizisi: eşit mi, azalan mı, artan mı?',
-      minutes: 35,
+      minutes: 45,
       objectives: [
         'Böl-ve-fethet algoritmalarının çalışma süresini özyineleme bağıntısı (recurrence relation) olarak yazmak.',
         'Bir özyineleme ağacında seviye başına alt problem sayısını, boyutu ve toplam işi hesaplamak.',
@@ -26,6 +26,17 @@ export const lecture3: Lecture = {
         {
           kind: 'intuition',
           title: 'Sezgi: üç kuvvetin yarışı',
+          check: [
+            {
+              id: 'c1',
+              kind: 'mcq',
+              prompt: '$T(n) = 4T(n/2) + n^2$ için özyineleme ağacının $j$. seviyesindeki toplam iş nedir?',
+              options: ['$n^2$ (her seviyede aynı)', '$n^2 / 2^j$', '$4^j n^2$', '$n^2 \\log n$'],
+              answer: 0,
+              hint: '$a^j \\cdot (n/b^j)^d$ ifadesini $a = 4$, $b = 2$, $d = 2$ ile hesaplayın.',
+              explanation: '$4^j (n/2^j)^2 = n^2$: oran $a/b^d = 1$, her seviye eşit iş yapar ve sonuç $O(n^2\\log n)$.',
+            },
+          ],
           label: 'intuition',
           body: `$T(n) = a\\,T(n/b) + O(n^d)$ biçimindeki bir algoritmada iki kuvvet yarışır:
 
@@ -37,6 +48,17 @@ Seviye $j$’deki toplam iş $c\\,n^d (a/b^d)^j$’dir. Oran $1$ ise her seviye 
         {
           kind: 'formal',
           title: 'Master Teoremi (Ders 3 notları, Teorem 1)',
+          check: [
+            {
+              id: 'c2',
+              kind: 'mcq',
+              prompt: 'Hangisi Master Teoremi’nin (Teorem 1) bir koşulu **değildir**?',
+              options: ['$a \\ge 1$ bir tam sayı', '$b > 1$', 'Tüm alt problemler aynı boyutta ($n/b$)', '$d$ bir tam sayı olmalı'],
+              answer: 3,
+              hint: '$T(n) = 4T(n/2) + n^{1.5}$ gibi bağıntıları düşünün.',
+              explanation: '$d \\ge 0$ herhangi bir gerçel sayı olabilir (ör. $d = 1/4$ ya da $2.5$). $a$ ise alt problem sayısı olduğu için tam sayıdır.',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `$a \\ge 1$ (tam sayı), $b > 1$, $d \\ge 0$ sabitler ve $T(n) = a\\cdot T\\!\\left(\\frac{n}{b}\\right) + O(n^d)$, $T(1) = O(1)$ olsun. O hâlde
@@ -49,12 +71,28 @@ $$T(n) = \\begin{cases} O(n^d \\log n) & a = b^d \\\\ O(n^d) & a < b^d \\\\ O(n^
         {
           kind: 'viz',
           title: 'Master Teoremi gezgini ve bağıntı oyun alanı',
+          tasks: [
+            '**Parametreler** sekmesinde $a = 2$, $b = 2$ ile başla; $d$’yi $0.5$, $1$ ve $2$ yap. Her seferinde hangi durum seçiliyor ve seviye tablosu nasıl değişiyor?',
+            '**Bağıntı yaz** sekmesinde “Select (MoM)” ve “T(n−1)” örneklerini dene. Araç neden çözmeyi reddediyor, ne öneriyor?',
+            '“Boşluk durumu” örneğini çalıştır: genel sürüm (Teorem 3) ne diyor?',
+            'Ağaç derinliği kaydırıcısıyla $n$’yi büyüt: “Göreli” sütunu hangi seviyenin baskın olduğunu nasıl gösteriyor?',
+          ],
           viz: 'master',
           body: `**Parametreler** sekmesinde $a$, $b$, $d$’yi ayrı ayrı girin; **Bağıntı yaz** sekmesinde kendi bağıntınızı yazın. Araç koşulları denetler, durumu seçer, nedenini gösterir ve özyineleme ağacının seviye toplamlarını listeler. Koşullar sağlanmıyorsa (farklı boyutlu alt problemler, $T(n-1)$, log çarpanlı boşluk durumu) sonucu sessizce uydurmaz; nedenini açıklar.`,
         },
         {
           kind: 'correctness',
           title: 'Kanıt fikri: özyineleme ağacı',
+          check: [
+            {
+              id: 'c3',
+              kind: 'numeric',
+              prompt: '$a = 8$, $b = 2$, $d = 2$ için ardışık seviye toplamlarının oranı $a/b^d$ kaçtır?',
+              answer: 2,
+              hint: '$b^d = 4$.',
+              explanation: '$8/4 = 2 > 1$: seviye işleri her seviyede ikiye katlanır, yapraklar baskın: $O(n^{\\log_2 8}) = O(n^3)$.',
+            },
+          ],
           label: 'formalProof',
           proof: [
             { title: 'Kurulum', body: '$T(1) = 1$ ve $n$’nin $b$’nin kuvveti olduğunu varsayalım. Bir $c > 0$ için $T(n) \\le a\\,T(n/b) + c\\,n^d$.' },
@@ -75,6 +113,35 @@ $$T(n) = \\begin{cases} O(n^d \\log n) & a = b^d \\\\ O(n^d) & a < b^d \\\\ O(n^
 - **Karatsuba:** $T(n) = 3T(n/2) + O(n)$, $a = 3 > 2$ → $O(n^{\\log_2 3}) \\approx O(n^{1.59})$.
 - **MergeSort:** $T(n) = 2T(n/2) + O(n)$, $a = 2 = 2^1$ → $O(n\\log n)$.
 - **Örnek:** $T(n) = 2T(n/2) + O(n^2)$, $a = 2 < 4$ → $O(n^2)$.`,
+        },
+        {
+          kind: 'text',
+          title: 'Pratikte: Master Teoremi ile tanıdık algoritmalar',
+          body: `- **İkili arama:** $T(n) = T(n/2) + O(1)$; $a = 1 = 2^0 = b^d$ → $O(\\log n)$.
+- **Strassen matris çarpımı:** $T(n) = 7T(n/2) + O(n^2)$; $7 > 4$ → $O(n^{\\log_2 7}) \\approx O(n^{2.81})$. Basit özyinelemeli matris çarpımı ise $8T(n/2) + O(n^2) = O(n^3)$.
+- **FFT** (polinom çarpımı, sinyal işleme) ve **en yakın nokta çifti:** $T(n) = 2T(n/2) + O(n)$ → $O(n\\log n)$.
+- **Ağaç tabanlı toplama** (ör. tam ikili ağaçta her düğümü bir kez ziyaret): $T(n) = 2T(n/2) + O(1)$ → $O(n)$.
+
+Alt problemler farklı boyutlardaysa Master Teoremi yetmez; yerine koyma yöntemi ya da daha genel **Akra–Bazzi** teoremi kullanılır. Hızlı bir kontrol için bağıntıyı küçük bir programla sayısal olarak hesaplayıp $T(n)/f(n)$ oranına bakmak da iyi bir alışkanlıktır.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'mcq',
+              prompt: 'İkili aramanın bağıntısı $T(n) = T(n/2) + O(1)$ Master Teoremi’nin hangi durumuna girer?',
+              options: ['$a = b^d$ → $O(\\log n)$', '$a < b^d$ → $O(1)$', '$a > b^d$ → $O(n)$', 'Uygulanamaz'],
+              answer: 0,
+              hint: '$a = 1$, $b = 2$, $d = 0$.',
+              explanation: '$b^d = 2^0 = 1 = a$: $O(n^0\\log n) = O(\\log n)$.',
+            },
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'Basit özyinelemeli matris çarpımı $T(n) = 8T(n/2) + O(n^2)$’nin çözümü $O(n^k)$ biçimindedir. $k$ kaçtır?',
+              answer: 3,
+              hint: '$\\log_2 8$.',
+              explanation: '$8 > 2^2$ → $O(n^{\\log_2 8}) = O(n^3)$: bölmek tek başına kazandırmaz; Strassen 7 alt çarpımla üssü düşürür.',
+            },
+          ],
         },
         {
           kind: 'mistakes',
@@ -153,7 +220,7 @@ $$T(n) = \\begin{cases} O(n^d \\log n) & a = b^d \\\\ O(n^d) & a < b^d \\\\ O(n^
       title: 'Yerine koyma yöntemi',
       titleEn: 'The substitution method',
       summary: 'Bir sınır tahmin et, tümevarımla doğrula — Master Teoremi işe yaramadığında.',
-      minutes: 25,
+      minutes: 35,
       objectives: [
         'Yerine koyma (substitution) yönteminin adımlarını sıralamak: tahmin, taban durumu, tümevarım hipotezi, yerine koyma, sadeleştirme, sabit seçimi.',
         'Farklı boyutlu alt problemli bağıntılar için doğrusal (ya da polinom) bir sınırı kanıtlamak.',
@@ -164,12 +231,33 @@ $$T(n) = \\begin{cases} O(n^d \\log n) & a = b^d \\\\ O(n^d) & a < b^d \\\\ O(n^
         {
           kind: 'intuition',
           title: 'Sezgi',
+          check: [
+            {
+              id: 'c1',
+              kind: 'mcq',
+              prompt: 'Yerine koyma yönteminde sabit $D$ ne zaman belirlenir?',
+              options: ['En başta, rastgele seçilir', 'Kanıtı yazarken ortaya çıkan koşullardan, en sonda', 'Her seviyede ayrı ayrı', 'Hiç gerekmez'],
+              answer: 1,
+              hint: 'Önce adımın neyi gerektirdiğine bakarız.',
+              explanation: 'Tümevarım adımı $D$ üzerinde bir koşul verir (ör. $D \\ge 10c$); taban durumunun koşuluyla birleştirip tek bir sabit seçeriz. Sabit, $n$’ye ya da seviyeye göre değişemez.',
+            },
+          ],
           label: 'intuition',
           body: `Özyineleme ağacı karmaşıklaşınca (alt problemler farklı boyutlardaysa) cevabı **tahmin edip** tümevarımla doğrularız. Tahmin $T(n) \\le D\\cdot g(n)$ biçimindedir; $D$’yi önceden bilmeyiz — kanıtı yazarken $D$’nin hangi koşulu sağlaması gerektiğini **keşfederiz**.`,
         },
         {
           kind: 'formal',
           title: 'Yöntem (Ders 3–4 notları)',
+          check: [
+            {
+              id: 'c2',
+              kind: 'numeric',
+              prompt: '$T(n) \\le T(n/2) + T(n/4) + n$, $T(1) = 1$ için $T(n) \\le Dn$ tahmininin tümevarım adımı en küçük hangi $D$ ile tutar?',
+              answer: 4,
+              hint: '$\\tfrac{D}{2} + \\tfrac{D}{4} + 1 \\le D$.',
+              explanation: '$\\tfrac34 D + 1 \\le D \\iff D \\ge 4$; taban $D \\ge 1$ ile birlikte $D = 4$.',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `$T(n) \\le f(n) + \\sum_{i=1}^k T(n_i)$ için tahmin: $T(n) \\le D\\,g(n)$ ($n \\ge n_0$).
@@ -183,6 +271,11 @@ $$T(n) = \\begin{cases} O(n^d \\log n) & a = b^d \\\\ O(n^d) & a < b^d \\\\ O(n^
         {
           kind: 'viz',
           title: 'Adım adım yerine koyma',
+          tasks: [
+            '“Özgün örnek”te adımları tek tek aç ve 6. adımdaki koşulu kendin çözmeye çalış; sonra 7. adımla karşılaştır.',
+            '“Başarısız tahmin: 2T(n/2)+n” örneğinde çelişki adımını oku. Tahmin neden fazla küçük?',
+            'Kendi terimlerini gir: $T(n/2) + T(n/3) + T(n/6) + n$. Oranların toplamı kaç? Araç ne diyor?',
+          ],
           viz: 'substitution',
           body: `Hazır örneklerden birini seçin ya da kendi terimlerinizi girin. Araç, tahmin $T(n) \\le D\\,n^p$ için her cebirsel adımı gösterir ve ya geçerli bir $D$ bulur ya da tahminin neden başarısız olduğunu açıklar.`,
         },
@@ -197,6 +290,33 @@ $$T(n) = \\begin{cases} O(n^d \\log n) & a = b^d \\\\ O(n^d) & a < b^d \\\\ O(n^
             { title: 'Yerine koy', body: '$T(n) \\le D\\frac{n}{3} + D\\frac{n}{2} + n = \\left(\\frac{5}{6}D + 1\\right) n$.' },
             { title: 'Koşul', body: '$\\left(\\frac{5}{6}D + 1\\right)n \\le D\\,n \\iff 1 \\le \\frac{D}{6} \\iff D \\ge 6$.' },
             { title: 'Sonuç', body: '$D = \\max(1, 6) = 6$ hem tabanı hem adımı sağlar: $T(n) \\le 6n$, yani $T(n) = O(n)$.' },
+          ],
+        },
+        {
+          kind: 'text',
+          title: 'Pratikte: hangi bağıntıya hangi yöntem?',
+          body: `Bir bağıntıyla karşılaştığınızda şu sırayla düşünmek işe yarar:
+
+1. **Alt problemler aynı boyutta mı ($aT(n/b)$)?** Master Teoremi; iş terimi log çarpanı içeriyorsa genel sürüm.
+2. **Farklı boyutlar, oranların toplamı $< 1$ mi?** (ör. $T(n/5) + T(7n/10)$) Doğrusal tahminle yerine koyma: $D = c/(1 - \\sum)$.
+3. **Oranların toplamı tam $1$ mi?** (ör. $T(n/4) + T(3n/4) + n$) Her seviye $\\approx n$ iş: $n\\log n$ tahmin edip yerine koyma ya da özyineleme ağacı.
+4. **Boyut sabit miktar azalıyor mu ($T(n-1)$)?** Bağıntıyı açıp toplamı hesaplayın.
+5. **Emin değil misiniz?** Bağıntıyı küçük bir programla sayısal olarak hesaplayın, $T(n)/g(n)$ oranının sınırlı kalıp kalmadığına bakın; sonra kanıtlayın.`,
+          check: [
+            {
+              id: 'c3',
+              kind: 'mcq',
+              prompt: '$T(n) = T(n/4) + T(3n/4) + n$ için en uygun yaklaşım hangisidir?',
+              options: [
+                'Master Teoremi',
+                '$T(n) \\le Dn$ ile yerine koyma',
+                '$T(n) \\le Dn\\log n$ tahmini ile yerine koyma (ya da özyineleme ağacı)',
+                'Bağıntıyı $T(n-1)$ gibi açmak',
+              ],
+              answer: 2,
+              hint: '$\\tfrac14 + \\tfrac34 = 1$.',
+              explanation: 'Oranların toplamı 1 olduğundan her tam seviye $n$ iş yapar ve $\\Theta(\\log n)$ seviye vardır: $\\Theta(n\\log n)$. Doğrusal tahmin $\\tfrac{D}{4}n + \\tfrac{3D}{4}n + n \\le Dn$ gerektirir — imkânsız.',
+            },
           ],
         },
         {

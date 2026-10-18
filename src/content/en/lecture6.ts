@@ -14,7 +14,7 @@ export const lecture6: Lecture = {
       title: 'Lower bound for comparison-based sorting',
       titleEn: 'Lower bound for comparison-based sorting',
       summary: 'Every comparison-based algorithm is a decision tree; $n!$ leaves $\\Rightarrow$ height $\\Omega(n\\log n)$.',
-      minutes: 30,
+      minutes: 40,
       objectives: [
         'Explain why the model of computation matters: which operations are allowed?',
         'See that every deterministic comparison-based algorithm can be represented as a decision tree.',
@@ -26,6 +26,17 @@ export const lecture6: Lecture = {
         {
           kind: 'intuition',
           title: 'Intuition: “StickSort” and the model of computation',
+          check: [
+            {
+              id: 'c1',
+              kind: 'mcq',
+              prompt: 'Which one is an **allowed** operation in the comparison model?',
+              options: ['Reading the last digit of $x$', 'Asking “is $x < y$?”', 'Using $x$ as an index into an array', 'Dividing $x$ by 10'],
+              answer: 1,
+              hint: 'In this model there is no direct access to values.',
+              explanation: 'In the comparison model, information about the items comes only from pairwise comparisons. Reading digits or using values as indices belongs to the different model used by CountingSort/RadixSort.',
+            },
+          ],
           label: 'intuition',
           body: `The joke in the slides: drop sticks upright on a table and they are “sorted” by length — $O(1)$! The lesson: a lower bound is only meaningful in a particular **model of computation**.
 
@@ -34,6 +45,22 @@ export const lecture6: Lecture = {
         {
           kind: 'formal',
           title: 'Theorem (Lecture 6 slides)',
+          check: [
+            {
+              id: 'c2',
+              kind: 'mcq',
+              prompt: 'What exactly does the lower-bound theorem say?',
+              options: [
+                'Every sorting algorithm takes $\\Omega(n\\log n)$ steps on every input.',
+                'Every deterministic comparison-based algorithm has **at least one** input that needs $\\Omega(n\\log n)$ comparisons.',
+                'MergeSort makes exactly $n\\log n$ comparisons on every input.',
+                'Sorting cannot be done in $O(n)$.',
+              ],
+              answer: 1,
+              hint: 'It is a worst-case lower bound, and it depends on a model.',
+              explanation: 'The bound is about the worst case and holds only in the comparison model. Some inputs (e.g. a sorted array) can be sorted with fewer comparisons, and value-based algorithms are outside the model.',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `- Every **deterministic** comparison-based sorting algorithm takes $\\Omega(n\\log n)$ steps in the worst case.
@@ -44,12 +71,27 @@ Consequence: in the comparison model MergeSort is **asymptotically optimal**.`,
         {
           kind: 'viz',
           title: 'Decision tree explorer',
+          tasks: [
+            'InsertionSort with $n = 3$: compare the number of leaves, the height and $\\lceil\\log_2 3!\\rceil$. Does InsertionSort reach the bound?',
+            'Pick MergeSort with $n = 4$: is the height equal to the lower bound ($\\lceil\\log_2 24\\rceil = 5$)?',
+            'Change the hidden input to find the shortest and the longest paths. Which inputs are easy, which hard?',
+          ],
           viz: 'decisionTree',
           body: `The trees below were built by actually running the selected algorithm: every possible input ordering was run with an oracle and the questions asked were recorded. Change the hidden input; the length of the highlighted path is the number of comparisons on that input. Compare the number of leaves and the height with $\\lceil\\log_2 n!\\rceil$.`,
         },
         {
           kind: 'correctness',
           title: 'Proof',
+          check: [
+            {
+              id: 'c3',
+              kind: 'numeric',
+              prompt: 'At least how many comparisons must a comparison algorithm sorting 6 distinct items make in the worst case?',
+              answer: 10,
+              hint: '$6! = 720$; $2^9 = 512$, $2^{10} = 1024$.',
+              explanation: '$\\lceil \\log_2 720 \\rceil = 10$: a tree with 9 comparisons has at most 512 leaves and cannot distinguish 720 orderings.',
+            },
+          ],
           label: 'formalProof',
           proof: [
             { title: 'Algorithm = decision tree', body: 'A deterministic algorithm chooses its next question based on the answers so far. Internal nodes are questions, the two children are the YES/NO answers, and the leaves are outputs. Running on an input is a path from the root to a leaf.' },
@@ -65,6 +107,25 @@ Consequence: in the comparison model MergeSort is **asymptotically optimal**.`,
           body: `- It applies only to algorithms **in the comparison model**. Algorithms that use the values directly (e.g. as a bucket index) are outside this model — the next lesson.
 - It is a **lower bound** (Ω): it says “no comparison algorithm can be faster”; it doesn’t say any particular algorithm is fast.
 - It is about the worst case: on some inputs (e.g. InsertionSort on a sorted array) far fewer comparisons may be made; but every algorithm has at least one “bad” input.`,
+        },
+        {
+          kind: 'text',
+          title: 'In practice: where else the decision-tree argument helps',
+          body: `The same idea — “number of possible answers ≤ $2^{\\text{number of questions}}$” — gives many lower bounds:
+
+- **Searching a sorted array:** the position (or absence) of a key in a sorted array of $n$ elements is one of $n + 1$ different answers; every comparison-based search makes at least $\\lceil\\log_2(n+1)\\rceil$ comparisons in the worst case. Binary search reaches this bound.
+- **Generic libraries:** functions such as \`sorted\` and \`std::sort\` must work with any comparable type, so they live in the comparison model; $\\Omega(n\\log n)$ is a real bound for them.
+- **Stepping outside the model:** when keys are small integers or of fixed length (e.g. 32-bit numbers), value-based methods like RadixSort can go below this bound; that is why fast GPU sorting libraries use RadixSort.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'At least how many comparisons does every comparison-based search make in the worst case on a sorted array of 1,000,000 elements?',
+              answer: 20,
+              hint: '$n + 1$ possible answers; $2^{20} = 1\\,048\\,576$.',
+              explanation: '$\\lceil\\log_2 1\\,000\\,001\\rceil = 20$, because $2^{19} = 524\\,288 < 1\\,000\\,001 \\le 2^{20}$. Binary search makes exactly that many.',
+            },
+          ],
         },
         {
           kind: 'mistakes',
@@ -127,7 +188,7 @@ Consequence: in the comparison model MergeSort is **asymptotically optimal**.`,
       title: 'BucketSort: CountingSort and RadixSort',
       titleEn: 'BucketSort: CountingSort and RadixSort',
       summary: 'Use values as bucket indices: $O(n + r)$ and $O(d(n + r))$.',
-      minutes: 35,
+      minutes: 45,
       objectives: [
         'Run CountingSort (one FIFO bucket per key) and explain its $O(n + r)$ time.',
         'Define stability and show why it matters.',
@@ -139,6 +200,16 @@ Consequence: in the comparison model MergeSort is **asymptotically optimal**.`,
         {
           kind: 'intuition',
           title: 'Intuition: sorting by birth month',
+          check: [
+            {
+              id: 'c1',
+              kind: 'numeric',
+              prompt: 'About how many basic operations ($n + r$) does CountingSort make to sort 1000 students by birth month with 12 buckets?',
+              answer: 1012,
+              hint: 'Each student goes into a bucket once, each bucket is scanned once.',
+              explanation: '$n + r = 1000 + 12 = 1012$: no comparisons, linear time.',
+            },
+          ],
           label: 'intuition',
           body: `Pre-lecture exercise: sort $n$ students by birth month. MergeSort takes $O(n\\log n)$. But if you open 12 boxes, drop each student into the box of their birth month, then concatenate the boxes from January to December, it is $O(n + 12) = O(n)$! We made no comparisons at all: we used **the value directly as an index**.
 
@@ -147,6 +218,17 @@ The “BucketSort” in the lecture title is this bucket idea; the notes and sli
         {
           kind: 'formal',
           title: 'Algorithms and assumptions',
+          check: [
+            {
+              id: 'c2',
+              kind: 'mcq',
+              prompt: 'If the (key, label) pairs $[(2, a), (1, b), (2, c), (1, d)]$ are sorted **stably** by key, what is the output?',
+              options: ['$[(1,b), (1,d), (2,a), (2,c)]$', '$[(1,d), (1,b), (2,c), (2,a)]$', '$[(1,b), (1,d), (2,c), (2,a)]$', '$[(1,d), (1,b), (2,a), (2,c)]$'],
+              answer: 0,
+              hint: 'Items with equal keys keep their input order.',
+              explanation: 'The key-1 items come in input order (b, d), then the key-2 items (a, c).',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `**CountingSort** (keys in $\\{0, \\dots, r-1\\}$): create $r$ empty FIFO buckets (linked lists); append each item to the **end** of its key’s bucket; concatenate the buckets in the order $0, 1, \\dots, r-1$. **Worst case** $O(n + r)$.
@@ -160,12 +242,29 @@ The “BucketSort” in the lecture title is this bucket idea; the notes and sli
         {
           kind: 'viz',
           title: 'Bucket visualizer',
+          tasks: [
+            'Run the “Birth month” example in CountingSort and look at the subscripts: is the order of students born in the same month preserved?',
+            'Run the “Slide example” in RadixSort with base 10: how many passes? Then set the base to 2: why did the number of passes grow?',
+            'Try base 16: explain the trade-off between the number of passes and the number of buckets.',
+            'In **prediction mode**, predict each item’s bucket.',
+          ],
           viz: 'bucketSort',
           body: `Start with CountingSort, then switch to RadixSort. The subscripts show the input order: watch the order of items with equal keys being preserved. In RadixSort, change the base (2, 10, 16…) and see how the number of passes and buckets changes. In prediction mode, guess each item’s bucket.`,
         },
         {
           kind: 'correctness',
           title: 'Correctness of RadixSort',
+          check: [
+            {
+              id: 'c3',
+              kind: 'mcq',
+              prompt: 'What happens if RadixSort starts from the **most** significant digit and stably re-buckets the whole array by that digit on every pass?',
+              options: ['It still sorts correctly.', 'The last pass sorts only by the ones digit; the order from earlier passes is broken and the result can be wrong.', 'It gets faster.', 'It loops forever.'],
+              answer: 1,
+              hint: 'Which digit does the last pass sort by?',
+              explanation: 'The LSD order matters: the last pass must be on the most significant digit so that ties are resolved by the order of the earlier (less significant) digits. Done the other way, e.g. [21, 12] is sorted by tens and then by ones and stays [21, 12] — wrong.',
+            },
+          ],
           label: 'formalProof',
           proof: [
             { title: 'Hypothesis', body: 'After iteration $k$, the array is sorted by its $k$ least significant digits.' },
@@ -178,10 +277,38 @@ The “BucketSort” in the lecture title is this bucket idea; the notes and sli
         {
           kind: 'complexity',
           title: 'Choosing the base',
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'Integers smaller than $10^6$ are sorted with base-10 RadixSort. At most how many passes are needed?',
+              answer: 6,
+              hint: 'The largest value is 999,999.',
+              explanation: '999,999 has 6 digits: $d = 6$ passes.',
+            },
+          ],
           body: `- Sorting $n$ numbers in $\\{1..n\\}$ with base 10: $d = \\lfloor\\log_{10} n\\rfloor + 1$ → $O(n\\log n)$ — no better than MergeSort.
 - Base $r = n$: $O\\big((\\log_n M + 1)(n + n)\\big)$. If $M \\le n^c$ ($c$ constant), that is $O(n)$ — beating MergeSort and QuickSort.
 - If $M = 2^n$, then $d \\approx n/\\log n$ → $O(n^2/\\log n)$: we don’t use RadixSort in this regime.
 - A large $r$ means more buckets (time/memory), a small $r$ means more digits: a **trade-off**.`,
+        },
+        {
+          kind: 'text',
+          title: 'In practice: buckets and digits',
+          body: `- **Fixed-width integers:** 32-bit numbers are sorted in 4 passes with base $2^8 = 256$; each pass is a single counting/distribution scan. GPU sorting libraries (e.g. CUB, Thrust) use RadixSort for this reason.
+- **Text:** fixed-length keys (postal codes, dates \`YYYYMMDD\`, IP addresses) suit LSD RadixSort very well; for variable-length strings the recursive variant starting from the most significant digit (MSD) is used.
+- **Histograms and grades:** sorting or counting small-range values such as exam scores, ages or months is a single CountingSort scan.
+- **Building indexes:** text indexes such as suffix arrays are built by repeatedly RadixSorting ranks of characters.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: '32-bit unsigned integers are sorted with LSD RadixSort in base $256$ ($8$ bits). How many passes are needed?',
+              answer: 4,
+              hint: 'Each pass handles 8 bits.',
+              explanation: '$32 / 8 = 4$ passes, each $O(n + 256)$: $O(n)$ in total.',
+            },
+          ],
         },
         {
           kind: 'mistakes',
@@ -246,7 +373,7 @@ The “BucketSort” in the lecture title is this bucket idea; the notes and sli
       title: 'Comparing the sorting algorithms so far',
       titleEn: 'Comparing the sorting algorithms so far',
       summary: 'Model, kind of guarantee and assumptions: which one when?',
-      minutes: 15,
+      minutes: 25,
       objectives: [
         'Compare the sorting algorithms of Lectures 2–6 by model, worst case, expected time and assumptions.',
         'Distinguish worst-case, expected and input-distribution-dependent performance.',
@@ -257,15 +384,52 @@ The “BucketSort” in the lecture title is this bucket idea; the notes and sli
         {
           kind: 'viz',
           title: 'Comparison table and scenarios',
+          tasks: [
+            'Pick each scenario and read the “kind of guarantee” column of the recommended algorithm. In which scenarios does the model change?',
+            'Open the measurement panel and raise $n$ to 512: how many times larger is InsertionSort’s count than MergeSort’s?',
+          ],
           viz: 'sortComparison',
           body: `Pick a scenario; the suitable algorithms and the reasoning are highlighted. Pay special attention to the “kind of guarantee” column in the table.`,
         },
         {
           kind: 'text',
           title: 'Three different kinds of guarantee',
+          check: [
+            {
+              id: 'c1',
+              kind: 'mcq',
+              prompt: 'In a real-time system such as brake-control software, every sort must **never** exceed a time limit. Which is most suitable?',
+              options: ['Randomized QuickSort', 'MergeSort (or HeapSort)', 'Fixed-pivot QuickSort', 'InsertionSort'],
+              answer: 1,
+              hint: 'An expected-time guarantee does not bound a single run.',
+              explanation: 'Real-time systems need a worst-case guarantee: MergeSort or HeapSort guarantee $O(n\\log n)$ on every input and every run.',
+            },
+          ],
           body: `- **Worst case (deterministic):** holds for every input (MergeSort $O(n\\log n)$, CountingSort $O(n + r)$).
 - **Expected (randomized algorithm):** for every input, an expectation over the algorithm’s random choices (randomized QuickSort $O(n\\log n)$). A single run may be worse.
 - **Depends on the input distribution (average case):** under the assumption that inputs arrive at random (e.g. fixed-pivot QuickSort doing well on random permutations). An adversary can break this assumption.`,
+        },
+        {
+          kind: 'text',
+          title: 'In practice: the default sorts of programming languages',
+          body: `- **Python** \`sorted\` / \`list.sort\`: **Timsort** — stable, $O(n\\log n)$ in the worst case, very fast on nearly sorted data.
+- **C++** \`std::sort\`: **introsort** (QuickSort + HeapSort + InsertionSort) — not stable, $O(n\\log n)$ in the worst case. If stability is needed, \`std::stable_sort\` (merge-based).
+- **Java** \`Arrays.sort\`: **dual-pivot QuickSort** for primitives, **Timsort** for objects.
+- **Databases:** **external MergeSort** for sorts that do not fit in memory.
+- **GPUs and large integer arrays:** **RadixSort**.
+
+The common lesson: no algorithm is best in every situation; the model (comparisons or values), the kind of guarantee, stability and memory are weighed together.`,
+          check: [
+            {
+              id: 'c2',
+              kind: 'mcq',
+              prompt: 'In C++, records must be sorted while keeping the existing order of records with equal keys. Which should be used?',
+              options: ['`std::sort`', '`std::stable_sort`', '`std::nth_element`', 'None; you have to write it by hand'],
+              answer: 1,
+              hint: 'Introsort is not stable.',
+              explanation: '`std::stable_sort` guarantees stability (it is merge-based); `std::sort` does not.',
+            },
+          ],
         },
       ],
       quiz: [

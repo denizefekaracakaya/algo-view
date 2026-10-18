@@ -14,7 +14,7 @@ export const lecture6: Lecture = {
       title: 'Karşılaştırma tabanlı sıralama için alt sınır',
       titleEn: 'Lower bound for comparison-based sorting',
       summary: 'Her karşılaştırma tabanlı algoritma bir karar ağacıdır; $n!$ yaprak $\\Rightarrow$ yükseklik $\\Omega(n\\log n)$.',
-      minutes: 30,
+      minutes: 40,
       objectives: [
         'Hesaplama modelinin (model of computation) önemini açıklamak: hangi işlemlere izin var?',
         'Karşılaştırma tabanlı her deterministik algoritmanın bir karar ağacı (decision tree) olarak gösterilebileceğini görmek.',
@@ -26,6 +26,17 @@ export const lecture6: Lecture = {
         {
           kind: 'intuition',
           title: 'Sezgi: “StickSort” ve hesaplama modeli',
+          check: [
+            {
+              id: 'c1',
+              kind: 'mcq',
+              prompt: 'Hangisi karşılaştırma modelinde **izin verilen** bir işlemdir?',
+              options: ['$x$’in son basamağını okumak', '“$x < y$ mi?” diye sormak', '$x$’i bir dizinin indeksi olarak kullanmak', '$x$’i 10’a bölmek'],
+              answer: 1,
+              hint: 'Bu modelde değerlere doğrudan erişim yok.',
+              explanation: 'Karşılaştırma modelinde öğeler hakkında yalnızca ikili karşılaştırmalarla bilgi edinilir. Basamak okumak ya da değeri indeks yapmak CountingSort/RadixSort’un kullandığı başka bir modeldir.',
+            },
+          ],
           label: 'intuition',
           body: `Slaytlardaki şaka: çubukları masaya dikine bırakırsanız uzunluklarına göre “sıralanırlar” — $O(1)$! Bu bize bir şey öğretir: bir alt sınır yalnızca belirli bir **hesaplama modelinde** anlamlıdır.
 
@@ -34,6 +45,22 @@ export const lecture6: Lecture = {
         {
           kind: 'formal',
           title: 'Teorem (Ders 6 slaytları)',
+          check: [
+            {
+              id: 'c2',
+              kind: 'mcq',
+              prompt: 'Alt sınır teoremi tam olarak ne söyler?',
+              options: [
+                'Her sıralama algoritması her girdide $\\Omega(n\\log n)$ adım atar.',
+                'Karşılaştırma tabanlı her deterministik algoritmanın, $\\Omega(n\\log n)$ karşılaştırma gerektiren **en az bir** girdisi vardır.',
+                'MergeSort her girdide tam $n\\log n$ karşılaştırma yapar.',
+                'Sıralama $O(n)$’de yapılamaz.',
+              ],
+              answer: 1,
+              hint: 'Bu bir en kötü durum alt sınırıdır ve bir modele bağlıdır.',
+              explanation: 'Sınır en kötü durum için ve yalnızca karşılaştırma modelinde geçerlidir. Bazı girdiler (ör. sıralı dizi) daha az karşılaştırmayla sıralanabilir; değer tabanlı algoritmalar da modelin dışındadır.',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `- Her **deterministik** karşılaştırma tabanlı sıralama algoritması en kötü durumda $\\Omega(n\\log n)$ adım atar.
@@ -44,12 +71,27 @@ Sonuç: karşılaştırma modelinde MergeSort **asimptotik olarak optimaldir**.`
         {
           kind: 'viz',
           title: 'Karar ağacı gezgini',
+          tasks: [
+            'InsertionSort ve $n = 3$: yaprak sayısını, yüksekliği ve $\\lceil\\log_2 3!\\rceil$’i karşılaştır. InsertionSort bu sınıra ulaşıyor mu?',
+            'MergeSort’u $n = 4$ ile seç: yükseklik alt sınıra ($\\lceil\\log_2 24\\rceil = 5$) eşit mi?',
+            'Gizli girdiyi değiştirerek en kısa ve en uzun yolları bul. Hangi girdiler kolay, hangileri zor?',
+          ],
           viz: 'decisionTree',
           body: `Aşağıdaki ağaçlar, seçilen algoritma gerçekten çalıştırılarak oluşturuldu: her olası girdi sırası bir kahin (oracle) ile çalıştırıldı ve sorulan sorular kaydedildi. Gizli girdiyi değiştirin; vurgulanan yolun uzunluğu o girdideki karşılaştırma sayısıdır. Yaprak sayısını ve yüksekliği $\\lceil\\log_2 n!\\rceil$ ile karşılaştırın.`,
         },
         {
           kind: 'correctness',
           title: 'Kanıt',
+          check: [
+            {
+              id: 'c3',
+              kind: 'numeric',
+              prompt: '6 farklı öğeyi sıralayan bir karşılaştırma algoritmasının en kötü durumda en az kaç karşılaştırma yapması gerekir?',
+              answer: 10,
+              hint: '$6! = 720$; $2^9 = 512$, $2^{10} = 1024$.',
+              explanation: '$\\lceil \\log_2 720 \\rceil = 10$: 9 karşılaştırmalık bir ağacın en fazla 512 yaprağı olur, 720 sıralamayı ayırt edemez.',
+            },
+          ],
           label: 'formalProof',
           proof: [
             { title: 'Algoritma = karar ağacı', body: 'Deterministik bir algoritma, şimdiye kadarki cevaplara göre bir sonraki soruyu seçer. İç düğümler sorular, iki çocuk EVET/HAYIR cevapları, yapraklar çıktılardır. Bir girdide çalışmak, kökten bir yaprağa giden bir yoldur.' },
@@ -65,6 +107,25 @@ Sonuç: karşılaştırma modelinde MergeSort **asimptotik olarak optimaldir**.`
           body: `- Yalnızca **karşılaştırma modelindeki** algoritmalar için geçerlidir. Değerleri doğrudan kullanan (ör. kova indeksi olarak) algoritmalar bu modelin dışındadır — bir sonraki ders.
 - Bir **alt sınırdır** (Ω): “hiçbir karşılaştırma algoritması daha hızlı olamaz” der; belirli bir algoritmanın hızlı olduğunu söylemez.
 - En kötü durum içindir: bazı girdilerde (ör. sıralı dizide InsertionSort) çok daha az karşılaştırma yapılabilir; ama her algoritmanın en az bir “kötü” girdisi vardır.`,
+        },
+        {
+          kind: 'text',
+          title: 'Pratikte: karar ağacı argümanı başka nerelerde işe yarar?',
+          body: `Aynı “olası cevap sayısı ≤ $2^{\\text{soru sayısı}}$” fikri birçok alt sınır verir:
+
+- **Sıralı dizide arama:** $n$ elemanlı sıralı dizide bir anahtarın konumu (ya da yokluğu) $n + 1$ farklı cevaptan biridir; karşılaştırma tabanlı her arama en kötü durumda en az $\\lceil\\log_2(n+1)\\rceil$ karşılaştırma yapar. İkili arama bu sınıra ulaşır.
+- **Genel (generic) kütüphaneler:** \`sorted\`, \`std::sort\` gibi fonksiyonlar herhangi bir karşılaştırılabilir türle çalışmak zorunda oldukları için karşılaştırma modelindedir; $\\Omega(n\\log n)$ onlar için gerçek bir sınırdır.
+- **Modelin dışına çıkmak:** anahtarlar küçük tam sayılar ya da sabit uzunlukta ise (ör. 32 bitlik sayılar), RadixSort gibi değer tabanlı yöntemler bu sınırın altına inebilir; GPU’lardaki hızlı sıralama kütüphaneleri bu yüzden RadixSort kullanır.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: '1 000 000 elemanlı sıralı bir dizide karşılaştırma tabanlı her arama algoritması en kötü durumda en az kaç karşılaştırma yapar?',
+              answer: 20,
+              hint: '$n + 1$ olası cevap; $2^{20} = 1\\,048\\,576$.',
+              explanation: '$\\lceil\\log_2 1\\,000\\,001\\rceil = 20$, çünkü $2^{19} = 524\\,288 < 1\\,000\\,001 \\le 2^{20}$. İkili arama tam bu kadar yapar.',
+            },
+          ],
         },
         {
           kind: 'mistakes',
@@ -127,7 +188,7 @@ Sonuç: karşılaştırma modelinde MergeSort **asimptotik olarak optimaldir**.`
       title: 'BucketSort: CountingSort ve RadixSort',
       titleEn: 'BucketSort: CountingSort and RadixSort',
       summary: 'Değerleri kova indeksi olarak kullan: $O(n + r)$ ve $O(d(n + r))$.',
-      minutes: 35,
+      minutes: 45,
       objectives: [
         'CountingSort’u (anahtar başına bir FIFO kova) çalıştırmak ve $O(n + r)$ süresini açıklamak.',
         'Kararlılığı (stability) tanımlamak ve neden önemli olduğunu göstermek.',
@@ -139,6 +200,16 @@ Sonuç: karşılaştırma modelinde MergeSort **asimptotik olarak optimaldir**.`
         {
           kind: 'intuition',
           title: 'Sezgi: doğum ayına göre sıralamak',
+          check: [
+            {
+              id: 'c1',
+              kind: 'numeric',
+              prompt: '1000 öğrenciyi doğum ayına göre 12 kovayla sıralayan CountingSort yaklaşık kaç temel işlem yapar ($n + r$)?',
+              answer: 1012,
+              hint: 'Her öğrenci bir kez kovaya atılır, her kova bir kez taranır.',
+              explanation: '$n + r = 1000 + 12 = 1012$: karşılaştırma yok, süre doğrusal.',
+            },
+          ],
           label: 'intuition',
           body: `Ön alıştırma: $n$ öğrenciyi doğum ayına göre sıralayın. MergeSort $O(n\\log n)$ alır. Ama 12 kutu açıp her öğrenciyi doğum ayının kutusuna atar, sonra kutuları Ocak’tan Aralık’a birleştirirseniz $O(n + 12) = O(n)$! Hiç karşılaştırma yapmadık: **değeri doğrudan indeks olarak** kullandık.
 
@@ -147,6 +218,17 @@ Ders başlığındaki “BucketSort” bu kova fikridir; notlar ve slaytlar onu 
         {
           kind: 'formal',
           title: 'Algoritmalar ve varsayımlar',
+          check: [
+            {
+              id: 'c2',
+              kind: 'mcq',
+              prompt: '(anahtar, etiket) çiftleri $[(2, a), (1, b), (2, c), (1, d)]$ anahtara göre **kararlı** sıralanırsa çıktı nedir?',
+              options: ['$[(1,b), (1,d), (2,a), (2,c)]$', '$[(1,d), (1,b), (2,c), (2,a)]$', '$[(1,b), (1,d), (2,c), (2,a)]$', '$[(1,d), (1,b), (2,a), (2,c)]$'],
+              answer: 0,
+              hint: 'Eşit anahtarlılar girdideki sıralarını korur.',
+              explanation: 'Anahtarı 1 olanlar girdideki sırayla (b, d), anahtarı 2 olanlar (a, c) gelir.',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `**CountingSort** (anahtarlar $\\{0, \\dots, r-1\\}$): $r$ boş FIFO kova (bağlı liste) oluştur; her öğeyi anahtarının kovasının **sonuna** ekle; kovaları $0, 1, \\dots, r-1$ sırasıyla birleştir. **En kötü durum** $O(n + r)$.
@@ -160,12 +242,29 @@ Ders başlığındaki “BucketSort” bu kova fikridir; notlar ve slaytlar onu 
         {
           kind: 'viz',
           title: 'Kova görselleştiricisi',
+          tasks: [
+            'CountingSort’ta “Doğum ayı” örneğini çalıştır ve alt simgelere bak: aynı aydaki öğrencilerin sırası korunuyor mu?',
+            'RadixSort’ta “Slayt örneği”ni taban 10 ile çalıştır: kaç geçiş yapıldı? Sonra tabanı 2 yap: geçiş sayısı neden arttı?',
+            'Taban 16’yı dene: geçiş sayısı ve kova sayısı arasındaki ödünleşimi açıkla.',
+            '**Tahmin modu**nda her öğenin gideceği kovayı tahmin et.',
+          ],
           viz: 'bucketSort',
           body: `CountingSort ile başlayın, sonra RadixSort’a geçin. Alt simgeler girişteki sırayı gösterir: eşit anahtarlı öğelerin sırasının korunduğunu izleyin. RadixSort’ta tabanı (2, 10, 16…) değiştirerek geçiş sayısının ve kova sayısının nasıl değiştiğine bakın. Tahmin modunda her öğenin kovasını tahmin edin.`,
         },
         {
           kind: 'correctness',
           title: 'RadixSort’un doğruluğu',
+          check: [
+            {
+              id: 'c3',
+              kind: 'mcq',
+              prompt: 'RadixSort en **anlamlı** basamaktan başlayıp her geçişte tüm diziyi o basamağa göre kararlı biçimde yeniden kovalasa ne olur?',
+              options: ['Yine doğru sıralar.', 'Son geçiş yalnızca birler basamağına göre sıralar; önceki geçişlerin düzeni bozulur ve sonuç yanlış olabilir.', 'Daha hızlı olur.', 'Sonsuz döngüye girer.'],
+              answer: 1,
+              hint: 'Son geçiş hangi basamağa göre sıralıyor?',
+              explanation: 'LSD sırası önemlidir: son geçiş en anlamlı basamağa göre olmalıdır ki eşitlikler önceki (daha anlamsız) basamakların düzeniyle çözülsün. Tersi yapılırsa ör. [21, 12] önce onlar basamağına, sonra birlere göre sıralanıp [21, 12] kalır — yanlış.',
+            },
+          ],
           label: 'formalProof',
           proof: [
             { title: 'Hipotez', body: '$k$. iterasyondan sonra dizi, en anlamsız $k$ basamağa göre sıralıdır.' },
@@ -178,10 +277,38 @@ Ders başlığındaki “BucketSort” bu kova fikridir; notlar ve slaytlar onu 
         {
           kind: 'complexity',
           title: 'Taban seçimi',
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'Değerleri $10^6$’dan küçük olan tam sayılar taban 10 RadixSort ile sıralanıyor. En fazla kaç geçiş gerekir?',
+              answer: 6,
+              hint: 'En büyük değer 999 999.',
+              explanation: '999 999’un 6 basamağı var: $d = 6$ geçiş.',
+            },
+          ],
           body: `- Taban 10 ile $\\{1..n\\}$ aralığındaki $n$ sayıyı sıralamak: $d = \\lfloor\\log_{10} n\\rfloor + 1$ → $O(n\\log n)$ — MergeSort’tan iyi değil.
 - Taban $r = n$: $O\\big((\\log_n M + 1)(n + n)\\big)$. $M \\le n^c$ ($c$ sabit) ise $O(n)$ — MergeSort ve QuickSort’u geçer.
 - $M = 2^n$ ise $d \\approx n/\\log n$ → $O(n^2/\\log n)$: bu rejimde RadixSort kullanmayız.
 - Büyük $r$ daha çok kova (zaman/bellek), küçük $r$ daha çok basamak demektir: bir **ödünleşim** (trade-off).`,
+        },
+        {
+          kind: 'text',
+          title: 'Pratikte: kovalar ve basamaklar',
+          body: `- **Sabit genişlikli tam sayılar:** 32 bitlik sayılar taban $2^8 = 256$ ile 4 geçişte sıralanır; her geçiş tek bir sayım/dağıtım taramasıdır. GPU sıralama kütüphaneleri (ör. CUB, Thrust) bu yüzden RadixSort kullanır.
+- **Metinler:** sabit uzunlukta anahtarlar (posta kodu, tarih \`YYYYMMDD\`, IP adresi) LSD RadixSort’a çok uygundur; değişken uzunlukta metinler için en anlamlı basamaktan başlayan (MSD) özyinelemeli türü kullanılır.
+- **Histogramlar ve notlar:** sınav puanı, yaş, ay gibi küçük aralıklı değerleri sıralamak ya da saymak CountingSort ile tek taramadır.
+- **Dizin oluşturma:** sonek dizileri (suffix array) gibi metin dizinleri, karakter sıralarını tekrar tekrar RadixSort ile sıralayarak kurulur.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: '32 bitlik işaretsiz tam sayılar taban $256$ ($8$ bit) ile LSD RadixSort’ta sıralanıyor. Kaç geçiş gerekir?',
+              answer: 4,
+              hint: 'Her geçiş 8 bit işler.',
+              explanation: '$32 / 8 = 4$ geçiş, her biri $O(n + 256)$: toplam $O(n)$.',
+            },
+          ],
         },
         {
           kind: 'mistakes',
@@ -246,7 +373,7 @@ Ders başlığındaki “BucketSort” bu kova fikridir; notlar ve slaytlar onu 
       title: 'Sıralama algoritmalarını karşılaştırmak',
       titleEn: 'Comparing the sorting algorithms so far',
       summary: 'Model, garanti türü ve varsayımlar: hangi durumda hangisi?',
-      minutes: 15,
+      minutes: 25,
       objectives: [
         'Ders 2–6’daki sıralama algoritmalarını model, en kötü durum, beklenen süre ve varsayımlara göre karşılaştırmak.',
         'En kötü durum, beklenen ve girdi dağılımına bağlı performansı ayırt etmek.',
@@ -257,15 +384,52 @@ Ders başlığındaki “BucketSort” bu kova fikridir; notlar ve slaytlar onu 
         {
           kind: 'viz',
           title: 'Karşılaştırma tablosu ve senaryolar',
+          tasks: [
+            'Her senaryoyu seç ve önerilen algoritmanın “garanti türü” sütununu oku. Hangi senaryolarda model değişiyor?',
+            'Ölçüm panelini aç ve $n$’yi 512’ye çıkar: InsertionSort ile MergeSort arasındaki fark kaç kat?',
+          ],
           viz: 'sortComparison',
           body: `Bir senaryo seçin; uygun algoritmalar ve gerekçe vurgulanır. Tablodaki “garanti türü” sütununa özellikle dikkat edin.`,
         },
         {
           kind: 'text',
           title: 'Üç farklı garanti türü',
+          check: [
+            {
+              id: 'c1',
+              kind: 'mcq',
+              prompt: 'Bir fren kontrol yazılımı gibi gerçek zamanlı bir sistemde her sıralama belirli bir süreyi **kesinlikle** aşmamalı. Hangisi en uygundur?',
+              options: ['Rastgele QuickSort', 'MergeSort (ya da HeapSort)', 'Sabit pivotlu QuickSort', 'InsertionSort'],
+              answer: 1,
+              hint: 'Beklenen süre garantisi tek bir çalışmayı sınırlamaz.',
+              explanation: 'Gerçek zamanlı sistemlerde en kötü durum garantisi gerekir: MergeSort ya da HeapSort $O(n\\log n)$’i her girdide ve her çalıştırmada garanti eder.',
+            },
+          ],
           body: `- **En kötü durum (deterministik):** her girdi için geçerli (MergeSort $O(n\\log n)$, CountingSort $O(n + r)$).
 - **Beklenen (rastgele algoritma):** her girdi için, algoritmanın rastgele seçimleri üzerinden beklenti (rastgele QuickSort $O(n\\log n)$). Tek bir çalışma daha kötü olabilir.
 - **Girdi dağılımına bağlı (ortalama durum):** girdilerin rastgele geldiği varsayımı altında (ör. sabit pivotlu QuickSort’un rastgele permütasyonlarda iyi çalışması). Rakip bu varsayımı bozabilir.`,
+        },
+        {
+          kind: 'text',
+          title: 'Pratikte: dillerin varsayılan sıralamaları',
+          body: `- **Python** \`sorted\` / \`list.sort\`: **Timsort** — kararlı, en kötü durumda $O(n\\log n)$, neredeyse sıralı veride çok hızlı.
+- **C++** \`std::sort\`: **introsort** (QuickSort + HeapSort + InsertionSort) — kararlı değil, en kötü durumda $O(n\\log n)$. Kararlılık gerekiyorsa \`std::stable_sort\` (birleştirme tabanlı).
+- **Java** \`Arrays.sort\`: ilkel türlerde **çift pivotlu QuickSort**, nesnelerde **Timsort**.
+- **Veritabanları:** belleğe sığmayan sıralamalarda **dış bellek MergeSort**’u.
+- **GPU’lar ve büyük tam sayı dizileri:** **RadixSort**.
+
+Ortak ders: hiçbir algoritma her durumda en iyisi değildir; model (karşılaştırma mı, değer mi), garanti türü, kararlılık ve bellek birlikte değerlendirilir.`,
+          check: [
+            {
+              id: 'c2',
+              kind: 'mcq',
+              prompt: 'C++’ta eşit anahtarlı kayıtların mevcut sırası korunarak sıralanması gerekiyor. Hangisi kullanılmalı?',
+              options: ['`std::sort`', '`std::stable_sort`', '`std::nth_element`', 'Hiçbiri; elle yazmak gerekir'],
+              answer: 1,
+              hint: 'Introsort kararlı değildir.',
+              explanation: '`std::stable_sort` kararlılığı garanti eder (birleştirme tabanlıdır); `std::sort` etmez.',
+            },
+          ],
         },
       ],
       quiz: [

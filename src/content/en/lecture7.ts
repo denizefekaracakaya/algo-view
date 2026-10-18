@@ -15,7 +15,7 @@ export const lecture7: Lecture = {
       title: 'Binary search trees',
       titleEn: 'Binary search trees',
       summary: 'Search, insert, delete — all follow one search path: $O(h)$.',
-      minutes: 30,
+      minutes: 40,
       objectives: [
         'Define the BST property and check whether a tree is a BST.',
         'Trace search, insert, delete (three cases) and min/max step by step.',
@@ -27,6 +27,16 @@ export const lecture7: Lecture = {
         {
           kind: 'intuition',
           title: 'Intuition: the best of sorted arrays and linked lists',
+          check: [
+            {
+              id: 'c1',
+              kind: 'numeric',
+              prompt: 'In a **perfectly balanced** BST with 1,000,000 keys, how many nodes does a search look at in the worst case? ($\\lfloor\\log_2 n\\rfloor + 1$)',
+              answer: 20,
+              hint: '$2^{19} = 524\\,288$, $2^{20} = 1\\,048\\,576$.',
+              explanation: 'The height is $\\lfloor\\log_2 10^6\\rfloor = 19$, so at most 20 nodes lie on a path. In a degenerate BST it could be 1,000,000.',
+            },
+          ],
           label: 'intuition',
           body: `In a sorted array search is $O(\\log n)$ but insert/delete are $O(n)$; in a linked list insert is $O(1)$ but search is $O(n)$. A **balanced** binary search tree does all three in $O(\\log n)$.
 
@@ -35,6 +45,17 @@ Each node in a BST is like a QuickSort pivot for its own subtree: the left subtr
         {
           kind: 'formal',
           title: 'Definition (Lecture 7 notes)',
+          check: [
+            {
+              id: 'c2',
+              kind: 'mcq',
+              prompt: 'Root 10; the root’s left child is 5, 5’s right child is 12; the root’s right child is 15. Is this a BST?',
+              options: ['Yes, every node is in the right order with its children.', 'No: 12 is in 10’s left subtree but larger than 10.', 'No: 15 is larger than 12.', 'Yes, because the in-order traversal is sorted.'],
+              answer: 1,
+              hint: 'The property must hold for whole subtrees, not just direct children.',
+              explanation: '**All** keys in the left subtree must be smaller than 10. The in-order traversal gives 5, 12, 10, 15 — not sorted.',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `Each node $x$ has a key $key(x)$, a parent $p(x)$ and children $left(x)$, $right(x)$ (NIL if absent). **BST property:** for every $x$, all keys under $left(x)$ are $< key(x)$ and all keys under $right(x)$ are $> key(x)$. In this lesson keys are distinct.
@@ -44,18 +65,50 @@ Each node in a BST is like a QuickSort pivot for its own subtree: the left subtr
         {
           kind: 'viz',
           title: 'BST visualizer',
+          tasks: [
+            'In the pre-lecture tree, **Search** for 4.5: at which node does the search stop? What would that node be if 4.5 were inserted?',
+            'Set the insertion order to “Sorted (degenerate)”: what is the height? Build the same keys with “Balanced order” and compare.',
+            '**Delete** 3 from the pre-lecture tree: which case applies, and who is the successor?',
+            'Turn on **prediction mode** and predict the search direction at every comparison.',
+          ],
           viz: 'bst',
           body: `Enter an insertion order (the tree is built from scratch, step by step) or run an operation on the prepared tree. Search for a fractional key (e.g. 4.5) to see where the search stops. Note what tree the “Sorted” insertion order produces, and its height. In prediction mode, guess the direction at every comparison.`,
         },
         {
           kind: 'pseudocode',
           title: 'search (Algorithm 4 in the notes)',
+          check: [
+            {
+              id: 'c3',
+              kind: 'numeric',
+              prompt: 'In the pre-lecture tree (root 5; 3 and 9; 1, 4, 6), how many nodes does search look at when searching for 7?',
+              answer: 3,
+              hint: '5 → 9 → 6, then 6’s right is NIL.',
+              explanation: 'It looks at 5, 9 and 6; since 6’s right child is NIL, search returns 6 — the node that would be 7’s parent if it were inserted.',
+            },
+          ],
           code: BST_SEARCH_CODE,
           body: `If the key is not in the tree, this search returns the node that **would be its parent if it were inserted** (Claim 7). insert uses this; delete first finds the node with search.`,
         },
         {
           kind: 'steps',
           title: 'Deletion: three cases',
+          check: [
+            {
+              id: 'c4',
+              kind: 'mcq',
+              prompt: 'Why does the successor used when deleting a node with two children **have no left child**?',
+              options: [
+                'The successor is always a leaf.',
+                'The successor is the smallest key in the right subtree; if it had a left child, that child would be smaller.',
+                'The deleted node’s left child takes the successor’s place.',
+                'No node in a BST has a left child.',
+              ],
+              answer: 1,
+              hint: 'To find the minimum of the right subtree you keep going left.',
+              explanation: 'The minimum is reached by going left until we cannot; so the successor has at most one (right) child and is easy to unlink.',
+            },
+          ],
           body: `1. **No children:** remove the node (the parent’s pointer becomes NIL).
 2. **One child:** promote the child into the node’s place.
 3. **Two children:** find the successor $z$ — the smallest key of the right subtree, which has no left child. Link $z$’s right child into $z$’s place, then put $z$ in place of the deleted node. (Symmetrically, the predecessor can be used.)
@@ -71,6 +124,25 @@ Deleting 3 in the pre-lecture tree is the two-children case: the successor 4 tak
 - In the worst case (e.g. inserting $1, 2, \\dots, n$ in order) the tree becomes a chain: $h = n - 1$ → $\\Theta(n)$.
 
 So a plain BST has **no $O(\\log n)$ guarantee**. Logarithmic height requires rebalancing the tree (AVL, red-black, splay…).`,
+        },
+        {
+          kind: 'text',
+          title: 'In practice: where trees are used',
+          body: `- **Ordered dictionaries:** Java \`TreeMap\` and C++ \`std::map\` / \`std::set\` are balanced BSTs (mostly red-black). Unlike hash tables, they keep the keys **in order**.
+- **Range queries:** “all keys between $a$ and $b$” is answered in $O(h + k)$ by searching for $a$ and then walking in order ($k$: the number of keys returned). Think of records in a date range or products in a price range.
+- **Databases and file systems:** on disk they use **B-trees**, where each node holds hundreds of keys; the tree becomes very shallow and few disk reads are needed.
+- **Other balanced trees:** AVL (stricter balance), treaps (random priorities), splay trees (frequently accessed keys near the root).`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'In a balanced BST with $n$ keys, how long does “list all keys in $[a, b]$” take if it returns $k$ keys?',
+              options: ['Always $O(n)$', '$O(\\log n + k)$', '$O(k\\log n)$', '$O(\\log n)$'],
+              answer: 1,
+              hint: 'Go down to $a$ first, then walk in order.',
+              explanation: 'Finding $a$’s position is $O(\\log n)$; from there the in-order walk does amortized $O(1)$ work per key returned: $O(\\log n + k)$.',
+            },
+          ],
         },
         {
           kind: 'mistakes',
@@ -135,7 +207,7 @@ So a plain BST has **no $O(\\log n)$ guarantee**. Logarithmic height requires re
       title: 'Red-black trees',
       titleEn: 'Red-black trees',
       summary: 'Five properties, rotations and recoloring: height $\\le 2\\log_2(n+1)$.',
-      minutes: 45,
+      minutes: 55,
       objectives: [
         'State the five red-black properties and find violations in a tree.',
         'See that a rotation is an $O(1)$ local operation that preserves the BST property.',
@@ -147,6 +219,17 @@ So a plain BST has **no $O(\\log n)$ guarantee**. Logarithmic height requires re
         {
           kind: 'formal',
           title: 'Definition (Lecture 7 notes, Definition 10)',
+          check: [
+            {
+              id: 'c1',
+              kind: 'mcq',
+              prompt: 'Which property makes sure that **at most half** of the nodes on a root-to-NIL path can be red?',
+              options: ['Property 2 (the root is black)', 'Property 3 (NILs are black)', 'Property 4 (children of red are black)', 'Property 5 (equal black counts)'],
+              answer: 2,
+              hint: 'Can two reds be adjacent?',
+              explanation: 'Because of property 4, reds cannot be adjacent; every red is followed by a black. Combined with property 5, path lengths differ by at most a factor of 2.',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `A red-black tree is a BST satisfying the following properties (the children of leaves are taken to be NIL):
@@ -162,6 +245,11 @@ Intuition (Remark 15): red nodes mark the places where a path “starts to get l
         {
           kind: 'viz',
           title: 'Invariant checker: change the colors yourself',
+          tasks: [
+            'Make the root red: which property breaks?',
+            'Flip a leaf from black to red or the other way around: which property, and why?',
+            'Can you find a color change that keeps the tree valid? (Hint: try flipping a black node and its two red children together.)',
+          ],
           viz: 'rbPlayground',
           body: `Click nodes to change their colors and see which property breaks. Make the root red; make a leaf black; make a red node’s child red. Every violation is marked with “!”.`,
         },
@@ -173,7 +261,30 @@ Intuition (Remark 15): red nodes mark the places where a path “starts to get l
         },
         {
           kind: 'viz',
+          title: 'Watch a rotation',
+          viz: 'rotation',
+          body: `Press the button to rotate right at $x$, and undo it. $\\alpha$, $\\beta$, $\\gamma$ are subtrees; only $\\beta$’s parent changes. Notice that the in-order sequence stays the same.`,
+          tasks: ['Count the distances from the root to $\\alpha$ and to $\\gamma$ before and after the rotation. Which side went up, which went down?', 'Check which three links changed using the list in the side panel.'],
+          check: [
+            {
+              id: 'c2',
+              kind: 'numeric',
+              prompt: 'How many **child pointers** change in one rotation (including the pointer in the parent above that points to the subtree root)?',
+              answer: 3,
+              hint: 'One child of $x$, one child of $y$, and one child of the parent above.',
+              explanation: 'left($x$): $y \\to \\beta$, right($y$): $\\beta \\to x$, and the pointer above: $x \\to y$. A constant number of changes: $O(1)$.',
+            },
+          ],
+        },
+        {
+          kind: 'viz',
           title: 'Insertion visualizer',
+          tasks: [
+            'Play the “Sorted 1…10” input to the end: how many rotations were made, and what is the final height? What would the height be in a plain BST?',
+            'In the “Case 3 triangle” example, follow the two rotations — first at $p$, then at $g$ — step by step.',
+            'In **prediction mode**, predict which case applies before each fix-up step.',
+            'In the “Case 2 chain” example, watch the violation move upward.',
+          ],
           viz: 'rb',
           body: `Build the tree from an order or insert keys one at a time. At each step x, p (parent), u (uncle) and g (grandparent) are labelled, and the checker on the right shows which properties the current tree satisfies — you can see the temporary violations during the fix-up. In prediction mode, guess which case applies before each one. Try the input “Sorted 1…10”.`,
         },
@@ -192,6 +303,16 @@ The notes show the case where $x$ is a left child and $u$ a right child in detai
         {
           kind: 'correctness',
           title: 'The height guarantee (Claim 16)',
+          check: [
+            {
+              id: 'c3',
+              kind: 'numeric',
+              prompt: 'If the black height of the root is $b(r) = 4$, at least how many (non-NIL) nodes does the tree have?',
+              answer: 15,
+              hint: 'Lemma: at least $2^{b(x)} - 1$.',
+              explanation: '$2^4 - 1 = 15$: a perfectly balanced, all-black tree with 4 levels reaches this bound.',
+            },
+          ],
           label: 'formalProof',
           proof: [
             { title: 'Black height', body: '$b(x)$: the number of black nodes on any path from $x$ to a NIL, excluding $x$ (including the NIL). Well defined thanks to property 5.' },
@@ -212,6 +333,30 @@ The notes show the case where $x$ is a left child and $u$ a right child in detai
 4. Hence all operations are $O(\\log n)$ **in the worst case**.
 
 Intuitively: the lengths of all root-to-NIL paths are within a factor of 2 of each other (the shortest path is all black, the longest alternates black and red).`,
+        },
+        {
+          kind: 'text',
+          title: 'In practice: where red-black trees run',
+          body: `- **Standard libraries:** Java \`TreeMap\`/\`TreeSet\` and C++ \`std::map\`/\`std::set\` (in common implementations) are red-black trees.
+- **Operating systems:** the Linux kernel keeps runnable tasks in its scheduler (CFS) and memory regions in red-black trees; it needs to find the task with the smallest key quickly and to insert and delete often.
+- **Why not AVL?** AVL is more strictly balanced (searches are slightly faster) but may rotate more on insertion and deletion. A red-black tree, with at most 2 rotations per insertion, is a good balance for frequently changing data.
+- **Disk:** database indexes use B-trees instead of red-black trees; since every disk read is expensive, holding many keys per node to keep the tree shallow matters more.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'mcq',
+              prompt: 'Why do on-disk database indexes usually use B-trees instead of red-black trees?',
+              options: [
+                'Red-black trees are not ordered.',
+                'B-trees hold many keys per node; the tree is very shallow and a search needs very few disk reads.',
+                'B-trees have no rotations.',
+                'Red-black trees only work with integers.',
+              ],
+              answer: 1,
+              hint: 'On disk, the cost is the number of blocks read.',
+              explanation: 'A disk block holds hundreds of keys; a B-tree’s height is $\\log_{B} n$ (e.g. with $B = 500$, 3–4 levels for billions of records).',
+            },
+          ],
         },
         {
           kind: 'mistakes',
@@ -297,7 +442,7 @@ Final tree: 10 (B) → left 5 (R) [left 3 (B) → left 1 (R); right 7 (B)], righ
       title: 'Comparing a BST and a red-black tree',
       titleEn: 'Comparing a BST and a red-black tree',
       summary: 'The same insertion order, very different heights.',
-      minutes: 10,
+      minutes: 20,
       objectives: [
         'Compare the shapes the same insertion order produces in a plain BST and in a red-black tree.',
         'Observe the link between height and search cost through measurements, and relate it to the proven guarantee.',
@@ -307,15 +452,52 @@ Final tree: 10 (B) → left 5 (R) [left 3 (B) → left 1 (R); right 7 (B)], righ
         {
           kind: 'viz',
           title: 'Side-by-side comparison',
+          tasks: [
+            'With “Sorted 1…12”, read off the heights and the worst-case search comparisons of both trees.',
+            'Try “Reverse sorted”: what shape does the plain BST have?',
+            'Does the gap shrink with the “Shuffled” order? Try **Random** a few times.',
+          ],
           viz: 'treeCompare',
           body: `Try sorted, reverse-sorted and shuffled insertion orders. Examine the average and worst-case number of search comparisons, the height, and the guaranteed bound.`,
         },
         {
           kind: 'text',
           title: 'What should we observe?',
+          check: [
+            {
+              id: 'c1',
+              kind: 'numeric',
+              prompt: 'In a plain BST built by inserting 1 to 12 in sorted order, what is the average number of comparisons in a successful search?',
+              answer: 6.5,
+              tolerance: 0.01,
+              hint: 'Key $k$ is the $k$-th node of the chain.',
+              explanation: '$(1 + 2 + \\dots + 12)/12 = 78/12 = 6.5$. In the red-black tree it is a little above 3.',
+            },
+          ],
           body: `- Sorted insertion turns a plain BST into a chain: height $n - 1$, search $\\Theta(n)$.
 - With the same order the red-black tree stays balanced through rotations: height $\\le 2\\log_2(n+1)$.
 - The measured values belong to a single order; the red-black bound is proven for **every** order.`,
+        },
+        {
+          kind: 'text',
+          title: 'In practice: is a random order enough?',
+          body: `If keys are inserted in **random order**, the expected height of a plain BST is $O(\\log n)$: the root behaves like a random pivot in QuickSort, and the tree resembles randomized QuickSort’s recursion tree.
+
+But real data is often not random: timestamps, increasing ID numbers and alphabetical lists arrive **sorted** and turn a plain BST into a chain. There are two remedies:
+
+- **A guarantee:** self-balancing trees such as red-black or AVL trees give $O(\\log n)$ for every insertion order.
+- **Randomization:** a **treap** gives every node a random priority, so whatever the data order, the tree behaves as if keys were inserted randomly (expected $O(\\log n)$).`,
+          check: [
+            {
+              id: 'c2',
+              kind: 'mcq',
+              prompt: 'An application inserts records into a plain BST in order of creation time (increasing timestamps). What happens?',
+              options: ['The tree stays balanced by itself.', 'The tree becomes a chain; searches become $\\Theta(n)$.', 'The tree’s height becomes $\\log n$.', 'Insertion fails.'],
+              answer: 1,
+              hint: 'Inserting increasing keys is the same as the “Sorted” example.',
+              explanation: 'Each new key is larger than the previous one, so it is inserted at the far right: height $n - 1$. A self-balancing tree or randomization is needed.',
+            },
+          ],
         },
       ],
       quiz: [

@@ -15,7 +15,7 @@ export const lecture7: Lecture = {
       title: 'İkili arama ağaçları',
       titleEn: 'Binary search trees',
       summary: 'Arama, ekleme, silme — hepsi bir arama yolunu izler: $O(h)$.',
-      minutes: 30,
+      minutes: 40,
       objectives: [
         'BST özelliğini tanımlamak ve bir ağacın BST olup olmadığını kontrol etmek.',
         'search, insert, delete (üç durum), min/max işlemlerini adım adım izlemek.',
@@ -27,6 +27,16 @@ export const lecture7: Lecture = {
         {
           kind: 'intuition',
           title: 'Sezgi: sıralı dizi ile bağlı listenin en iyi yanları',
+          check: [
+            {
+              id: 'c1',
+              kind: 'numeric',
+              prompt: '1 000 000 anahtarlı **tam dengeli** bir BST’de en kötü durumda bir arama kaç düğüme bakar? ($\\lfloor\\log_2 n\\rfloor + 1$)',
+              answer: 20,
+              hint: '$2^{19} = 524\\,288$, $2^{20} = 1\\,048\\,576$.',
+              explanation: 'Yükseklik $\\lfloor\\log_2 10^6\\rfloor = 19$, yol üzerinde en fazla 20 düğüm. Dejenere bir BST’de ise 1 000 000 olabilir.',
+            },
+          ],
           label: 'intuition',
           body: `Sıralı dizide arama $O(\\log n)$ ama ekleme/silme $O(n)$; bağlı listede ekleme $O(1)$ ama arama $O(n)$. **Dengeli** bir ikili arama ağacı üçünü de $O(\\log n)$’de yapar.
 
@@ -35,6 +45,17 @@ BST’deki her düğüm, kendi alt ağacı için bir QuickSort pivotu gibidir: s
         {
           kind: 'formal',
           title: 'Tanım (Ders 7 notları)',
+          check: [
+            {
+              id: 'c2',
+              kind: 'mcq',
+              prompt: 'Kök 10; kökün sol çocuğu 5, 5’in sağ çocuğu 12; kökün sağ çocuğu 15. Bu bir BST midir?',
+              options: ['Evet, her düğüm çocuklarıyla doğru sırada.', 'Hayır: 12, 10’un sol alt ağacında ama 10’dan büyük.', 'Hayır: 15, 12’den büyük.', 'Evet, çünkü in-order dolaşım sıralı.'],
+              answer: 1,
+              hint: 'Özellik yalnızca doğrudan çocuklar için değil, tüm alt ağaç için geçerli olmalı.',
+              explanation: 'Sol alt ağaçtaki **tüm** anahtarlar 10’dan küçük olmalı. In-order dolaşım 5, 12, 10, 15 verir — sıralı değil.',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `Her $x$ düğümünün bir anahtarı $key(x)$, ebeveyni $p(x)$ ve çocukları $left(x)$, $right(x)$ vardır (yoksa NIL). **BST özelliği:** her $x$ için $left(x)$ altındaki tüm anahtarlar $< key(x)$, $right(x)$ altındakiler $> key(x)$. Bu derste anahtarlar farklıdır.
@@ -44,18 +65,50 @@ BST’deki her düğüm, kendi alt ağacı için bir QuickSort pivotu gibidir: s
         {
           kind: 'viz',
           title: 'BST görselleştiricisi',
+          tasks: [
+            'Ön alıştırma ağacında **Ara** ile 4.5’i ara: arama hangi düğümde duruyor? Bu düğüm, 4.5 eklenseydi ne olurdu?',
+            'Ekleme sırasını “Sıralı (dejenere)” yap: yükseklik kaç oldu? Aynı anahtarları “Dengeli sıra” ile kur ve karşılaştır.',
+            'Ön alıştırma ağacında 3’ü **Sil**: hangi durum uygulandı, ardıl kim?',
+            '**Tahmin modu**nu aç ve her karşılaştırmada aramanın yönünü tahmin et.',
+          ],
           viz: 'bst',
           body: `Bir ekleme sırası girin (ağaç baştan, adım adım kurulur) ya da hazır ağaçta işlem çalıştırın. Ondalıklı bir anahtar arayarak (ör. 4.5) aramanın nerede durduğunu görün. “Sıralı” ekleme sırasının nasıl bir ağaç ürettiğine ve yüksekliğe dikkat edin. Tahmin modunda her karşılaştırmada yönü tahmin edin.`,
         },
         {
           kind: 'pseudocode',
           title: 'search (notlardaki Algoritma 4)',
+          check: [
+            {
+              id: 'c3',
+              kind: 'numeric',
+              prompt: 'Ön alıştırma ağacında (kök 5; 3 ve 9; 1, 4, 6) 7 aranırken search kaç düğüme bakar?',
+              answer: 3,
+              hint: '5 → 9 → 6, sonra 6’nın sağı NIL.',
+              explanation: '5, 9 ve 6’ya bakılır; 6’nın sağ çocuğu NIL olduğu için search 6’yı döndürür — 7 eklenseydi ebeveyni olacak düğüm.',
+            },
+          ],
           code: BST_SEARCH_CODE,
           body: `Bu search, anahtar ağaçta yoksa **eklenseydi ebeveyni olacak** düğümü döndürür (Claim 7). insert bunu kullanır; delete önce search ile düğümü bulur.`,
         },
         {
           kind: 'steps',
           title: 'Silme: üç durum',
+          check: [
+            {
+              id: 'c4',
+              kind: 'mcq',
+              prompt: 'İki çocuklu bir düğüm silinirken kullanılan ardılın (successor) neden **sol çocuğu yoktur**?',
+              options: [
+                'Ardıl her zaman bir yapraktır.',
+                'Ardıl, sağ alt ağacın en küçüğüdür; sol çocuğu olsaydı o daha küçük olurdu.',
+                'Silinen düğümün sol çocuğu ardılın yerine geçer.',
+                'BST’de hiçbir düğümün sol çocuğu olmaz.',
+              ],
+              answer: 1,
+              hint: 'Sağ alt ağaçta en küçüğü bulmak için hep sola inilir.',
+              explanation: 'En küçük elemana sola inerek ulaşılır ve sola inemediğimiz yerde dururuz; bu yüzden ardılın en fazla bir (sağ) çocuğu vardır ve kolayca yerinden çıkarılır.',
+            },
+          ],
           body: `1. **Çocuk yok:** düğümü kaldır (ebeveyndeki işaretçi NIL).
 2. **Tek çocuk:** çocuğu düğümün yerine yükselt.
 3. **İki çocuk:** ardılı (successor) $z$’yi bul — sağ alt ağacın en küçüğü, sol çocuğu yoktur. $z$’nin sağ çocuğunu $z$’nin yerine bağla, sonra $z$’yi silinen düğümün yerine koy. (Simetrik olarak öncül/predecessor da kullanılabilir.)
@@ -71,6 +124,25 @@ BST’deki her düğüm, kendi alt ağacı için bir QuickSort pivotu gibidir: s
 - En kötü durumda (ör. $1, 2, \\dots, n$ sırasıyla ekleme) ağaç bir zincire döner: $h = n - 1$ → $\\Theta(n)$.
 
 Yani sıradan bir BST için **$O(\\log n)$ garantisi yoktur**. Logaritmik yükseklik için ağacı yeniden dengelemek gerekir (AVL, kırmızı-siyah, splay…).`,
+        },
+        {
+          kind: 'text',
+          title: 'Pratikte: ağaçlar nerede kullanılır?',
+          body: `- **Sıralı sözlükler:** Java \`TreeMap\`, C++ \`std::map\` / \`std::set\` dengeli BST’lerdir (çoğunlukla kırmızı-siyah). Hash tablolarından farkları: anahtarları **sıralı** tutarlar.
+- **Aralık sorguları:** “$a$ ile $b$ arasındaki tüm anahtarlar” sorgusu, $a$’yı aradıktan sonra in-order dolaşımla $O(h + k)$’de cevaplanır ($k$: dönen anahtar sayısı). Tarih aralığındaki kayıtlar, fiyat aralığındaki ürünler gibi.
+- **Veritabanları ve dosya sistemleri:** disk üzerinde her düğümü yüzlerce anahtar tutan **B-ağaçları** kullanılır; böylece ağaç çok sığ olur ve az disk okuması yapılır.
+- **Diğer dengeli ağaçlar:** AVL (daha sıkı denge), treap (rastgele öncelikler), splay ağaçları (sık erişilenler köke yakın).`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: '$n$ anahtarlı dengeli bir BST’de “$[a, b]$ aralığındaki tüm anahtarları listele” sorgusu, $k$ anahtar döndürüyorsa ne kadar sürer?',
+              options: ['$O(n)$ her zaman', '$O(\\log n + k)$', '$O(k\\log n)$', '$O(\\log n)$'],
+              answer: 1,
+              hint: 'Önce $a$’ya kadar inin, sonra sıralı dolaşın.',
+              explanation: '$a$’nın yerini bulmak $O(\\log n)$; oradan in-order dolaşım her dönen anahtar için amortize $O(1)$ iş yapar: $O(\\log n + k)$.',
+            },
+          ],
         },
         {
           kind: 'mistakes',
@@ -135,7 +207,7 @@ Yani sıradan bir BST için **$O(\\log n)$ garantisi yoktur**. Logaritmik yükse
       title: 'Kırmızı-siyah ağaçlar',
       titleEn: 'Red-black trees',
       summary: 'Beş özellik, rotasyonlar ve yeniden boyama: yükseklik $\\le 2\\log_2(n+1)$.',
-      minutes: 45,
+      minutes: 55,
       objectives: [
         'Beş kırmızı-siyah özelliği ifade etmek ve bir ağaçta ihlalleri bulmak.',
         'Rotasyonun BST özelliğini koruyan $O(1)$ bir yerel işlem olduğunu görmek.',
@@ -147,6 +219,17 @@ Yani sıradan bir BST için **$O(\\log n)$ garantisi yoktur**. Logaritmik yükse
         {
           kind: 'formal',
           title: 'Tanım (Ders 7 notları, Tanım 10)',
+          check: [
+            {
+              id: 'c1',
+              kind: 'mcq',
+              prompt: 'Kökten NIL’e giden bir yolda düğümlerin **en fazla yarısının** kırmızı olabilmesini hangi özellik sağlar?',
+              options: ['Özellik 2 (kök siyah)', 'Özellik 3 (NIL’ler siyah)', 'Özellik 4 (kırmızının çocukları siyah)', 'Özellik 5 (eşit siyah sayısı)'],
+              answer: 2,
+              hint: 'İki kırmızı art arda gelebilir mi?',
+              explanation: 'Özellik 4 yüzünden kırmızılar art arda gelemez; her kırmızıdan sonra bir siyah gelir. Özellik 5 ile birleşince yollar en fazla 2 kat farklı uzunlukta olur.',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `Kırmızı-siyah ağaç, aşağıdaki özellikleri sağlayan bir BST’dir (yaprakların çocukları NIL kabul edilir):
@@ -162,6 +245,11 @@ Sezgi (Remark 15): kırmızı düğümler bir yolun “uzamaya başladığı” 
         {
           kind: 'viz',
           title: 'Değişmez denetleyicisi: renkleri kendiniz değiştirin',
+          tasks: [
+            'Kökü kırmızı yap: hangi özellik bozuldu?',
+            'Bir yaprağı siyahtan kırmızıya ya da tersine çevir: hangi özellik ve neden?',
+            'Ağacı geçerli tutan bir renk değişikliği bulabilir misin? (İpucu: bir siyah düğüm ile iki kırmızı çocuğunun renklerini birlikte değiştirmeyi dene.)',
+          ],
           viz: 'rbPlayground',
           body: `Düğümlere tıklayarak renklerini değiştirin ve hangi özelliğin bozulduğunu görün. Kökü kırmızı yapın; bir yaprağı siyah yapın; bir kırmızının çocuğunu kırmızı yapın. Her ihlal “!” ile işaretlenir.`,
         },
@@ -173,7 +261,30 @@ Sezgi (Remark 15): kırmızı düğümler bir yolun “uzamaya başladığı” 
         },
         {
           kind: 'viz',
+          title: 'Rotasyonu izle',
+          viz: 'rotation',
+          body: `Düğmeye basarak $x$’te sağa rotasyon yapın ve geri alın. $\\alpha$, $\\beta$, $\\gamma$ birer alt ağaçtır; yalnızca $\\beta$’nın ebeveyni değişir. Sıralı dolaşımın aynı kaldığına dikkat edin.`,
+          tasks: ['Rotasyondan önce ve sonra kökten $\\alpha$’ya ve $\\gamma$’ya olan uzaklıkları say. Hangi taraf yükseldi, hangisi alçaldı?', 'Hangi üç bağlantının değiştiğini yan paneldeki listeyle doğrula.'],
+          check: [
+            {
+              id: 'c2',
+              kind: 'numeric',
+              prompt: 'Bir rotasyonda kaç **çocuk işaretçisi** değişir (alt ağacın kökünü gösteren, ebeveyndeki işaretçi dahil)?',
+              answer: 3,
+              hint: '$x$’in bir çocuğu, $y$’nin bir çocuğu ve yukarıdaki ebeveynin bir çocuğu.',
+              explanation: 'left($x$): $y \\to \\beta$, right($y$): $\\beta \\to x$ ve üstteki işaretçi $x \\to y$. Sabit sayıda değişiklik: $O(1)$.',
+            },
+          ],
+        },
+        {
+          kind: 'viz',
           title: 'Ekleme görselleştiricisi',
+          tasks: [
+            '“Sıralı 1…10” girdisini sona kadar oynat: kaç rotasyon yapıldı, son yükseklik kaç? Sıradan bir BST’de yükseklik kaç olurdu?',
+            '“Durum 3 üçgen” örneğinde önce $p$’de, sonra $g$’de yapılan iki rotasyonu adım adım izle.',
+            '**Tahmin modu**nda her düzeltme adımından önce hangi durumun uygulanacağını tahmin et.',
+            '“Durum 2 zinciri” örneğinde ihlalin yukarı doğru nasıl taşındığını izle.',
+          ],
           viz: 'rb',
           body: `Ağacı bir sırayla kurun ya da tek tek anahtar ekleyin. Her adımda x, p (ebeveyn), u (amca), g (büyük ebeveyn) etiketlenir ve sağdaki denetleyici o anki ağacın hangi özellikleri sağladığını gösterir — düzeltme sırasında geçici ihlalleri görebilirsiniz. Tahmin modunda her durumdan önce hangi durumun uygulanacağını tahmin edin. “Sıralı 1…10” girdisini deneyin.`,
         },
@@ -192,6 +303,16 @@ Notlar $x$’in sol, $u$’nun sağ çocuk olduğu durumu ayrıntılı gösterir
         {
           kind: 'correctness',
           title: 'Yükseklik garantisi (Claim 16)',
+          check: [
+            {
+              id: 'c3',
+              kind: 'numeric',
+              prompt: 'Kökün siyah yüksekliği $b(r) = 4$ ise ağaçta en az kaç (NIL olmayan) düğüm vardır?',
+              answer: 15,
+              hint: 'Lemma: en az $2^{b(x)} - 1$.',
+              explanation: '$2^4 - 1 = 15$: tam dengeli, hepsi siyah 4 seviyeli bir ağaç bu sınıra ulaşır.',
+            },
+          ],
           label: 'formalProof',
           proof: [
             { title: 'Siyah yükseklik', body: '$b(x)$: $x$’ten NIL’e herhangi bir yoldaki siyah düğüm sayısı, $x$ hariç (NIL dahil). Özellik 5 sayesinde iyi tanımlıdır.' },
@@ -212,6 +333,30 @@ Notlar $x$’in sol, $u$’nun sağ çocuk olduğu durumu ayrıntılı gösterir
 4. Dolayısıyla tüm işlemler **en kötü durumda** $O(\\log n)$.
 
 Sezgisel ifade: kökten NIL’e tüm yolların uzunlukları birbirinin en fazla 2 katıdır (en kısa yol yalnızca siyah, en uzun yol siyah-kırmızı dönüşümlü).`,
+        },
+        {
+          kind: 'text',
+          title: 'Pratikte: kırmızı-siyah ağaçlar nerede çalışıyor?',
+          body: `- **Standart kütüphaneler:** Java \`TreeMap\`/\`TreeSet\`, C++ \`std::map\`/\`std::set\` (yaygın uygulamalarda) kırmızı-siyah ağaçtır.
+- **İşletim sistemleri:** Linux çekirdeği zamanlayıcıda (CFS) çalışmaya hazır görevleri ve bellek bölgelerini kırmızı-siyah ağaçlarda tutar; en küçük anahtarlı görevi hızla bulmak ve ekleme/silme yapmak gerekir.
+- **Neden AVL değil?** AVL daha sıkı dengelidir (aramalar biraz daha hızlı), ama ekleme ve silmede daha çok rotasyon yapabilir. Kırmızı-siyah ağaç, ekleme başına en fazla 2 rotasyonla sık değişen veriler için iyi bir dengedir.
+- **Disk:** veritabanı dizinleri kırmızı-siyah ağaç yerine B-ağacı kullanır; her disk okuması pahalı olduğu için düğüm başına çok anahtar tutup ağacı sığlaştırmak daha önemlidir.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'mcq',
+              prompt: 'Diskteki veritabanı dizinleri neden genellikle kırmızı-siyah ağaç yerine B-ağacı kullanır?',
+              options: [
+                'Kırmızı-siyah ağaçlar sıralı değildir.',
+                'B-ağaçları düğüm başına çok anahtar tutar; ağaç çok sığdır ve bir aramada çok az disk okuması gerekir.',
+                'B-ağaçlarında rotasyon yoktur.',
+                'Kırmızı-siyah ağaçlar yalnızca tam sayılarla çalışır.',
+              ],
+              answer: 1,
+              hint: 'Diskte maliyet, okunan blok sayısıdır.',
+              explanation: 'Bir disk bloğu yüzlerce anahtar alır; B-ağacının yüksekliği $\\log_{B} n$ olur (ör. $B = 500$ ile milyarlarca kayıt için 3–4 seviye).',
+            },
+          ],
         },
         {
           kind: 'mistakes',
@@ -297,7 +442,7 @@ Son ağaç: 10 (S) → sol 5 (K) [sol 3 (S) → sol 1 (K); sağ 7 (S)], sağ 15 
       title: 'BST ve kırmızı-siyah ağaç karşılaştırması',
       titleEn: 'Comparing a BST and a red-black tree',
       summary: 'Aynı ekleme sırası, çok farklı yükseklikler.',
-      minutes: 10,
+      minutes: 20,
       objectives: [
         'Aynı ekleme sırasının sıradan bir BST ve bir kırmızı-siyah ağaçta ürettiği şekilleri karşılaştırmak.',
         'Yükseklik ile arama maliyeti arasındaki bağı ölçümlerle gözlemlemek ve kanıtlanmış garantiyle ilişkilendirmek.',
@@ -307,15 +452,52 @@ Son ağaç: 10 (S) → sol 5 (K) [sol 3 (S) → sol 1 (K); sağ 7 (S)], sağ 15 
         {
           kind: 'viz',
           title: 'Yan yana karşılaştırma',
+          tasks: [
+            '“Sıralı 1…12” ile iki ağacın yüksekliklerini ve en kötü arama karşılaştırmalarını oku.',
+            '“Ters sıralı”yı dene: sıradan BST’nin şekli nasıl?',
+            '“Karışık” sırada fark azalıyor mu? **Rastgele** ile birkaç kez dene.',
+          ],
           viz: 'treeCompare',
           body: `Sıralı, ters sıralı ve karışık ekleme sıralarını deneyin. Ortalama ve en kötü arama karşılaştırma sayısını, yüksekliği ve garanti edilen sınırı inceleyin.`,
         },
         {
           kind: 'text',
           title: 'Ne gözlemlemeliyiz?',
+          check: [
+            {
+              id: 'c1',
+              kind: 'numeric',
+              prompt: '1’den 12’ye sıralı eklenen sıradan BST’de başarılı bir aramanın ortalama karşılaştırma sayısı kaçtır?',
+              answer: 6.5,
+              tolerance: 0.01,
+              hint: '$k$ anahtarı zincirde $k$. düğümdür.',
+              explanation: '$(1 + 2 + \\dots + 12)/12 = 78/12 = 6.5$. Kırmızı-siyah ağaçta bu değer 3’ün biraz üstündedir.',
+            },
+          ],
           body: `- Sıralı ekleme sıradan BST’yi bir zincire çevirir: yükseklik $n - 1$, arama $\\Theta(n)$.
 - Kırmızı-siyah ağaç aynı sırada rotasyonlarla dengede kalır: yükseklik $\\le 2\\log_2(n+1)$.
 - Ölçülen değerler tek bir sıraya aittir; kırmızı-siyah ağacın sınırı ise **her** sıra için kanıtlanmıştır.`,
+        },
+        {
+          kind: 'text',
+          title: 'Pratikte: rastgele sıra yeterli mi?',
+          body: `Anahtarlar **rastgele bir sırayla** eklenirse sıradan bir BST’nin beklenen yüksekliği $O(\\log n)$’dir: kök, QuickSort’taki rastgele pivot gibi davranır ve ağaç, rastgele QuickSort’un özyineleme ağacına benzer.
+
+Ama gerçek veriler çoğu zaman rastgele değildir: zaman damgaları, artan kimlik numaraları, alfabetik listeler **sıralı** gelir ve sıradan BST’yi bir zincire çevirir. İki çözüm vardır:
+
+- **Garanti:** kırmızı-siyah ya da AVL gibi dengeleyen ağaçlar her ekleme sırasında $O(\\log n)$ sağlar.
+- **Rastgeleleştirme:** **treap** her düğüme rastgele bir öncelik verir; böylece veri sırası ne olursa olsun ağaç rastgele eklenmiş gibi davranır (beklenen $O(\\log n)$).`,
+          check: [
+            {
+              id: 'c2',
+              kind: 'mcq',
+              prompt: 'Bir uygulama kayıtları oluşturulma zamanına göre (artan zaman damgasıyla) sıradan bir BST’ye ekliyor. Ne olur?',
+              options: ['Ağaç kendiliğinden dengeli kalır.', 'Ağaç bir zincire dönüşür; aramalar $\\Theta(n)$ olur.', 'Ağacın yüksekliği $\\log n$ olur.', 'Ekleme başarısız olur.'],
+              answer: 1,
+              hint: 'Artan anahtarlarla ekleme, “Sıralı” örneğiyle aynıdır.',
+              explanation: 'Her yeni anahtar bir öncekinden büyük olduğu için en sağa eklenir: yükseklik $n - 1$. Dengeleyen bir ağaç ya da rastgeleleştirme gerekir.',
+            },
+          ],
         },
       ],
       quiz: [

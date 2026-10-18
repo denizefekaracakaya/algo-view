@@ -15,7 +15,7 @@ export const lecture5: Lecture = {
       title: 'QuickSort and pivot selection',
       titleEn: 'QuickSort and pivot selection',
       summary: 'Partition, put the pivot in place, recurse on both sides.',
-      minutes: 30,
+      minutes: 40,
       objectives: [
         'Trace QuickSort’s partition step and its in-place implementation.',
         'See how the choice of pivot determines the running time: $T(n) \\le cn + T(k-1) + T(n-k)$.',
@@ -27,6 +27,22 @@ export const lecture5: Lecture = {
         {
           kind: 'intuition',
           title: 'Intuition',
+          check: [
+            {
+              id: 'c1',
+              kind: 'mcq',
+              prompt: 'Right after the partition, which is **always** true of the pivot?',
+              options: [
+                'The pivot is in the middle of the array.',
+                'The pivot is in its final position in the sorted array; everything to its left is smaller, everything to its right greater or equal.',
+                'The left and right parts are sorted.',
+                'The left part is longer than the right part.',
+              ],
+              answer: 1,
+              hint: 'How many elements are exactly to the left of the pivot?',
+              explanation: 'Everything smaller than the pivot is to its left, so its position equals its position in the sorted array and it never moves again. The parts themselves are not sorted yet.',
+            },
+          ],
           label: 'intuition',
           body: `QuickSort is very similar to Select: choose a pivot $x$ and rearrange the array as $[A_<,\\ x,\\ A_>]$. The difference: Select recurses on one side only, while QuickSort sorts **both** sides. After partitioning, the pivot is in its **final position** and never moves again.
 
@@ -35,18 +51,45 @@ The notes assume distinct elements (without loss of generality). In the in-place
         {
           kind: 'viz',
           title: 'QuickSort visualizer',
+          tasks: [
+            'Run the “Sorted” example with the **Last element** rule and jump to the end: what does the recursion tree look like, how many comparisons were made?',
+            'Try the same input with **Random** and press **New seed** a few times. How much does the comparison count vary?',
+            'Look at the shape of the tree with the **Median (ideal)** rule: why is it balanced?',
+            'In **prediction mode**, predict which region each element goes to.',
+          ],
           viz: 'quickSort',
           body: `Choose the pivot rule and (for the random rule) the seed. The same seed reproduces the same run exactly; use “New seed” to compare different pivot choices. In the tree below, every node is the pivot of one call — an unbalanced tree = deep recursion = many comparisons. Try the “Last element” rule on the “Sorted” example.`,
         },
         {
           kind: 'pseudocode',
           title: 'Pseudocode (in-place partition)',
+          check: [
+            {
+              id: 'c2',
+              kind: 'numeric',
+              prompt: 'How many key comparisons does the Lomuto partition make on a subarray of 10 elements (pivot included)?',
+              answer: 9,
+              hint: 'Every element other than the pivot is compared with the pivot once.',
+              explanation: '$m - 1$ comparisons on a subarray of $m$ elements: $10 - 1 = 9$.',
+            },
+          ],
           code: QUICKSORT_CODE,
           body: `The “better partition” idea from the Lecture 5 slides: pick the pivot at random, move it to the end of the subarray, then scan left to right gathering the smaller elements at the front. The notes leave the details of the in-place version to CLRS; the version here is the Lomuto partition.`,
         },
         {
           kind: 'correctness',
           title: 'Correctness',
+          check: [
+            {
+              id: 'c3',
+              kind: 'mcq',
+              prompt: 'What can happen if, after partitioning, the pivot is included in one of the recursive calls (e.g. `QuickSort(A, lo, i)`)?',
+              options: ['Nothing; it just gets a little slower.', 'If the pivot is the largest of the subarray, a call of the same size can repeat over and over: infinite recursion.', 'The array is sorted in reverse.', 'It becomes stable.'],
+              answer: 1,
+              hint: 'Does the subproblem get smaller?',
+              explanation: 'The correctness proof relies on every call being on a shorter part. If the pivot is included the part may not shrink and the recursion may not terminate.',
+            },
+          ],
           label: 'proofIdea',
           proof: [
             { title: 'Partition invariant', body: 'At every step of the loop, $A[lo..i-1] <$ pivot $\\le A[i..j-1]$. Both regions start empty; each step adds one element to the right region.' },
@@ -57,6 +100,16 @@ The notes assume distinct elements (without loss of generality). In the in-place
         {
           kind: 'complexity',
           title: 'Pivot choice and running time',
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'How many comparisons in total does QuickSort with the “last element” pivot make on an already sorted array of 10 elements?',
+              answer: 45,
+              hint: '$9 + 8 + \\dots + 1$.',
+              explanation: 'In every call the pivot is the largest element and one element drops out: $\\frac{10 \\cdot 9}{2} = 45$.',
+            },
+          ],
           body: `If the pivot is the $k$-th smallest element: $T(n) \\le cn + T(k-1) + T(n-k)$.
 
 - **Worst pivot (min/max):** $T(n) = T(n-1) + O(n) = \\Theta(n^2)$. On sorted input the “first/last element” rule does this every time.
@@ -64,6 +117,39 @@ The notes assume distinct elements (without loss of generality). In the in-place
 - **Random pivot:** the worst case is still $\\Theta(n^2)$ (the worst choice every time), but the **expected** time **for every input** is $O(n\\log n)$ — the topic of the next lesson.
 
 The comparison in the slides: QuickSort (random pivot) is easy to implement in place and is not stable; MergeSort is $O(n\\log n)$ in the worst case and stable.`,
+        },
+        {
+          kind: 'text',
+          title: 'In practice: QuickSort in libraries',
+          body: `- **Introsort** (most C++ \`std::sort\` implementations): starts with QuickSort, switches to **HeapSort** if the recursion depth exceeds about $2\\log_2 n$ (an $O(n\\log n)$ worst-case guarantee), and uses InsertionSort on small parts.
+- **Java:** **dual-pivot QuickSort** for arrays of primitives, and **Timsort** for object arrays because it is stable.
+- **Why so popular?** It works in place (no extra array) and accesses memory sequentially, which makes it very cache-friendly.
+- **Attacks:** if the pivot rule is fixed (e.g. “first element” or “median of three”), someone who knows the rule can construct inputs that take $\\Theta(n^2)$; this has been used as a denial-of-service tool. A random pivot or introsort removes the risk.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'Why does introsort switch to HeapSort when the recursion gets too deep?',
+              options: [
+                'Because HeapSort is always faster',
+                'To guarantee $O(n\\log n)$ in the worst case',
+                'To make the sort stable',
+                'To use more memory',
+              ],
+              answer: 1,
+              hint: 'Deep recursion is a sign of bad pivots.',
+              explanation: 'If the depth exceeds $O(\\log n)$, QuickSort is heading for $\\Theta(n^2)$ with bad pivots; switching to HeapSort bounds the total by $O(n\\log n)$.',
+            },
+            {
+              id: 'c6',
+              kind: 'mcq',
+              prompt: 'Why does Java use Timsort instead of QuickSort for object arrays?',
+              options: ['Objects cannot be compared.', 'Sorting objects calls for stability, and QuickSort is not stable.', 'QuickSort does not work with objects.', 'Timsort works in place.'],
+              answer: 1,
+              hint: 'Think of sorting by name, then by department.',
+              explanation: 'Objects with equal keys must keep their previous order (stability). Timsort is stable; QuickSort is not. For primitive numbers equal values are indistinguishable, so stability does not matter.',
+            },
+          ],
         },
         {
           kind: 'mistakes',
@@ -124,7 +210,7 @@ The comparison in the slides: QuickSort (random pivot) is easy to implement in p
       title: 'Expected running time via indicator variables',
       titleEn: 'Expected running time via indicator variables',
       summary: 'How often is each pair compared? $E[C] \\le 2n\\ln n$ by linearity of expectation.',
-      minutes: 35,
+      minutes: 45,
       objectives: [
         'Apply random variables, expectation and indicator variables to QuickSort.',
         'Explain why each pair $(z_i, z_j)$ is compared at most once.',
@@ -137,6 +223,17 @@ The comparison in the slides: QuickSort (random pivot) is easy to implement in p
         {
           kind: 'formal',
           title: 'Setup (Lecture 5 notes)',
+          check: [
+            {
+              id: 'c1',
+              kind: 'mcq',
+              prompt: 'Does $E[X + Y] = E[X] + E[Y]$ require $X$ and $Y$ to be independent?',
+              options: ['Yes, always', 'No, linearity of expectation always holds', 'Only for indicator variables', 'Only if $X = Y$'],
+              answer: 1,
+              hint: 'The $X_{i,j}$ are not independent, yet the analysis works.',
+              explanation: 'Linearity needs no independence. Independence is needed for $E[XY] = E[X]E[Y]$.',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `Let $z_1 < z_2 < \\dots < z_n$ be the elements of the sorted array. $X_{i,j}$: the number of times $z_i$ and $z_j$ are compared. Every comparison is made with the pivot, and the pivot is not part of later calls; so $X_{i,j} \\in \\{0, 1\\}$ — an **indicator variable**.
@@ -148,11 +245,27 @@ The second equality is **linearity of expectation**: it holds even though the $X
         {
           kind: 'viz',
           title: 'Interactive: which pairs are compared, and how often?',
+          tasks: [
+            'Click the cells closest to the diagonal (adjacent pairs): why is the probability 1?',
+            'Pick $z_1$ and $z_{10}$: why is the probability only $0.2$?',
+            'Compare the simulated rate with the formula. How far apart are they? Why not exactly equal?',
+          ],
           viz: 'pairProbability',
         },
         {
           kind: 'correctness',
           title: 'Derivation',
+          check: [
+            {
+              id: 'c2',
+              kind: 'numeric',
+              prompt: 'For $n = 10$, what is the probability that $z_2$ and $z_9$ are compared? (Decimal.)',
+              answer: 0.25,
+              tolerance: 0.001,
+              hint: 'The window has $9 - 2 + 1$ elements.',
+              explanation: '$\\frac{2}{8} = 0.25$.',
+            },
+          ],
           label: 'formalProof',
           proof: [
             { title: 'The window idea', body: 'Look at the window $\\{z_i, \\dots, z_j\\}$. Until an element of this window is chosen as a pivot, they all stay in the same subarray.' },
@@ -165,6 +278,11 @@ The second equality is **linearity of expectation**: it holds even though the $X
         {
           kind: 'viz',
           title: 'Experiment: comparison counts with different seeds',
+          tasks: [
+            'With the “Sorted array” input and $n = 100$, compare the measured mean of the random pivot with the deterministic “last element” pivot.',
+            'Set the number of runs to 1000: how widely does the histogram spread around the theoretical value?',
+            'Grow $n$ and check that the mean stays below the $2n\\ln n$ bound.',
+          ],
           viz: 'quickExperiment',
         },
         {
@@ -173,6 +291,34 @@ The second equality is **linearity of expectation**: it holds even though the $X
           body: `The notes also show a second route: if $T(n)$ is the expected number of comparisons, then
 $$T(n) = n - 1 + \\frac{2}{n}\\sum_{i=1}^{n-1} T(i)$$
 and strong induction proves $T(n) \\le 2n\\ln n$ (bounding the sum from above by $\\int 2x\\ln x\\,dx$).`,
+        },
+        {
+          kind: 'text',
+          title: 'In practice: randomized algorithms',
+          body: `- **Las Vegas and Monte Carlo:** randomized QuickSort always gives the correct result; only its running time is random (**Las Vegas**). Some randomized algorithms are always fast but may answer wrongly with small probability (**Monte Carlo**; e.g. primality tests).
+- **How reliable is the expectation?** QuickSort’s comparison count concentrates around its expectation: the probability of taking several times the expectation shrinks quickly as $n$ grows. The histogram in the experiment panel shows this.
+- **Neutralizing the adversary:** randomness is the cheapest defense against a malicious adversary who picks the input; the hash tables of Lecture 8 use the same idea.
+- **Reproducibility:** with seeded generators a random run can be replayed exactly for debugging — every random visualizer in this app works this way.`,
+          check: [
+            {
+              id: 'c3',
+              kind: 'mcq',
+              prompt: 'What kind of randomized algorithm is QuickSort with a random pivot?',
+              options: ['Las Vegas: always correct, random running time', 'Monte Carlo: always fast, sometimes wrong', 'Deterministic', 'An approximation algorithm'],
+              answer: 0,
+              hint: 'Is the output sorted whatever the pivots are?',
+              explanation: 'Correctness does not depend on the pivots; only the number of comparisons is random.',
+            },
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'For $n = 3$, what is randomized QuickSort’s expected number of comparisons $E[C] = \\sum_{i<j} \\frac{2}{j-i+1}$? (Two decimals.)',
+              answer: 2.67,
+              tolerance: 0.01,
+              hint: '2 pairs at distance 1, 1 pair at distance 2.',
+              explanation: '$2 \\cdot 1 + 1 \\cdot \\frac23 = \\frac83 \\approx 2.67$. Check: $2(n+1)H_n - 4n = 8 \\cdot \\frac{11}{6} - 12 = \\frac83$.',
+            },
+          ],
         },
         {
           kind: 'mistakes',

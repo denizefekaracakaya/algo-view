@@ -16,7 +16,7 @@ export const lecture2: Lecture = {
       title: 'InsertionSort and loop invariants',
       titleEn: 'InsertionSort and loop invariants',
       summary: 'Proving by induction that a simple sorting algorithm is correct.',
-      minutes: 25,
+      minutes: 35,
       objectives: [
         'Trace and predict what InsertionSort does at each step.',
         'State the loop invariant “after each iteration A[:i+1] is sorted”.',
@@ -28,23 +28,69 @@ export const lecture2: Lecture = {
         {
           kind: 'intuition',
           title: 'Intuition',
+          check: [
+            {
+              id: 'c1',
+              kind: 'numeric',
+              prompt: 'You hold the sorted cards 2, 5, 9 and the new card is 6. How many cards slide one place to the right to make room?',
+              answer: 1,
+              hint: 'The cards larger than 6 slide.',
+              explanation: 'Only 9 slides; 6 goes between 5 and 9: 2, 5, 6, 9.',
+            },
+          ],
           label: 'intuition',
           body: `Like sorting the playing cards in your hand: the cards on the left are already sorted; you take a new card from the right (\`current\`) and slide each larger card to its left one position right until \`current\` fits. Each round the sorted region grows by one.`,
         },
         {
           kind: 'viz',
           title: 'Sorting visualizer (InsertionSort ↔ MergeSort)',
+          tasks: [
+            'On the “Lecture example”, turn on **prediction mode** and predict the index where `current` lands in each round.',
+            'Compare the comparison counts of “Reverse sorted (worst)” and “Nearly sorted”. Why is the difference so large?',
+            'In the “Duplicates” example, watch the relative order of equal values being preserved (stability).',
+          ],
           viz: 'sortingLab',
           body: `Enter your own array or pick an example. If you turn on **prediction mode**, before each round you are asked where \`current\` will land. Use the selector at the top to switch to MergeSort on the same input and compare the comparison counts.`,
         },
         {
           kind: 'pseudocode',
           title: 'Pseudocode (the Python version from the Lecture 2 notes)',
+          check: [
+            {
+              id: 'c2',
+              kind: 'mcq',
+              prompt: 'In Python, what happens if `j >= 0` is left out of the loop condition (`while A[j] > current`)?',
+              options: [
+                'Nothing changes.',
+                'When `j = -1`, `A[-1]` — the **last** element — is read; comparisons are made against the wrong element and the result can break.',
+                'The program always stops with an error.',
+                'The algorithm sorts in reverse.',
+              ],
+              answer: 1,
+              hint: 'Negative indices count from the end in Python.',
+              explanation: 'Python reads `A[-1]` as the last element without any error. For example in `[2, 1]`, when `current = 1` reaches the front it is compared with `A[-1]`; such bugs silently produce wrong output. Boundary conditions belong in the proof too.',
+            },
+          ],
           code: INSERTION_SORT_CODE,
         },
         {
           kind: 'correctness',
           title: 'Correctness: the loop invariant',
+          check: [
+            {
+              id: 'c3',
+              kind: 'order',
+              prompt: 'Put the parts of a loop-invariant proof in order.',
+              items: [
+                'State the invariant explicitly: “after iteration $i$, $A[:i+1]$ is sorted.”',
+                'Initialization: the invariant holds before the loop (i = 0).',
+                'Maintenance: one iteration does not break the invariant (the inductive step).',
+                'Termination: when the loop ends, the invariant gives the desired result.',
+              ],
+              hint: 'Think of the base–step–conclusion structure of induction.',
+              explanation: 'Invariant → initialization (base) → maintenance (step) → termination (connect the invariant to the goal).',
+            },
+          ],
           label: 'formalProof',
           body: `**Invariant (inductive hypothesis):** after iteration $i$, $A[:i+1]$ is sorted. Reveal the proof step by step; before seeing each step, think about what it has to say.`,
           proof: [
@@ -70,6 +116,63 @@ export const lecture2: Lecture = {
           body: `In iteration $i$ at most $i$ elements are shifted: in total $\\sum_{i=1}^{n-1} i = \\frac{n(n-1)}{2}$ comparisons and shifts — about $n^2/2$ **in the worst case** (reverse-sorted input). The course wants to go further: can we sort asymptotically faster than $n^2$? (Answer: MergeSort, $n\\log n$.)
 
 **Note:** On nearly sorted input InsertionSort does little work; but worst-case analysis gives a guarantee that holds for every input.`,
+        },
+        {
+          kind: 'viz',
+          title: 'Inversions: the secret behind the number of shifts',
+          viz: 'inversions',
+          body: `A pair $(i, j)$ with $i < j$ and $A[i] > A[j]$ is called an **inversion**. The number of inversions $I$ measures how far the array is from sorted: $0$ for a sorted array, $\\frac{n(n-1)}{2}$ for a reverse-sorted array of distinct elements.
+
+Each shift of InsertionSort swaps \`current\` with a larger **neighbor**: it removes exactly **one** inversion and changes the order of no other pair. Hence
+
+$$\\text{number of shifts} = I, \\qquad \\text{running time} = \\Theta(n + I).$$
+
+In a random array each pair is inverted with probability $\\tfrac12$, so the expected $I$ is $\\frac{n(n-1)}{4}$: the average case is $\\Theta(n^2)$ too. In a “nearly sorted” array where every element is at most $k$ places from its correct position, $I = O(nk)$ and the time drops to $O(nk)$.`,
+          tasks: [
+            'On the default array, press **Do one shift** repeatedly: does “left + done” ever change?',
+            'How many shifts in total for 5, 4, 3, 2, 1? Compare with $\\frac{n(n-1)}{2}$.',
+            'How many inversions does 1, 2, 4, 3, 5 have? Why is InsertionSort so fast on it?',
+          ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'How many shifts does InsertionSort make in total while sorting $[4, 1, 3, 2]$? (Find it by counting inversions.)',
+              answer: 4,
+              hint: 'How many later elements is 4 larger than? And 3?',
+              explanation: 'Inversions: (4,1), (4,3), (4,2), (3,2) → $I = 4$, hence 4 shifts.',
+            },
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'What is InsertionSort’s running time on an array where every element is at most $k$ positions from its correct place?',
+              options: ['$O(n\\log n)$', '$O(nk)$', 'Always $O(n^2)$', '$O(k^2)$'],
+              hint: 'With how many elements can one element form an inversion?',
+              answer: 1,
+              explanation: 'Each element can only be inverted with the $O(k)$ elements around it: $I = O(nk)$, time $\\Theta(n + I) = O(nk)$.',
+            },
+          ],
+        },
+        {
+          kind: 'text',
+          title: 'In practice: where InsertionSort lives',
+          body: `Despite its $\\Theta(n^2)$ worst case, InsertionSort is used a lot in real systems:
+
+- **Small arrays:** its loop is very simple and its constant factors small. Up to a few dozen elements it is often faster than “better” algorithms.
+- **Hybrid algorithms:** **Timsort**, used by Python’s \`sorted\` and for Java’s object arrays, sorts short pieces with a binary-search InsertionSort and then merges them like MergeSort. Common C++ \`std::sort\` implementations also switch to InsertionSort on small pieces.
+- **Nearly sorted data:** since the time is $\\Theta(n + I)$, it fixes a ranking table in which only a few records changed very quickly.
+- **Online sorting:** when elements arrive one at a time, each new element can be inserted into the sorted part.`,
+          check: [
+            {
+              id: 'c6',
+              kind: 'mcq',
+              prompt: 'What does Timsort (Python `sorted`) use InsertionSort for?',
+              options: ['To sort the whole array', 'To sort short pieces (runs), which are then merged', 'Only for reverse-sorted inputs', 'It does not use it'],
+              answer: 1,
+              hint: 'For small $n$, constant factors matter.',
+              explanation: 'Timsort sorts short pieces with (binary) InsertionSort and merges them like MergeSort: it combines the strengths of both algorithms.',
+            },
+          ],
         },
         {
           kind: 'mistakes',
@@ -129,7 +232,7 @@ export const lecture2: Lecture = {
       title: 'MergeSort and the recursion tree',
       titleEn: 'MergeSort and the recursion tree',
       summary: 'Divide, recurse, merge — with equal work on every level: $O(n\\log n)$.',
-      minutes: 30,
+      minutes: 40,
       objectives: [
         'Trace the split and merge phases of MergeSort step by step.',
         'See that Merge combines two sorted lists in linear time, and handle the case of an exhausted list.',
@@ -141,6 +244,16 @@ export const lecture2: Lecture = {
         {
           kind: 'intuition',
           title: 'Intuition',
+          check: [
+            {
+              id: 'c1',
+              kind: 'numeric',
+              prompt: 'How many **base-case** calls (of length 1) does MergeSort make on an array of 16 elements?',
+              answer: 16,
+              hint: 'The leaves of the recursion tree.',
+              explanation: 'Every element ends up alone in a leaf: 16 base cases ($2^4$).',
+            },
+          ],
           label: 'intuition',
           body: `Split the array in two, sort the two halves (magically, by recursion), then zip the two sorted halves together. Merging is easy: you take the smaller of the two front elements.
 
@@ -149,6 +262,11 @@ The pessimist’s view: the number of calls doubles on every level. The optimist
         {
           kind: 'viz',
           title: 'MergeSort visualizer',
+          tasks: [
+            'In **prediction mode**, guess the value appended to S before each merge step.',
+            'Compare the comparison counts of “Reverse sorted” and “Lecture example”. Is there a big difference as with InsertionSort? Why?',
+            'In the “Duplicates” example, see in which order two equal values enter S during a merge: what does picking L on ties guarantee?',
+          ],
           viz: 'mergeSort',
           body: `Each row is a recursion level; the boxes show the subarrays in their original positions. During Merge the bottom panel shows the L, R pointers (i, j) and the list S being built. In prediction mode, guess which element is appended to S before each merge step.`,
         },
@@ -161,6 +279,16 @@ The pessimist’s view: the number of calls doubles on every level. The optimist
         {
           kind: 'correctness',
           title: 'Correctness: the recursion invariant',
+          check: [
+            {
+              id: 'c2',
+              kind: 'numeric',
+              prompt: 'How many key comparisons are made when merging $L = [2, 7]$ and $R = [3, 5]$?',
+              answer: 3,
+              hint: 'When one list runs out, the rest is appended without comparisons.',
+              explanation: '2<3 (2 is appended), 7>3 (3), 7>5 (5); R is exhausted and 7 is appended without a comparison: 3 comparisons. If the lists have total length $m$, at most $m - 1$ comparisons.',
+            },
+          ],
           label: 'proofIdea',
           proof: [
             { title: 'Hypothesis', body: '“MergeSort returns a sorted array on every input of length $< i$.”' },
@@ -172,6 +300,16 @@ The pessimist’s view: the number of calls doubles on every level. The optimist
         {
           kind: 'complexity',
           title: 'Running time: the recursion tree',
+          check: [
+            {
+              id: 'c3',
+              kind: 'numeric',
+              prompt: 'How many levels does the MergeSort recursion tree have for $n = 32$?',
+              answer: 6,
+              hint: '$\\log_2 32 + 1$.',
+              explanation: 'Levels $0, 1, \\dots, 5$: 6 in total.',
+            },
+          ],
           label: 'formalProof',
           body: `Assume $n$ is a power of 2 (the justification in the notes: padding the array with $\\infty$ up to the nearest power of 2 at most doubles its size). A call on size $m$ does at most $11m$ operations (base-case check, copying, Merge).
 
@@ -182,6 +320,39 @@ The pessimist’s view: the number of calls doubles on every level. The optimist
 $$\\text{Total} \\le 11n(\\log_2 n + 1) = 11n\\log_2 n + 11n = O(n\\log n).$$
 
 This is a **worst-case** bound: it holds whatever the input is. As a recurrence: $T(n) = 2T(n/2) + O(n)$ (we also solve it with the Master Theorem in Lecture 3).`,
+        },
+        {
+          kind: 'text',
+          title: 'In practice: merging is everywhere',
+          body: `- **External sorting:** a file that does not fit in memory (say 1 TB of records) is read in chunks, each chunk is sorted in memory and written to disk, and then the chunks are combined into one sorted file with a **k-way merge**. Databases do this for large \`ORDER BY\` queries.
+- **Linked lists:** since no random access is needed, MergeSort is the natural way to sort linked lists.
+- **Stability:** MergeSort is stable, which is why it is preferred for sorting objects (e.g. by name, then by department). Timsort is built on merging too.
+- **Parallel sorting:** the two halves can be sorted independently; distributed sorting in systems like MapReduce rests on the same idea.
+- **Counting inversions:** during a merge, every element taken from R forms an inversion with all elements still left in L; so inversions can be counted in $O(n\\log n)$.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'mcq',
+              prompt: 'What is the standard way to sort a huge file that does not fit in memory?',
+              options: [
+                'Sort the file line by line with InsertionSort',
+                'Sort memory-sized chunks separately and write them to disk, then merge the chunks',
+                'Compress the file first',
+                'Run randomized QuickSort directly on the disk',
+              ],
+              answer: 1,
+              hint: 'MergeSort’s “merge” step only looks at the fronts of the lists.',
+              explanation: 'External MergeSort: Merge only needs sequential access to the front elements of the chunks, which is ideal for disks.',
+            },
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: '8 sorted chunks are reduced to one by merging them two by two in each round. How many rounds are needed?',
+              answer: 3,
+              hint: 'The number of chunks halves every round.',
+              explanation: '8 → 4 → 2 → 1: $\\log_2 8 = 3$ rounds.',
+            },
+          ],
         },
         {
           kind: 'mistakes',
@@ -249,7 +420,7 @@ This is a **worst-case** bound: it holds whatever the input is. As a recurrence:
       title: 'Worst-case analysis and asymptotic notation',
       titleEn: 'Worst-case analysis and asymptotic notation',
       summary: 'Big-O, Big-Ω and Big-Θ: why and how do we ignore constants and lower-order terms?',
-      minutes: 30,
+      minutes: 40,
       objectives: [
         'Explain worst-case analysis as a game against an adversary.',
         'Write and apply the definitions of Big-O, Big-Ω and Big-Θ with witnesses $c$ and $n_0$.',
@@ -260,6 +431,22 @@ This is a **worst-case** bound: it holds whatever the input is. As a recurrence:
         {
           kind: 'intuition',
           title: 'Worst-case analysis',
+          check: [
+            {
+              id: 'c1',
+              kind: 'mcq',
+              prompt: 'Which one is a **worst-case** guarantee?',
+              options: [
+                '“On random inputs, $n\\log n$ steps on average.”',
+                '“At most $11n\\log_2 n + 11n$ steps on every input of $n$ elements.”',
+                '“At most 5 seconds on the 1000 inputs we tested.”',
+                '“$n - 1$ comparisons on sorted input.”',
+              ],
+              answer: 1,
+              hint: 'It must hold whichever input the adversary picks.',
+              explanation: 'Only the second statement speaks about **every** input. The others depend on a distribution, a finite test, or a single input.',
+            },
+          ],
           label: 'intuition',
           body: `Imagine playing a game against an adversary: we name an algorithm and a time bound $T(n)$; the adversary picks the input of size $n$ that slows our algorithm down the most. If the time never exceeds $T(n)$ whatever the adversary picks, we win. This is a very strong guarantee that holds **for every input**.
 
@@ -268,6 +455,25 @@ Average-case analysis (which assumes a distribution over inputs) is harder and n
         {
           kind: 'formal',
           title: 'Asymptotic notation (Lecture 2 notes)',
+          check: [
+            {
+              id: 'c2',
+              kind: 'mcq',
+              prompt: 'Which is true for $f(n) = 5n^3 + 2n\\log n + 7$?',
+              options: ['$f(n) = \\Theta(n^3)$', '$f(n) = O(n^2)$', '$f(n) = \\Omega(n^4)$', '$f(n) = \\Theta(n\\log n)$'],
+              answer: 0,
+              hint: 'Which term grows fastest?',
+              explanation: 'For $n \\ge 1$, $5n^3 \\le f(n) \\le 14n^3$: witnesses $c = 5$ and $c = 14$, $n_0 = 1$.',
+            },
+            {
+              id: 'c3',
+              kind: 'order',
+              prompt: 'Order the functions by growth rate, slowest first.',
+              items: ['$\\log n$', '$\\sqrt{n}$', '$n$', '$n\\log n$', '$n^2$', '$2^n$', '$n!$'],
+              hint: 'Every exponential eventually beats every polynomial, every polynomial every logarithm.',
+              explanation: '$\\log n \\ll \\sqrt n \\ll n \\ll n\\log n \\ll n^2 \\ll 2^n \\ll n!$.',
+            },
+          ],
           box: 'formal',
           label: 'formal',
           body: `Let $T(n)$ and $f(n)$ be non-negative functions.
@@ -281,12 +487,22 @@ Intuitively: O is an **upper bound**, Ω a **lower bound**, and Θ a **tight** b
         {
           kind: 'viz',
           title: 'Growth-rate explorer',
+          tasks: [
+            'Select $n\\log_2 n$ and $n^2$ and set the upper limit to 1024: what is their ratio, roughly?',
+            'Add $2^n$ and turn off the logarithmic axis. What happened to the other curves?',
+            'On the logarithmic axis, watch how the gap between $\\log n$ and $n$ changes as $n$ grows.',
+          ],
           viz: 'growth',
           body: `Pick functions and watch them diverge as $n$ grows. A logarithmic axis shows very different magnitudes on one chart.`,
         },
         {
           kind: 'viz',
           title: 'Witness (c, n₀) checker',
+          tasks: [
+            'For $3n^2 + 5n + 10 = O(n^2)$ choose $c = 4$ and find the smallest $n_0$ that works.',
+            'Try to “rescue” the claim $11n\\log_2 n + 11n = O(n)$ with different $c$. How does the first counterexample move? Why is no $c$ enough?',
+            'Switch to **Ω** mode and find a witness for $100n + 1000 = \\Omega(n)$.',
+          ],
           viz: 'bigO',
           body: `Choose a $T(n)$, a claim, and $c$, $n_0$. The tool checks whether the condition holds for $n \\le 2000$ and shows the first counterexample. For example, for $3n^2 + 5n + 10 = O(n^2)$, which $n_0$ works with $c = 4$? What about $c = 30, n_0 = 1$ (the $c = (k+1)\\max_i|a_i|$ method from the notes: $k = 2$, $\\max_i|a_i| = 10$)? Which $c$ could rescue the claim $11n\\log_2 n + 11n = O(n)$?`,
         },
@@ -308,7 +524,39 @@ Intuitively: O is an **upper bound**, Ω a **lower bound**, and Θ a **tight** b
         {
           kind: 'viz',
           title: 'Empirical measurement: comparison counts',
+          tasks: ['Press **New random inputs** a few times: do the InsertionSort points stay around the $n^2/4$ curve? Is that a proof?'],
           viz: 'empiricalSorting',
+        },
+        {
+          kind: 'text',
+          title: 'In practice: when do constants matter?',
+          body: `Asymptotic notation tells us what wins for large $n$; in a real program $n$ is bounded and constants play a role too.
+
+- $100n$ versus $n^2$: for $n \\le 100$, $n^2$ is smaller. That is why libraries switch to simple methods on small inputs (InsertionSort, grade-school multiplication).
+- **Memory and caches:** of two algorithms doing the same number of operations, the one accessing memory sequentially is often much faster; asymptotic analysis does not see this.
+- **“Galactic” algorithms:** Harvey–van der Hoeven’s $O(n\\log n)$ multiplication is theoretically the best, but it only wins for sizes beyond the number of atoms in the universe.
+- **The base does not matter:** $\\log_2 n = \\log_{10} n / \\log_{10} 2$; bases differ only by a constant factor, which is why no base is written in $O(\\log n)$.
+
+A good engineer first picks the asymptotically right algorithm, then improves the constants by measuring.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'What is the smallest positive integer $n$ with $n^2 > 100n$?',
+              answer: 101,
+              hint: '$n^2 > 100n \\iff n > 100$.',
+              explanation: 'At $n = 100$ they are equal; from $n = 101$ on $n^2$ is larger.',
+            },
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'Which is true about $\\log_2 n$ and $\\log_{10} n$?',
+              options: ['$\\log_2 n = \\Theta(\\log_{10} n)$', '$\\log_2 n = O(\\log_{10} n)$ but not the other way around', 'They cannot be compared', '$\\log_2 n = \\Theta(n)$'],
+              answer: 0,
+              hint: 'The change-of-base formula.',
+              explanation: '$\\log_2 n = \\log_{10} n / \\log_{10} 2 \\approx 3.32\\,\\log_{10} n$: only a constant factor apart.',
+            },
+          ],
         },
         {
           kind: 'mistakes',
