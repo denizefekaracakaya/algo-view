@@ -1,12 +1,29 @@
 # Algo View
 
-**Algoritmaları görünür kıl.** Algo View, Stanford CS161 *Design and Analysis of Algorithms* (Winter 2026) dersinin kamuya açık materyallerine dayanan, Türkçe ve İngilizce, etkileşimli bir algoritma öğrenme uygulamasıdır. Öğrenci kendi girdisini verir, algoritmayı adım adım (ileri/geri) çalıştırır, her adımın nedenini okur, bir sonraki adımı tahmin eder ve çalışmayı karmaşıklık analizine bağlar.
+**Algoritmaları ezberlemek yerine çalışırken izle.**
 
-> Algo View bağımsız bir eğitim projesidir; Stanford Üniversitesi ile bağlantılı ya da onun resmî bir ürünü değildir. Açıklamalar, örnekler ve sorular özgündür; resmî materyallere yalnızca bağlantı verilir. Resmî ödev çözümleri yer almaz.
+Algo View, algoritma analizi dersine çalışanlar için hazırlanmış Türkçe ve İngilizce, etkileşimli bir çalışma uygulaması. Kendi dizini girersin, algoritmayı adım adım ileri geri oynatırsın, her adımda *neden* öyle olduğunu okursun. Sonra elle iz sürerek, soru çözerek, kod yazarak ve deneme sınavlarıyla öğrendiğini pekiştirirsin.
 
-## Hızlı başlangıç / Quick start
+İçerik, Stanford CS161 *Design and Analysis of Algorithms* (Winter 2026) dersinin herkese açık materyallerinin ilk yedi dersini takip ediyor: asimptotik analizden kırmızı-siyah ağaçlara kadar.
 
-**Gerekenler:** [Node.js](https://nodejs.org/) 20.19+ veya 22.12+ (npm ile birlikte gelir) ve Git.
+---
+
+## Neler var?
+
+| | |
+|---|---|
+| **Etkileşimli dersler** | Her konu sezgiyle başlar, sonra tanım, sözde kod, doğruluk kanıtı ve karmaşıklık analizi gelir. Kanıtlar adım adım açılır, aradaki “Kendini dene” soruları anlayıp anlamadığını yoklar. |
+| **Görselleştiriciler** | MergeSort, QuickSort, Select, RadixSort, BST ve kırmızı-siyah ağaç gibi algoritmaları kendi girdinle adım adım oynat. Bir sonraki adımı tahmin etmeni isteyen bir *tahmin modu* da var. |
+| **Elle iz sürme** | Algoritmanın her kararını sen verirsin: hangi eleman nereye gider, pivot nereye oturur, düğüm hangi tarafa eklenir. Takılırsan ipucu var. |
+| **Soru üreteci** | 21 soru türü, her seferinde yeni sayılarla. Bitmeyen bir alıştırma kaynağı. |
+| **Kod alıştırmaları** | 13 algoritmayı JavaScript ile kendin yaz, testler tarayıcıda anında çalışsın. Sonsuz döngüye girsen bile sayfa donmaz. |
+| **Deneme sınavı** | Dersleri, soru sayısını ve süreyi seç; sonunda ders ders puanını ve her sorunun çözümünü gör. |
+| **Notlar** | Her dersin sonuna kendi özetini yaz, hepsini tek bir Markdown dosyası olarak indir. |
+| **Türkçe / English, açık / karanlık tema** | Üst çubuktan tek tıkla değiştirilir. Telefonda da rahatça kullanılır. |
+
+## Hızlı başlangıç
+
+Bilgisayarında [Node.js](https://nodejs.org/) (20.19 veya daha yeni, LTS sürümü yeterli) ve [Git](https://git-scm.com/) kurulu olsun. Sonra bir terminal açıp şunları çalıştır:
 
 ```bash
 git clone https://github.com/denizefekaracakaya/algo-view.git
@@ -15,104 +32,97 @@ npm install
 npm run dev
 ```
 
-Terminalde yazan adresi (varsayılan **http://localhost:5173**) tarayıcıda aç. Önerilen ilk yol:
+Terminalde çıkan adresi (genellikle **http://localhost:5173**) tarayıcında aç, hepsi bu. Bir dahaki sefere yalnızca `algo-view` klasöründe `npm run dev` demen yeterli.
 
-1. **Panel**'de Ders 1'i aç; bölümleri oku, görselleştiricide *İleri / Geri* ile adım adım ilerle.
-2. Ders sonundaki mini quiz'i çöz ve **Tamamlandı olarak işaretle**.
-3. **Alıştırma** sayfasında elle iz sür, üretilen soruları çöz, kod yaz ya da sınav ol.
-4. Ders sonundaki **Notlarım** kutusuna kendi özetini yaz.
-5. Arada bir **Ayarlar → Çalışmalarını kaydet → Yedeği indir** ile yedek al.
+> İlk `npm install` birkaç dakika sürebilir. Yeni bir sürüm çıktığında klasörde `git pull` ve ardından `npm install` çalıştırarak güncelleyebilirsin.
 
-İnternete bağlanmadan kullanmak ya da başka bir bilgisayara kopyalamak için `npm run build` ile `dist/` klasörünü üret ve `npm run preview` ile aç (veya `dist/`'i herhangi bir statik sunucuya koy).
+## Nasıl çalışabilirsin?
 
-> **English:** install Node.js 20.19+ / 22.12+, then run the four commands above and open http://localhost:5173. Switch the interface to English with the **TR | EN** button in the top bar. Your work is saved automatically in the browser; use **Settings → Save your work → Download backup** to keep a copy.
+Bir konuyu çalışırken şu sıra işe yarıyor:
 
-## Çalışmaların nasıl kaydedilir?
+1. **Dersi oku.** Panelden dersi aç, görselleştiricide kendi örneklerini dene. Tahmin modunu açarsan uygulama her önemli adımdan önce “sence ne olacak?” diye sorar.
+2. **Elle iz sür.** *Alıştırma → Elle iz sür* sekmesinde algoritmayı kendin yürüt. Hatasız bitirmek, konuyu gerçekten anladığının iyi bir işareti.
+3. **Soru çöz.** *Soru üreteci* her seferinde yeni sayılar verir; bir türü rahatça çözene kadar tekrarlayabilirsin.
+4. **Kodla.** *Kod* sekmesinde algoritmayı sıfırdan yaz. Örnek çözüm, kodunu en az bir kez çalıştırdıktan sonra açılır.
+5. **Kendini sına.** Sınavdan önce *Sınav* sekmesinden süreli bir deneme yap; puanının düşük kaldığı derslere geri dön.
 
-Hesap ya da sunucu yoktur; her şey **bu tarayıcıda, yerelde** (`localStorage`, anahtar `algoview:progress:v1`) saklanır ve her değişiklikte otomatik kaydedilir:
+Ders sonundaki **Notlarım** kutusu, kendi cümlelerinle kısa bir özet yazmak için. Sınavdan önce Notlar sayfasından hepsini birlikte okuyabilirsin.
 
-- ders durumları ve okunan bölümler, quiz cevapları,
-- elle iz sürme ve soru üreteci istatistikleri, sınav geçmişi (son 20),
-- kod alıştırmalarındaki taslak kodlar ve çözülenler,
-- kişisel notlar, dil / tema / oynatma tercihleri.
+## Konular
 
-Sayfayı kapatıp açmak ya da bilgisayarı yeniden başlatmak verileri silmez. Aynı anda iki sekme açıksa biri kaydettiğinde diğeri o veriyi alır. Gizli pencerede ya da depolama doluysa tarayıcı kaydetmeye izin vermez; Ayarlar sayfası bunu uyarı olarak gösterir.
+| Ders | Konular |
+|---|---|
+| 1 | Algoritma nedir, çalışma süresi, Karatsuba çarpımı |
+| 2 | InsertionSort ve döngü değişmezi, MergeSort, asimptotik gösterim (O, Ω, Θ) |
+| 3 | Özyinelemeli bağıntılar, Master Teoremi, yerine koyma yöntemi |
+| 4 | Medyan ve seçim problemi, medyanların medyanı ile Select |
+| 5 | Rastgele algoritmalar, QuickSort ve beklenen çalışma süresi |
+| 6 | Karşılaştırmalı sıralamanın alt sınırı, CountingSort, RadixSort |
+| 7 | İkili arama ağaçları, kırmızı-siyah ağaçlar |
 
-**Ayarlar → Çalışmalarını kaydet** bölümünde:
+Her dersin sonunda kısa bir quiz ve dersin resmî slayt ve notlarına bağlantılar bulunur.
 
-- **Yedeği indir (.json):** tüm ilerlemeyi tek bir dosyaya indirir (`algo-view-yedek-YYYY-AA-GG.json`).
-- **Yedekten geri yükle:** bir yedek dosyasını seçince içeriğinin özeti gösterilir; onaylarsan bu tarayıcıdaki ilerlemenin yerine geçer. Böylece çalışmalarını başka bir tarayıcıya veya bilgisayara taşıyabilirsin.
-- **Kalıcı depolama iste:** tarayıcıdan, disk dolduğunda bu sitenin verilerini kendiliğinden silmemesini ister (destekleyen tarayıcılarda).
+## Çalışmaların güvende
 
-Tarayıcı verilerini (çerezler ve site verileri) temizlemek kayıtları siler; bundan önce yedek indir. Notlar ayrıca **Notlar** sayfasından Markdown olarak indirilebilir.
+Hesap açman gerekmiyor. İlerlemen, quiz cevapların, kodların, sınav geçmişin ve notların kendi tarayıcında saklanır ve her değişiklikte otomatik kaydedilir. Sayfayı kapatsan da bilgisayarı yeniden başlatsan da kaldığın yerden devam edersin.
 
-## Kapsam (Ders 1–7)
+Başka bir bilgisayara geçeceksen ya da tarayıcı verilerini temizleyeceksen **Ayarlar → Çalışmalarını kaydet** bölümünü kullan:
 
-| Ders | Algo View dersleri | Ana etkileşimler |
-|---|---|---|
-| 1 · Why are you here? | Algoritmalar ve çalışma süresi · Karatsuba | Sabit çarpan vs. üs hesaplayıcısı; Mult1/Karatsuba özyineleme ağacı ve işlem sayısı grafiği |
-| 2 · Asymptotics, Worst-Case, MergeSort | InsertionSort ve döngü değişmezi · MergeSort · Asimptotik gösterim | InsertionSort ↔ MergeSort görselleştiricisi, adım adım kanıtlar, büyüme gezgini, (c, n₀) tanık denetleyicisi, ampirik sayımlar |
-| 3 · Recurrences and the Master Theorem | Master Teoremi · Yerine koyma | a/b/d gezgini + serbest bağıntı oyun alanı (desteklenmeyen biçimleri açıkça reddeder), seviye seviye özyineleme ağacı, adım adım yerine koyma |
-| 4 · Median and Selection | Select | İlk eleman / rastgele (tohumlu) / medyanların medyanı pivotlarıyla Select; elenen bölgeler, k güncellemesi, 5’li gruplar |
-| 5 · Randomized Algorithms and QuickSort | QuickSort · Beklenen süre | Yerinde QuickSort (4 pivot kuralı, tohum), pivot özyineleme ağacı, P[zᵢ,zⱼ karşılaştırılır] matrisi + simülasyon, çok-tohumlu deney histogramı |
-| 6 · BucketSort and Lower Bounds | Alt sınır · CountingSort/RadixSort · Karşılaştırma | Gerçek çalıştırmadan üretilen karar ağaçları (n = 3, 4), kova görselleştiricisi (kararlılık, taban r), senaryo tabanlı algoritma karşılaştırması |
-| 7 · BSTs and Red-Black Trees | BST · Kırmızı-siyah ağaç · Karşılaştırma | BST ekle/ara/sil/min/max, RB ekleme (durum 1/2/3, rotasyonlar), canlı değişmez denetleyicisi, renk değiştirme oyun alanı, BST vs RB |
+- **Yedeği indir:** Her şeyi tek bir `.json` dosyasına kaydeder.
+- **Yedekten geri yükle:** O dosyayı başka bir tarayıcıda açar ve kaldığın yerden devam etmeni sağlar.
+- **Kalıcı depolama iste:** Tarayıcıdan, disk dolduğunda verilerini silmemesini ister.
 
-Ders 8 (Hashing) ve sonrası bu sürümün kapsamı dışındadır.
+Gizli pencerede tarayıcılar kayıt tutmaz; düzenli çalışmak için normal bir pencere kullan.
 
-Her ders: öğrenme hedefleri, ön koşullar, bölüm bölüm okuma takibi, bölümlerin arasında puanlanmayan “Kendini dene” soruları (toplam 75) ve ders sonu özeti, görselleştiricilerden önce “Uygulamaya hazırlık” görevleri, “Pratikte” bölümleri, sezgi, biçimsel tanım, etkileşimli görselleştirme, sözde kod, doğruluk (adım adım açılan kanıt), karmaşıklık (varsayımlarıyla), sık hatalar, mini quiz (çoktan seçmeli / sayısal / sıralama; ipucu, geri bildirim, çözüm), özgün alıştırmalar, resmî kaynak bağlantıları ve tamamlama düğmesi.
+## In English
 
-## Alıştırma laboratuvarı
+Algo View is an interactive study companion for an algorithms course, available in Turkish and English. It follows the first seven lectures of the public Stanford CS161 (Winter 2026) materials: asymptotics, MergeSort, recurrences and the Master Theorem, selection, QuickSort, sorting lower bounds and RadixSort, BSTs and red-black trees.
 
-Üst menüdeki **Alıştırma** sayfası (`#/alistirma`) dört sekmeden oluşur; her dersin sonunda da o derse filtrelenmiş bağlantılar vardır.
+You can step through algorithms on your own input, trace them by hand, solve generated questions, write and test code in the browser, and take timed practice exams. Install [Node.js](https://nodejs.org/) and Git, run the four commands from the quick start above, open http://localhost:5173 and switch to English with the **TR | EN** button. Your work is saved in the browser automatically, and **Settings → Save your work** lets you download a backup or move it to another computer.
 
-- **Elle iz sür:** InsertionSort, Merge, medyanların medyanı, Partition, RadixSort ve BST ekleme için algoritmanın her kararını öğrenci verir. Yanlış seçim ipucu gösterir ve hata sayılır; “Bu adımı göster” adımı açar (`src/practice/drills.ts`).
-- **Soru üreteci:** 14 derse yayılmış 21 soru türü; her soru rastgele bir tohumla yeni girdi alır ve cevap motorlarla hesaplanır (`src/practice/generators.ts`). Oturum skoru, seri ve tür başına toplam tutulur.
-- **Kod:** 13 JavaScript alıştırması (InsertionSort, Merge, MergeSort, ters çift sayma, Master durumu, Select, Partition, QuickSort, RadixSort, BST ekleme, BST doğrulama, sola rotasyon, Karatsuba). Kod tarayıcıda ayrı bir Web Worker’da çalışır, 5 saniyede bitmezse durdurulur; beklenen çıktılar referans uygulamalarla hesaplanır, `console.log` çıktısı gösterilir, taslak otomatik kaydedilir (`src/practice/coding.ts`, `runner.ts`).
-- **Sınav:** Ders seçimi, 5/10/20 soru ve süre sınırı (yok/10/20/30 dk). Quiz, “kendini dene” ve üretilen sorulardan karışık set; sınav boyunca geri bildirim yok, sonunda ders bazında skor ve her sorunun çözümü. Son 20 sınav saklanır (`src/practice/exam.ts`).
+## Geliştirmek isteyenler için
 
-## Notlar
-
-Her dersin sonunda **Notlarım** kutusu vardır; yazılanlar otomatik kaydedilir. **Notlar** sayfası (`#/notlar`) tüm notları toplar ve Markdown olarak indirmeye izin verir. Notlar ilerleme sıfırlanınca silinmez.
-
-## Dil ve tema
-
-- **Türkçe / English:** Üst çubuktaki **TR | EN** düğmesi (veya Ayarlar → Dil) tüm arayüzü, ders içeriğini, quizleri ve algoritma adım açıklamalarını değiştirir. Seçim `localStorage`’da saklanır. İngilizce içerik `src/content/en/` altındadır; `content.test.ts` iki dilin aynı ders/soru/cevap/görselleştirici yapısına sahip olduğunu denetler.
-- **Açık / karanlık mod:** Üst çubuktaki güneş/ay düğmesi açık ve karanlık mod arasında geçiş yapar; Ayarlar’da “sistem ayarını izle” seçeneği de vardır. Tema ilk boyamadan önce uygulanır (yanıp sönme olmaz).
-
-## Teknolojiler
-
-React 19 · TypeScript (strict) · Vite 8 · React Router (HashRouter) · KaTeX · lucide-react · Vitest + Testing Library · Playwright · oxlint. Arka uç, API anahtarı veya hesap yoktur; ilerleme `localStorage`’da tutulur, JSON yedek dosyası olarak dışa/içe aktarılabilir.
-
-## Kurulum ve komutlar
+Uygulama React, TypeScript ve Vite ile yazıldı; sunucu ya da veritabanı yok, her şey tarayıcıda çalışıyor.
 
 ```bash
-npm install
-npm run dev          # geliştirme sunucusu (http://localhost:5173)
-npm run typecheck    # tsc -b (strict)
-npm run lint         # oxlint
-npm test             # Vitest: algoritma motorları, içerik bütünlüğü, UI davranışı
-npm run build        # üretim derlemesi → dist/
-npm run preview      # derlemeyi yerelde sun
-npx playwright install chromium   # bir kez
-npm run test:e2e     # Playwright duman testleri (masaüstü + mobil)
+npm run dev          # geliştirme sunucusu
+npm test             # birim testleri (Vitest)
+npm run test:e2e     # tarayıcı testleri (Playwright; ilk sefer: npx playwright install chromium)
+npm run typecheck    # TypeScript denetimi
+npm run lint         # kod stili denetimi
+npm run build        # yayına hazır sürüm → dist/
+npm run preview      # derlenen sürümü yerelde aç
 ```
 
-`dist/` statik dosyalardan oluşur (`base: './'`, hash tabanlı yönlendirme), herhangi bir statik sunucudan açılabilir.
+`npm run build` ile oluşan `dist/` klasörü düz statik dosyalardan oluşur. Herhangi bir statik barındırma hizmetine konabilir ya da bir arkadaşına klasör olarak verilebilir.
 
-## Proje yapısı
+<details>
+<summary>Proje yapısı</summary>
 
 ```
 src/
-  engines/      Saf TypeScript algoritmalar + iz (trace) üreticileri ve testleri
-  trace/        İz modeli (TraceStep) ve oynatıcı durum makinesi (useTracePlayer)
-  components/   TraceViewer, ArrayView, TreeView, LineChart, Quiz, Tex/Rich, ProofStepper…
-  viz/          Derslere özgü görselleştiriciler ve registry (içerikteki `viz` anahtarları)
-  content/      Ders verisi (lecture1..7.ts; İngilizcesi en/), kaynaklar, curriculum + içerik testleri
-  i18n/         Etkin dil ve tx(tr, en) yardımcısı
-  practice/     Elle iz sürme, soru üreteçleri, kod alıştırmaları, sınav modu (+ testleri)
-  state/        İlerleme modeli, reducer, localStorage kalıcılığı
-  pages/        Panel, Ders, Alıştırma, Notlar, Kaynaklar, Ayarlar
-e2e/            Playwright testleri
-docs/           Kaynak envanteri, müfredat haritası, teknik kararlar
+  engines/      Algoritmaların kendisi ve adım adım iz üreticileri
+  trace/        Adım oynatıcı
+  components/   Ortak arayüz parçaları (görselleştirici, quiz, formüller…)
+  viz/          Derslere özel görselleştiriciler
+  content/      Ders metinleri (Türkçe; İngilizcesi content/en/)
+  practice/     Elle iz sürme, soru üreteci, kod alıştırmaları, sınav
+  state/        İlerleme ve kayıt
+  pages/        Sayfalar
+e2e/            Tarayıcı testleri
+docs/           Kaynak listesi, müfredat haritası, teknik kararlar
 ```
+
+Tasarım kararlarının ayrıntıları [`docs/technical-decisions.md`](docs/technical-decisions.md) dosyasında.
+
+</details>
+
+## Geri bildirim
+
+Bir hata bulduysan, bir açıklamayı anlaşılmaz bulduysan ya da eklenmesini istediğin bir konu varsa GitHub'da bir *issue* açabilir veya doğrudan bana yazabilirsin. Her öneri uygulamayı daha iyi bir çalışma aracı yapıyor.
+
+## Hakkında
+
+Algo View, öğrenciler için hazırlanmış bağımsız bir projedir. Stanford CS161'in herkese açık ders materyallerinden yola çıkar ama Stanford Üniversitesi ile bir bağı yoktur. Açıklamalar, örnekler ve sorular bu proje için yazıldı; resmî slayt ve notlara yalnızca bağlantı verilir. Ödev çözümleri bulunmaz, çünkü amaç konuyu gerçekten anlamana yardım etmek.
+
+İyi çalışmalar!
