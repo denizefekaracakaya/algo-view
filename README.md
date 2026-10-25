@@ -74,13 +74,3 @@ src/
 e2e/            Playwright testleri
 docs/           Kaynak envanteri, müfredat haritası, teknik kararlar
 ```
-
-## Bilinen sınırlamalar
-
-- Kırmızı-siyah ağaçta yalnızca **ekleme** görselleştirilir; RB silme Ders 7’de ayrıntılı işlenmediği için uygulanmadı (sıradan BST silme mevcuttur).
-- Ders 7 notlarındaki **heap** bölümü (slaytlarda yok) için görselleştirme yoktur.
-- Medyanların medyanı pivotu bulunurken yapılan iç `Select(C, …)` çağrısı tek adımda gösterilir.
-- Görselleştirmeler okunabilirlik için girdi boyutunu sınırlar (ör. sıralama 16–20, Select 30, ağaç 31 düğüm, Karatsuba 8 basamak); sınırlar arayüzde belirtilir.
-- Master Teoremi oyun alanı yalnızca `aT(n/b) + c·n^d·log^k n` ailesini çözer; farklı boyutlu terimleri ve `T(n−c)`’yi tanır ama çözmek yerine nedenini açıklar.
-- Ana JS paketi ~675 kB (KaTeX + içerik); ders sayfaları ayrı bir parçada tembel yüklenir.
-- Kaynak erişimi ile ilgili sınırlamalar için `docs/source-inventory.md`’ye bakın.
