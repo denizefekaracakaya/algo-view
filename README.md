@@ -4,6 +4,48 @@
 
 > Algo View bağımsız bir eğitim projesidir; Stanford Üniversitesi ile bağlantılı ya da onun resmî bir ürünü değildir. Açıklamalar, örnekler ve sorular özgündür; resmî materyallere yalnızca bağlantı verilir. Resmî ödev çözümleri yer almaz.
 
+## Hızlı başlangıç / Quick start
+
+**Gerekenler:** [Node.js](https://nodejs.org/) 20.19+ veya 22.12+ (npm ile birlikte gelir) ve Git.
+
+```bash
+git clone https://github.com/denizefekaracakaya/algo-view.git
+cd algo-view
+npm install
+npm run dev
+```
+
+Terminalde yazan adresi (varsayılan **http://localhost:5173**) tarayıcıda aç. Önerilen ilk yol:
+
+1. **Panel**'de Ders 1'i aç; bölümleri oku, görselleştiricide *İleri / Geri* ile adım adım ilerle.
+2. Ders sonundaki mini quiz'i çöz ve **Tamamlandı olarak işaretle**.
+3. **Alıştırma** sayfasında elle iz sür, üretilen soruları çöz, kod yaz ya da sınav ol.
+4. Ders sonundaki **Notlarım** kutusuna kendi özetini yaz.
+5. Arada bir **Ayarlar → Çalışmalarını kaydet → Yedeği indir** ile yedek al.
+
+İnternete bağlanmadan kullanmak ya da başka bir bilgisayara kopyalamak için `npm run build` ile `dist/` klasörünü üret ve `npm run preview` ile aç (veya `dist/`'i herhangi bir statik sunucuya koy).
+
+> **English:** install Node.js 20.19+ / 22.12+, then run the four commands above and open http://localhost:5173. Switch the interface to English with the **TR | EN** button in the top bar. Your work is saved automatically in the browser; use **Settings → Save your work → Download backup** to keep a copy.
+
+## Çalışmaların nasıl kaydedilir?
+
+Hesap ya da sunucu yoktur; her şey **bu tarayıcıda, yerelde** (`localStorage`, anahtar `algoview:progress:v1`) saklanır ve her değişiklikte otomatik kaydedilir:
+
+- ders durumları ve okunan bölümler, quiz cevapları,
+- elle iz sürme ve soru üreteci istatistikleri, sınav geçmişi (son 20),
+- kod alıştırmalarındaki taslak kodlar ve çözülenler,
+- kişisel notlar, dil / tema / oynatma tercihleri.
+
+Sayfayı kapatıp açmak ya da bilgisayarı yeniden başlatmak verileri silmez. Aynı anda iki sekme açıksa biri kaydettiğinde diğeri o veriyi alır. Gizli pencerede ya da depolama doluysa tarayıcı kaydetmeye izin vermez; Ayarlar sayfası bunu uyarı olarak gösterir.
+
+**Ayarlar → Çalışmalarını kaydet** bölümünde:
+
+- **Yedeği indir (.json):** tüm ilerlemeyi tek bir dosyaya indirir (`algo-view-yedek-YYYY-AA-GG.json`).
+- **Yedekten geri yükle:** bir yedek dosyasını seçince içeriğinin özeti gösterilir; onaylarsan bu tarayıcıdaki ilerlemenin yerine geçer. Böylece çalışmalarını başka bir tarayıcıya veya bilgisayara taşıyabilirsin.
+- **Kalıcı depolama iste:** tarayıcıdan, disk dolduğunda bu sitenin verilerini kendiliğinden silmemesini ister (destekleyen tarayıcılarda).
+
+Tarayıcı verilerini (çerezler ve site verileri) temizlemek kayıtları siler; bundan önce yedek indir. Notlar ayrıca **Notlar** sayfasından Markdown olarak indirilebilir.
+
 ## Kapsam (Ders 1–7)
 
 | Ders | Algo View dersleri | Ana etkileşimler |
@@ -40,7 +82,7 @@ Her dersin sonunda **Notlarım** kutusu vardır; yazılanlar otomatik kaydedilir
 
 ## Teknolojiler
 
-React 19 · TypeScript (strict) · Vite 8 · React Router (HashRouter) · KaTeX · lucide-react · Vitest + Testing Library · Playwright · oxlint. Arka uç, API anahtarı veya hesap yoktur; ilerleme `localStorage`’da tutulur.
+React 19 · TypeScript (strict) · Vite 8 · React Router (HashRouter) · KaTeX · lucide-react · Vitest + Testing Library · Playwright · oxlint. Arka uç, API anahtarı veya hesap yoktur; ilerleme `localStorage`’da tutulur, JSON yedek dosyası olarak dışa/içe aktarılabilir.
 
 ## Kurulum ve komutlar
 

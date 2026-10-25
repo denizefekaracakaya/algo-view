@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
-import { Trash2 } from 'lucide-react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { Download, HardDrive, Trash2, Upload } from 'lucide-react'
 import { useProgress } from '../state/ProgressContext'
-import type { ThemePref } from '../state/progress'
+import { backupJson, parseBackup, type ProgressData, type ThemePref } from '../state/progress'
 import { SPEEDS } from '../trace/player'
 import { tx, type Lang } from '../i18n/lang'
 
@@ -79,6 +79,7 @@ export function SettingsPage() {
           </p>
         )}
       </div>
+      <BackupCard />
       {confirming && (
         <div className="modal-backdrop" onClick={() => setConfirming(false)}>
           <div className="card card-pad modal" role="alertdialog" aria-modal="true" aria-labelledby="reset-title" aria-describedby="reset-desc" onClick={(e) => e.stopPropagation()}>
@@ -105,6 +106,141 @@ export function SettingsPage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+const summary = (p: ProgressData) => ({
+  lessons: Object.values(p.lessons).filter((l) => l.status === 'completed').length,
+  quiz: Object.keys(p.quiz).length,
+  notes: Object.keys(p.notes).length,
+  code: Object.values(p.code).filter((c) => c.solved).length,
+  exams: p.exams.length,
+})
+
+function SummaryText({ p }: { p: ProgressData }) {
+  const s = summary(p)
+  return (
+    <>
+      {tx(
+        `${s.lessons} tamamlanan ders · ${s.quiz} quiz sorusu · ${s.notes} not · ${s.code} çözülen kod alıştırması · ${s.exams} sınav`,
+        `${s.lessons} completed lessons · ${s.quiz} quiz questions · ${s.notes} notes · ${s.code} solved coding exercises · ${s.exams} exams`,
+      )}
+    </>
+  )
+}
+
+/** Export / import of all progress as a JSON file, plus the browser's persistent-storage request. */
+function BackupCard() {
+  const { progress, dispatch, saved } = useProgress()
+  const [pending, setPending] = useState<ProgressData | null>(null)
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
+  const [persisted, setPersisted] = useState<boolean | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
+  const storage = typeof navigator !== 'undefined' ? navigator.storage : undefined
+  const canPersist = !!storage?.persist && !!storage.persisted
+
+  useEffect(() => {
+    if (!canPersist) return
+    storage!.persisted().then(setPersisted, () => setPersisted(null))
+  }, [canPersist, storage])
+
+  const download = () => {
+    const url = URL.createObjectURL(new Blob([backupJson(progress)], { type: 'application/json' }))
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `algo-view-${tx('yedek', 'backup')}-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    setMsg({ ok: true, text: tx('Yedek dosyası indirildi.', 'Backup file downloaded.') })
+  }
+
+  const onFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    const data = parseBackup(await file.text())
+    setPending(data)
+    setMsg(data ? null : { ok: false, text: tx('Bu dosya geçerli bir Algo View yedeği değil.', 'This file is not a valid Algo View backup.') })
+  }
+
+  const requestPersist = async () => {
+    try {
+      setPersisted(await storage!.persist())
+    } catch {
+      setPersisted(false)
+    }
+  }
+
+  return (
+    <div className="card card-pad stack">
+      <h2>{tx('Çalışmalarını kaydet', 'Save your work')}</h2>
+      <p className={'small ' + (saved ? '' : 'feedback no')} style={{ margin: 0 }} role={saved ? undefined : 'alert'}>
+        {saved
+          ? tx(
+              'İlerlemen, notların, kodların ve sınav geçmişin her değişiklikte otomatik olarak bu tarayıcıya kaydedilir. Başka bir tarayıcıya ya da bilgisayara taşımak veya tarayıcı verilerini temizlemeden önce saklamak için yedek dosyası indir.',
+              'Your progress, notes, code and exam history are saved to this browser automatically on every change. Download a backup file to move them to another browser or computer, or to keep them before clearing browser data.',
+            )
+          : tx(
+              'Tarayıcı kaydetmeye izin vermiyor (gizli pencere ya da dolu depolama). Çalışmaların yalnızca bu sekme açıkken durur; kaybetmemek için yedek indir.',
+              'The browser does not allow saving (private window or full storage). Your work only lasts while this tab is open; download a backup so you do not lose it.',
+            )}
+      </p>
+      <p className="small muted" style={{ margin: 0 }}>
+        <SummaryText p={progress} />
+      </p>
+      <div className="row">
+        <button className="btn primary" onClick={download}>
+          <Download size={15} aria-hidden /> {tx('Yedeği indir (.json)', 'Download backup (.json)')}
+        </button>
+        <button className="btn" onClick={() => fileRef.current?.click()}>
+          <Upload size={15} aria-hidden /> {tx('Yedekten geri yükle', 'Restore from backup')}
+        </button>
+        <input ref={fileRef} type="file" accept=".json,application/json" hidden onChange={(e) => void onFile(e)} aria-label={tx('Yedek dosyası seç', 'Choose backup file')} />
+      </div>
+      {pending && (
+        <div className="feedback hint stack" role="status">
+          <span>
+            <strong>{tx('Dosyadaki yedek:', 'Backup in the file:')}</strong> <SummaryText p={pending} />
+          </span>
+          <span className="small">{tx('Geri yüklemek bu tarayıcıdaki mevcut ilerlemenin yerine geçer.', 'Restoring replaces the progress currently in this browser.')}</span>
+          <div className="row">
+            <button
+              className="btn primary sm"
+              onClick={() => {
+                dispatch({ type: 'replace', data: pending })
+                setPending(null)
+                setMsg({ ok: true, text: tx('Yedek geri yüklendi.', 'Backup restored.') })
+              }}
+            >
+              {tx('Geri yükle', 'Restore')}
+            </button>
+            <button className="btn sm" onClick={() => setPending(null)}>
+              {tx('Vazgeç', 'Cancel')}
+            </button>
+          </div>
+        </div>
+      )}
+      {msg && (
+        <p role="status" className={'feedback ' + (msg.ok ? 'ok' : 'no')} style={{ margin: 0 }}>
+          {msg.text}
+        </p>
+      )}
+      {canPersist && (
+        <div className="row small">
+          <HardDrive size={15} aria-hidden />
+          {persisted ? (
+            <span>{tx('Kalıcı depolama açık: tarayıcı yer açmak için verilerini kendiliğinden silmez.', 'Persistent storage is on: the browser will not delete your data on its own to free up space.')}</span>
+          ) : (
+            <>
+              <span className="grow">{tx('Tarayıcı, disk dolduğunda site verilerini silebilir.', 'The browser may delete site data when the disk fills up.')}</span>
+              <button className="btn sm" onClick={() => void requestPersist()}>
+                {tx('Kalıcı depolama iste', 'Request persistent storage')}
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>

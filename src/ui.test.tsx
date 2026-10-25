@@ -3,7 +3,7 @@ import { act, fireEvent, render, screen, waitFor, within } from '@testing-librar
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { playerReducer } from './trace/player'
-import { emptyProgress, loadProgress, progressReducer, saveProgress, STORAGE_KEY } from './state/progress'
+import { backupJson, emptyProgress, loadProgress, parseBackup, progressReducer, saveProgress, STORAGE_KEY } from './state/progress'
 import { ProgressProvider } from './state/ProgressContext'
 import { TraceViewer } from './components/TraceViewer'
 import { Quiz } from './components/Quiz'
@@ -12,6 +12,7 @@ import { insertionSortTrace } from './engines/insertionSort'
 import { LessonPage } from './pages/LessonPage'
 import { Dashboard } from './pages/Dashboard'
 import { PracticePage } from './pages/PracticePage'
+import { SettingsPage } from './pages/SettingsPage'
 import { drillInput, insertionDrill } from './practice/drills'
 import { EXERCISES } from './practice/coding'
 import type { Question } from './content/types'
@@ -69,6 +70,59 @@ describe('progress persistence', () => {
     expect(loadProgress()).toEqual(emptyProgress())
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 99 }))
     expect(loadProgress()).toEqual(emptyProgress())
+  })
+  it('backup files round-trip and bad files are rejected', () => {
+    let p = progressReducer(emptyProgress(), { type: 'complete', lessonId: 'x', now: 5 })
+    p = progressReducer(p, { type: 'note', lessonId: 'x', text: 'not', now: 6 })
+    p = progressReducer(p, { type: 'code', id: 'merge', src: 'function merge(){}', solved: true })
+    const text = backupJson(p, 0)
+    expect(JSON.parse(text)).toMatchObject({ app: 'algo-view', exportedAt: '1970-01-01T00:00:00.000Z' })
+    expect(parseBackup(text)).toEqual(p)
+    expect(parseBackup(JSON.stringify(p))).toEqual(p)
+    expect(parseBackup('{oops')).toBeNull()
+    expect(parseBackup('[]')).toBeNull()
+    expect(parseBackup(JSON.stringify({ app: 'algo-view', progress: { version: 2 } }))).toBeNull()
+    // Malformed fields fall back to empty values instead of crashing the app.
+    const odd = parseBackup(JSON.stringify({ version: 1, lessons: [1], exams: 'x', prefs: { lang: 'en' } }))!
+    expect(odd.lessons).toEqual({})
+    expect(odd.exams).toEqual([])
+    expect(odd.prefs).toEqual({ ...emptyProgress().prefs, lang: 'en' })
+    expect(progressReducer(emptyProgress(), { type: 'replace', data: p })).toBe(p)
+  })
+  it('adopts progress saved by another tab', async () => {
+    localStorage.clear()
+    wrap(
+      <MemoryRouter>
+        <SettingsPage />
+      </MemoryRouter>,
+    )
+    expect(screen.getByText(/^0 tamamlanan ders/)).toBeTruthy()
+    const other = progressReducer(emptyProgress(), { type: 'complete', lessonId: 'l1-why', now: 1 })
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(other))
+    act(() => {
+      window.dispatchEvent(new StorageEvent('storage', { key: STORAGE_KEY, newValue: JSON.stringify(other) }))
+    })
+    expect(await screen.findByText(/^1 tamamlanan ders/)).toBeTruthy()
+  })
+})
+
+describe('settings backup', () => {
+  it('restores a backup file after confirmation', async () => {
+    localStorage.clear()
+    const user = userEvent.setup()
+    wrap(
+      <MemoryRouter>
+        <SettingsPage />
+      </MemoryRouter>,
+    )
+    expect(screen.getByText(/0 not/)).toBeTruthy()
+    const backup = progressReducer(emptyProgress(), { type: 'note', lessonId: 'l2-merge', text: 'yedekteki not', now: 1 })
+    await user.upload(screen.getByLabelText('Yedek dosyası seç'), new File([backupJson(backup)], 'b.json', { type: 'application/json' }))
+    await user.click(await screen.findByRole('button', { name: 'Geri yükle' }))
+    expect(await screen.findByText('Yedek geri yüklendi.')).toBeTruthy()
+    await waitFor(() => expect(loadProgress().notes['l2-merge']?.text).toBe('yedekteki not'))
+    await user.upload(screen.getByLabelText('Yedek dosyası seç'), new File(['nope'], 'x.json', { type: 'application/json' }))
+    expect(await screen.findByText('Bu dosya geçerli bir Algo View yedeği değil.')).toBeTruthy()
   })
 })
 

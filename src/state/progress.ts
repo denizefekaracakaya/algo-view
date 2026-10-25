@@ -55,36 +55,65 @@ export const emptyProgress = (): ProgressData => ({
   prefs: { theme: 'system', speed: 1, predict: false, lang: 'tr' },
 })
 
+const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v)
+const objOr = <T,>(v: unknown): T => (isObj(v) ? v : {}) as T
+
+/** Normalises stored or imported data; returns null when it is not Algo View progress. */
+export function parseProgress(value: unknown): ProgressData | null {
+  if (!isObj(value) || value.version !== 1) return null
+  const parsed = value as Partial<ProgressData>
+  const base = emptyProgress()
+  return {
+    ...base,
+    ...parsed,
+    lessons: objOr(parsed.lessons),
+    quiz: objOr(parsed.quiz),
+    read: objOr(parsed.read),
+    drills: objOr(parsed.drills),
+    gen: objOr(parsed.gen),
+    notes: objOr(parsed.notes),
+    exams: Array.isArray(parsed.exams) ? parsed.exams.slice(0, MAX_EXAMS) : [],
+    code: objOr(parsed.code),
+    lastLesson: typeof parsed.lastLesson === 'string' ? parsed.lastLesson : null,
+    prefs: { ...base.prefs, ...objOr<Partial<ProgressData['prefs']>>(parsed.prefs) },
+  }
+}
+
 export function loadProgress(): ProgressData {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return emptyProgress()
-    const parsed = JSON.parse(raw) as Partial<ProgressData>
-    if (parsed.version !== 1) return emptyProgress()
-    const base = emptyProgress()
-    return {
-      ...base,
-      ...parsed,
-      lessons: parsed.lessons ?? {},
-      quiz: parsed.quiz ?? {},
-      read: parsed.read ?? {},
-      drills: parsed.drills ?? {},
-      gen: parsed.gen ?? {},
-      notes: parsed.notes ?? {},
-      exams: Array.isArray(parsed.exams) ? parsed.exams : [],
-      code: parsed.code ?? {},
-      prefs: { ...base.prefs, ...(parsed.prefs ?? {}) },
-    } as ProgressData
+    return parseProgress(JSON.parse(raw)) ?? emptyProgress()
   } catch {
     return emptyProgress()
   }
 }
 
-export function saveProgress(p: ProgressData): void {
+export function saveProgress(p: ProgressData): boolean {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(p))
+    return true
   } catch {
     /* storage unavailable (private mode, quota) — progress stays in memory */
+    return false
+  }
+}
+
+export const BACKUP_APP = 'algo-view'
+
+/** A backup file: the whole progress object plus a small header. */
+export function backupJson(p: ProgressData, now = Date.now()): string {
+  return JSON.stringify({ app: BACKUP_APP, exportedAt: new Date(now).toISOString(), progress: p }, null, 2)
+}
+
+/** Reads a backup file (or a bare progress object); null if the text is not a valid backup. */
+export function parseBackup(text: string): ProgressData | null {
+  try {
+    const v: unknown = JSON.parse(text)
+    if (isObj(v) && v.app === BACKUP_APP) return parseProgress(v.progress)
+    return parseProgress(v)
+  } catch {
+    return null
   }
 }
 
@@ -101,6 +130,7 @@ export type ProgressAction =
   | { type: 'code'; id: string; src?: string; solved?: boolean }
   | { type: 'prefs'; prefs: Partial<ProgressData['prefs']> }
   | { type: 'reset' }
+  | { type: 'replace'; data: ProgressData }
 
 export function progressReducer(s: ProgressData, a: ProgressAction): ProgressData {
   switch (a.type) {
@@ -153,6 +183,8 @@ export function progressReducer(s: ProgressData, a: ProgressAction): ProgressDat
       return { ...s, prefs: { ...s.prefs, ...a.prefs } }
     case 'reset':
       return { ...emptyProgress(), prefs: s.prefs, notes: s.notes }
+    case 'replace':
+      return a.data
   }
 }
 
