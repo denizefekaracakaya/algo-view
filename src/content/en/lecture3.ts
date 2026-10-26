@@ -14,7 +14,7 @@ export const lecture3: Lecture = {
       title: 'Recursion trees and the Master Theorem',
       titleEn: 'Recursion trees and the Master Theorem',
       summary: 'A geometric series of level sums: constant, decreasing or increasing?',
-      minutes: 45,
+      minutes: 50,
       objectives: [
         'Write the running time of divide-and-conquer algorithms as a recurrence relation.',
         'Compute the number of subproblems, their size and the total work per level of a recursion tree.',
@@ -144,6 +144,27 @@ If the subproblems have different sizes the Master Theorem is not enough; use th
           ],
         },
         {
+          kind: 'steps',
+          title: 'When the theorem does not apply: $T(n) = 2T(n/2) + n\\log_2 n$',
+          label: 'proofIdea',
+          proof: [
+            { title: 'Why it does not fit', body: 'The work term $n\\log n$ is not $\\Theta(n^d)$ for any $d$: it grows faster than $n$ and slower than every $n^{1+\\varepsilon}$. The condition of Theorem 1 fails; the recursion tree still works.' },
+            { title: 'Level j', body: '$2^j$ subproblems, each of size $n/2^j$ doing $\\frac{n}{2^j}\\log_2\\frac{n}{2^j}$ work: the level total is $n(\\log_2 n - j)$.' },
+            { title: 'Total', body: 'With $L = \\log_2 n$: $\\sum_{j=0}^{L-1} n(L - j) = n\\,(L + (L-1) + \\dots + 1) = n\\frac{L(L+1)}{2}$.' },
+            { title: 'Conclusion', body: '$T(n) = \\Theta(n\\log^2 n)$: neither $n\\log n$ nor $n^{1+\\varepsilon}$. The levels are not equal but shrink slowly, so the total stays of the order “number of levels × root”.' },
+          ],
+          check: [
+            {
+              id: 'c6',
+              kind: 'numeric',
+              prompt: 'For $n = 8$, what is the sum of the level totals without the leaves, $\\sum_{j=0}^{2} n(\\log_2 n - j)$?',
+              answer: 48,
+              hint: '$8 \\cdot 3 + 8 \\cdot 2 + 8 \\cdot 1$.',
+              explanation: '$24 + 16 + 8 = 48 = 8 \\cdot \\frac{3 \\cdot 4}{2}$.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- Applying the Master Theorem to subproblems of **different sizes**, like $T(n) = T(n/5) + T(7n/10) + n$. (In Lecture 4 this is exactly Select’s recurrence; it is solved with the substitution method.)
@@ -220,7 +241,7 @@ If the subproblems have different sizes the Master Theorem is not enough; use th
       title: 'The substitution method',
       titleEn: 'The substitution method',
       summary: 'Guess a bound, verify it by induction — when the Master Theorem doesn’t help.',
-      minutes: 35,
+      minutes: 40,
       objectives: [
         'List the steps of the substitution method: guess, base case, inductive hypothesis, substitute, simplify, choose the constant.',
         'Prove a linear (or polynomial) bound for recurrences with subproblems of different sizes.',
@@ -320,6 +341,34 @@ First derive the condition on $D$ from the inductive step, then combine it with 
           ],
         },
         {
+          kind: 'steps',
+          title: 'A classic trap: putting Big-O inside the induction',
+          label: 'proofIdea',
+          proof: [
+            { title: 'False claim', body: '“If $T(n) = 2T(n/2) + n$ then $T(n) = O(n)$.” In fact $T(n) = \\Theta(n\\log n)$, so the proof below must contain an error.' },
+            { title: 'Fake proof', body: 'Hypothesis: $T(m) = O(m)$ for $m < n$. Then $T(n) = 2\\,O(n/2) + n = O(n) + n = O(n)$.' },
+            { title: 'The error', body: 'Every $O$ on these lines hides a different constant. Written with an explicit constant, $T(m) \\le c\\,m$, the step gives $T(n) \\le cn + n = (c + 1)n$: we did not get $T(n) \\le cn$ with the **same** $c$ as in the hypothesis.' },
+            { title: 'The constant grows', body: 'The constant goes up by 1 per level: $c, c + 1, c + 2, \\dots$; after $\\log_2 n$ levels it is $c + \\log_2 n$. That is not a constant, and it is exactly the $n\\log n$ we see.' },
+            { title: 'The rule', body: 'Always write the induction hypothesis **with an explicit constant** ($T(m) \\le D\\,m$) and get the same $D$ back at the end of the step. Use $O(\\cdot)$ only in the final sentence.' },
+          ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'mcq',
+              prompt: 'For $T(n) = T(n-1) + n$ a student writes “hypothesis $T(n-1) = O(n)$, so $T(n) = O(n) + n = O(n)$”. Which is true?',
+              options: [
+                'The proof is right: $T(n) = O(n)$',
+                'The proof is wrong; in fact $T(n) = \\Theta(n^2)$, and the error is that $O$ hides a different constant at every step',
+                'The proof is right but the base case is missing',
+                'The proof is wrong; in fact $T(n) = \\Theta(n\\log n)$',
+              ],
+              answer: 1,
+              hint: 'Unroll the recurrence: $n + (n-1) + \\dots$',
+              explanation: '$T(n) = n + (n-1) + \\dots + 1 = \\Theta(n^2)$. With an explicit constant: if $T(n-1) \\le c(n-1)$ then $T(n) \\le cn - c + n$, which exceeds $cn$ unless $c \\ge n$; $c$ cannot stay constant.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Failed guesses (examples from the notes)',
           body: `- **Wrong bound:** for $T(n) = 2T(n/2) + n$, trying $T(n) \\le Dn$ requires $n + Dn \\le Dn$ — impossible. The guess is too small; the right answer is $\\Theta(n\\log n)$.
@@ -380,6 +429,12 @@ First derive the condition on $D$ from the inductive step, then combine it with 
           prompt: `Our own example: $T(n) \\le T(n/4) + T(n/2) + T(n/8) + n$, $T(1) = 1$. Show by substitution that $T(n) = O(n)$ and find a suitable $D$.`,
           hints: ['$1/4 + 1/2 + 1/8 = ?$', 'The condition is $D(1 - s) \\ge 1$.'],
           solution: `$s = \\frac14 + \\frac12 + \\frac18 = \\frac78$. Step: $\\frac78 D n + n \\le Dn \\iff D \\ge 8$. Base: $D \\ge 1$. Choose $D = 8$: $T(n) \\le 8n$. (Check by running the tool with these terms.)`,
+        },
+        {
+          id: 'p2',
+          prompt: `Our own example: $T(n) = 4T(n/2) + n$, $T(1) = 1$. Why does the guess $T(n) \\le cn^2$ get stuck in the induction? Prove $T(n) = O(n^2)$ by strengthening the hypothesis.`,
+          hints: ['Substitute: $4c(n/2)^2 + n = ?$', 'Try $T(n) \\le cn^2 - dn$.'],
+          solution: `$4c\\frac{n^2}{4} + n = cn^2 + n > cn^2$: the extra $n$ cannot be absorbed. The stronger hypothesis $T(m) \\le cm^2 - dm$ gives $4\\left(c\\frac{n^2}{4} - d\\frac{n}{2}\\right) + n = cn^2 - 2dn + n \\le cn^2 - dn \\iff d \\ge 1$. Base case $T(1) = 1 \\le c - d$; for example $d = 1$, $c = 2$. So $T(n) \\le 2n^2 - n = O(n^2)$; in fact equality holds when $n$ is a power of two ($T(2) = 6$, $T(4) = 28$). The Master Theorem agrees: $a = 4 > b^d = 2$ gives $\\Theta(n^2)$.`,
         },
       ],
       sources: [SRC.l3.notes, SRC.l3.slides, SRC.l4.notes, SRC.l3.concept, SRC.sec.s2],

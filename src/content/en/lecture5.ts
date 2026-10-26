@@ -15,7 +15,7 @@ export const lecture5: Lecture = {
       title: 'QuickSort and pivot selection',
       titleEn: 'QuickSort and pivot selection',
       summary: 'Partition, put the pivot in place, recurse on both sides.',
-      minutes: 40,
+      minutes: 45,
       objectives: [
         'Trace QuickSort’s partition step and its in-place implementation.',
         'See how the choice of pivot determines the running time: $T(n) \\le cn + T(k-1) + T(n-k)$.',
@@ -152,6 +152,23 @@ The comparison in the slides: QuickSort (random pivot) is easy to implement in p
           ],
         },
         {
+          kind: 'text',
+          title: 'Equal keys and three-way partitioning',
+          body: `Lomuto partitioning puts the elements **equal** to the pivot on the right. If all elements are equal, the left side stays empty in every partition, the pivot moves to the far left and the recursion continues with $n - 1$ elements: $T(n) = T(n-1) + (n-1)$, that is $\\Theta(n^2)$. A random pivot does not help, because whichever element is chosen, they are all the same.
+
+The fix is **three-way partitioning** (Dijkstra’s “Dutch national flag” problem): the array is split into $< p$, $= p$ and $> p$, and the recursion continues only on the first and last parts. An all-equal array is done in one pass: $\\Theta(n)$. Heavily repeated keys (ages, city codes, grades) are common in real data, so library sorts use this idea.`,
+          check: [
+            {
+              id: 'c7',
+              kind: 'numeric',
+              prompt: 'How many comparisons does QuickSort with Lomuto partitioning make in total when all 10 elements are equal?',
+              answer: 45,
+              hint: 'The calls have sizes 10, 9, …, 2, and a call of size $k$ makes $k - 1$ comparisons.',
+              explanation: '$9 + 8 + \\dots + 1 = 45 = \\binom{10}{2}$: the same as the worst case on a sorted array.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- “Randomized QuickSort is always $O(n\\log n)$.” — No: the guarantee is for the **expected** time; a single run can be bad.
@@ -193,6 +210,15 @@ The comparison in the slides: QuickSort (random pivot) is easy to implement in p
           hint: 'The notes: “We still consider the running time for a worst-case input…”',
           explanation: 'The guarantee holds for every input; the randomness comes only from the algorithm’s own coin flips.',
         },
+        {
+          id: 'q4',
+          kind: 'mcq',
+          prompt: 'How long does QuickSort with three-way partitioning take on an array whose $n$ elements are all equal?',
+          options: ['$\\Theta(1)$', '$\\Theta(n)$', '$\\Theta(n\\log n)$', '$\\Theta(n^2)$'],
+          answer: 1,
+          hint: 'After the first partition, how large are the $< p$ and $> p$ parts?',
+          explanation: 'One linear partition puts every element into the $= p$ part; both sides are empty and the recursion stops at once: $\\Theta(n)$.',
+        },
       ],
       practice: [
         {
@@ -210,7 +236,7 @@ The comparison in the slides: QuickSort (random pivot) is easy to implement in p
       title: 'Expected running time via indicator variables',
       titleEn: 'Expected running time via indicator variables',
       summary: 'How often is each pair compared? $E[C] \\le 2n\\ln n$ by linearity of expectation.',
-      minutes: 45,
+      minutes: 50,
       objectives: [
         'Apply random variables, expectation and indicator variables to QuickSort.',
         'Explain why each pair $(z_i, z_j)$ is compared at most once.',
@@ -220,6 +246,26 @@ The comparison in the slides: QuickSort (random pivot) is easy to implement in p
       ],
       prerequisites: ['The QuickSort lesson', 'Basic probability: expectation', 'The harmonic series $\\sum 1/k \\approx \\ln n$'],
       sections: [
+        {
+          kind: 'intuition',
+          title: 'Intuition: counting with indicators',
+          label: 'intuition',
+          body: `At a cloakroom the hats of $n$ people get mixed up and everybody gets a random hat back. On average, how many people get **their own** hat?
+
+Computing it directly is hard, because who gets which hat is all connected. But we can split the question: let $X_i$ be 1 if person $i$ gets their own hat and 0 otherwise. The total is $X = X_1 + \\dots + X_n$, and $E[X_i] = P(X_i = 1) = \\frac1n$ for each of them. By linearity of expectation
+$$E[X] = \\sum_{i=1}^n E[X_i] = n \\cdot \\frac1n = 1.$$
+The $X_i$ are **not** independent, but linearity does not need independence. The analysis of QuickSort follows the same pattern: we write the number of comparisons as a sum of one indicator variable per pair.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'With $n = 100$ people, how many get their own hat on average?',
+              answer: 1,
+              hint: '$n$ indicators, each with probability $1/n$.',
+              explanation: '$100 \\cdot \\frac{1}{100} = 1$: the answer does not depend on $n$.',
+            },
+          ],
+        },
         {
           kind: 'formal',
           title: 'Setup (Lecture 5 notes)',
@@ -383,6 +429,12 @@ and strong induction proves $T(n) \\le 2n\\ln n$ (bounding the sum from above by
           prompt: `Our own example: for $n = 4$, compute $E[C] = \\sum_{i<j} \\frac{2}{j-i+1}$ exactly and compare it with $n = 4$ in the experiment panel.`,
           hints: ['There are 3 pairs at distance 1, 2 pairs at distance 2 and 1 pair at distance 3.'],
           solution: `$3\\cdot\\frac22 + 2\\cdot\\frac23 + 1\\cdot\\frac24 = 3 + \\frac43 + \\frac12 = \\frac{29}{6} \\approx 4.83$. With the formula $2(n+1)H_n - 4n$: $H_4 = \\frac{25}{12}$, $2\\cdot5\\cdot\\frac{25}{12} - 16 = \\frac{125}{6} - 16 = \\frac{29}{6}$ ✓.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Our own example: in a random permutation, call an element a “record” if it is larger than everything before it (the first element is always a record). What is the expected number of records for $n = 4$? For general $n$?`,
+          hints: ['$R_i$: 1 if element $i$ is a record. What is $P(R_i = 1)$?', 'Think about the probability that the largest of the first $i$ elements is in position $i$.'],
+          solution: `Element $i$ is a record if it is the largest of the first $i$ elements; by symmetry this has probability $\\frac1i$. By linearity $E[R] = 1 + \\frac12 + \\frac13 + \\frac14 = \\frac{25}{12} \\approx 2.08$. In general $H_n = \\sum_{i=1}^n \\frac1i \\approx \\ln n$: the same harmonic sum as in the QuickSort analysis.`,
         },
       ],
       sources: [SRC.l5.notes, SRC.l5.slides, SRC.l5.concept, SRC.sec.s3, SRC.hw.hw3],

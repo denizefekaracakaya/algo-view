@@ -16,7 +16,7 @@ export const lecture2: Lecture = {
       title: 'InsertionSort and loop invariants',
       titleEn: 'InsertionSort and loop invariants',
       summary: 'Proving by induction that a simple sorting algorithm is correct.',
-      minutes: 35,
+      minutes: 40,
       objectives: [
         'Trace and predict what InsertionSort does at each step.',
         'State the loop invariant “after each iteration A[:i+1] is sorted”.',
@@ -175,6 +175,29 @@ In a random array each pair is inverted with probability $\\tfrac12$, so the exp
           ],
         },
         {
+          kind: 'formal',
+          title: 'Best, worst and average case',
+          box: 'formal',
+          label: 'formal',
+          body: `The work of InsertionSort is set by the number of inversions $I$: exactly $I$ shifts and at most $I + (n - 1)$ comparisons.
+
+- **Best case (sorted array):** $I = 0$ and one comparison per $i$: $n - 1$ comparisons, $\\Theta(n)$.
+- **Worst case (reversed array):** every pair is inverted, $I = \\frac{n(n-1)}{2}$: $\\Theta(n^2)$.
+- **Average case (random permutation):** the relative order of two elements is equally likely either way, so every pair is inverted with probability $\\tfrac12$. By linearity of expectation $E[I] = \\binom{n}{2} \\cdot \\frac12 = \\frac{n(n-1)}{4}$: still $\\Theta(n^2)$, exactly half the worst case.
+
+Hoping that it is “fast on average” does not save InsertionSort; but it really is fast when the input is **almost sorted** ($I$ small). This is also why the focus of this lecture on the worst case is reasonable: the average is often of the same order.`,
+          check: [
+            {
+              id: 'c7',
+              kind: 'numeric',
+              prompt: 'On average, how many shifts does InsertionSort make on a randomly ordered array of 8 distinct elements?',
+              answer: 14,
+              hint: '$E[I] = \\frac{n(n-1)}{4}$.',
+              explanation: '$\\frac{8 \\cdot 7}{4} = 14$: on average half of the 28 pairs are inverted.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- Thinking the invariant is “$A[:i+1]$ contains the $i+1$ smallest elements of the array”. No: it is only sorted **among itself**; smaller elements may still be waiting on the right.
@@ -215,6 +238,15 @@ In a random array each pair is inverted with probability $\\tfrac12$, so the exp
           hint: 'For each $i$, `current` travels all the way to the front: $i$ comparisons.',
           explanation: '$\\sum_{i=1}^{7} i = 28 = \\frac{8\\cdot 7}{2}$.',
         },
+        {
+          id: 'q4',
+          kind: 'mcq',
+          prompt: 'How many comparisons (`A[j] > current`) does InsertionSort make on an already sorted array of $n$ elements?',
+          options: ['$0$', '$n - 1$', '$n\\log_2 n$', '$\\frac{n(n-1)}{2}$'],
+          answer: 1,
+          hint: 'For each $i$, how many times is the inner loop condition tested?',
+          explanation: 'For each $i$, `A[i-1] > current` is tested once and is false: $n - 1$ in total, that is $\\Theta(n)$.',
+        },
       ],
       practice: [
         {
@@ -232,7 +264,7 @@ In a random array each pair is inverted with probability $\\tfrac12$, so the exp
       title: 'MergeSort and the recursion tree',
       titleEn: 'MergeSort and the recursion tree',
       summary: 'Divide, recurse, merge — with equal work on every level: $O(n\\log n)$.',
-      minutes: 40,
+      minutes: 45,
       objectives: [
         'Trace the split and merge phases of MergeSort step by step.',
         'See that Merge combines two sorted lists in linear time, and handle the case of an exhausted list.',
@@ -355,6 +387,25 @@ This is a **worst-case** bound: it holds whatever the input is. As a recurrence:
           ],
         },
         {
+          kind: 'text',
+          title: 'Stability and extra memory',
+          body: `Two properties define MergeSort in practice:
+
+- **Stability:** on ties, Merge takes from the left list (\`L[i] <= R[j]\`). Of two records with equal keys, the one that came first in the input is always on the left, so it also comes first in the output. Multi-key jobs, such as sorting records by name and then by department, rely on this.
+- **Extra memory:** Merge writes its result into a new list: $\\Theta(n)$ extra space. InsertionSort and QuickSort work inside the array. In-place merging methods exist but they are complicated and have large constants; libraries usually accept the extra memory.`,
+          check: [
+            {
+              id: 'c6',
+              kind: 'mcq',
+              prompt: 'What would change if Merge took from the right list on ties (from L only when `L[i] < R[j]`)?',
+              options: ['The array would no longer be sorted', 'It still sorts, but it is no longer stable', 'The running time would become $\\Theta(n^2)$', 'Nothing would change'],
+              answer: 1,
+              hint: 'Look at the relative order of equal keys.',
+              explanation: 'The output is still sorted and the time is the same; but on ties the element from the right (the one that came later in the input) is written first, so the relative order can break.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- Reading past the end of a list in Merge once it is exhausted (the gap the notes’ pseudocode leaves on purpose).
@@ -411,6 +462,12 @@ This is a **worst-case** bound: it holds whatever the input is. As a recurrence:
           hints: ['How many subproblems are on level $t$, and of what size?', 'How many levels are there? How are $\\log_3 n$ and $\\log_2 n$ related?'],
           solution: `Level $t$ has $3^t$ subproblems of size $n/3^t$; since Merge3 is linear, the work per level is $c\\cdot 3^t \\cdot n/3^t = cn$. There are $\\log_3 n + 1$ levels → $O(n\\log_3 n) = O(n \\log n)$, because $\\log_3 n = \\log_2 n / \\log_2 3$ differs only by a constant factor. It is **not** an asymptotic improvement.`,
         },
+        {
+          id: 'p2',
+          prompt: `Our own example: exactly how many key comparisons does MergeSort make in the worst case for $n = 8$? Which input reaches this number?`,
+          hints: ['Merging two lists of total length $m$ takes at most $m - 1$ comparisons.', 'Add up the levels separately: four merges of 2 elements, two of 4 and one of 8.'],
+          solution: `Levels: four merges of 2 elements ($4 \\cdot 1$), two merges of 4 ($2 \\cdot 3$), one merge of 8 ($7$): $4 + 6 + 7 = 17$ in total. In general $n\\log_2 n - n + 1$ for $n = 2^k$. For example, $[1, 5, 3, 7, 2, 6, 4, 8]$ takes from the two lists alternately in every merge and makes exactly 17 comparisons.`,
+        },
       ],
       sources: [SRC.l2.notes, SRC.l2.slides, SRC.l2.notebook, SRC.l2.conceptSort, SRC.hw.hw2],
     },
@@ -420,7 +477,7 @@ This is a **worst-case** bound: it holds whatever the input is. As a recurrence:
       title: 'Worst-case analysis and asymptotic notation',
       titleEn: 'Worst-case analysis and asymptotic notation',
       summary: 'Big-O, Big-Ω and Big-Θ: why and how do we ignore constants and lower-order terms?',
-      minutes: 40,
+      minutes: 45,
       objectives: [
         'Explain worst-case analysis as a game against an adversary.',
         'Write and apply the definitions of Big-O, Big-Ω and Big-Θ with witnesses $c$ and $n_0$.',
@@ -559,6 +616,28 @@ A good engineer first picks the asymptotically right algorithm, then improves th
           ],
         },
         {
+          kind: 'steps',
+          title: 'Worked example: $\\frac{n^2}{2} - 3n = \\Theta(n^2)$',
+          label: 'formalProof',
+          proof: [
+            { title: 'Goal', body: 'We need two pairs of witnesses: $(c_1, n_1)$ for the upper bound and $(c_2, n_2)$ for the lower bound.' },
+            { title: 'Upper bound', body: 'For $n \\ge 1$, $-3n \\le 0$, so $\\frac{n^2}{2} - 3n \\le \\frac12 n^2$: $c_1 = \\frac12$, $n_1 = 1$.' },
+            { title: 'Lower bound: pick c', body: 'Pick a constant below the leading coefficient: $c_2 = \\frac14$. We want $\\frac{n^2}{2} - 3n \\ge \\frac{n^2}{4}$.' },
+            { title: 'Lower bound: find n0', body: '$\\frac{n^2}{4} \\ge 3n \\iff n \\ge 12$: $n_2 = 12$. (At $n = 12$ both sides are 36.)' },
+            { title: 'Conclusion', body: 'For $n \\ge 12$, $\\frac14 n^2 \\le \\frac{n^2}{2} - 3n \\le \\frac12 n^2$: $\\Theta(n^2)$. Witnesses are not unique: the closer $c_2$ gets to the leading coefficient ($\\frac12$), the larger the $n_0$ it needs.' },
+          ],
+          check: [
+            {
+              id: 'c6',
+              kind: 'numeric',
+              prompt: 'With $c_2 = \\frac15$, from which smallest $n$ on does $\\frac{n^2}{2} - 3n \\ge \\frac{n^2}{5}$ hold?',
+              answer: 10,
+              hint: '$\\frac{n^2}{2} - \\frac{n^2}{5} = \\frac{3n^2}{10} \\ge 3n$.',
+              explanation: '$\\frac{3n^2}{10} \\ge 3n \\iff n \\ge 10$. A smaller $c_2$ gives a smaller $n_0$.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- Using $O$ to mean “exactly”: $n = O(n^2)$ is true but not tight; use $\\Theta$ for tightness.
@@ -625,6 +704,12 @@ A good engineer first picks the asymptotically right algorithm, then improves th
 **Ω:** $T(n) \\ge 11\\,n\\log_2 n$ for every $n \\ge 1$. Witness $c = 11$, $n_0 = 1$.
 
 Together they give $T(n) = \\Theta(n\\log n)$.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Our own example: is $2^{n+5} = O(2^n)$? And is $3^n = O(2^n)$?`,
+          hints: ['Look at the ratios $2^{n+5} / 2^n$ and $3^n / 2^n$.', 'Big-O asks for the ratio to stay below a constant.'],
+          solution: `$2^{n+5} = 32 \\cdot 2^n$: $O(2^n)$ with $c = 32$, $n_0 = 1$. But $3^n / 2^n = (3/2)^n$ grows without bound; whatever $c$ you pick, some $n$ has $(3/2)^n > c$, so $3^n \\ne O(2^n)$. A constant **added** to the exponent is a constant factor; a difference in the **base** is not.`,
         },
       ],
       sources: [SRC.l2.notes, SRC.l2.slides, SRC.l2.conceptAsym, SRC.sec.s1, SRC.hw.hw2],

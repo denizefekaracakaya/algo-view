@@ -14,7 +14,7 @@ export const lecture1: Lecture = {
       title: 'Algoritmalar ve çalışma süresini ölçmek',
       titleEn: 'Algorithms and how we measure running time',
       summary: 'Bir algoritmayı “daha iyi” yapan nedir? Saniye yerine büyüme hızını neden ölçeriz?',
-      minutes: 20,
+      minutes: 25,
       objectives: [
         'Algoritma tasarımı ve analizinin bilgisayar biliminin her alanında neden yer aldığını açıklamak.',
         'Bir algoritmanın çalışma süresini milisaniyeyle değil, girdi büyüklüğüne göre ölçeklenmesiyle ifade etmenin nedenini anlamak.',
@@ -115,6 +115,28 @@ Aynı makine, aynı veri; fark yalnızca algoritmanın büyüme hızında. Bu y�
           ],
         },
         {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: adımları saymak',
+          label: 'formal',
+          body: `Bir dizide tekrar eden eleman var mı? En doğrudan yol her çifti karşılaştırmaktır: dış döngü $i = 0, \\dots, n-1$, iç döngü $j = i+1, \\dots, n-1$ ve her adımda bir karşılaştırma \`A[i] == A[j]\`. Tekrar yoksa algoritma sonuna kadar çalışır; bu en kötü durumda kaç karşılaştırma yapılır?`,
+          proof: [
+            { title: 'İç döngü', body: '$i$ sabitken iç döngü $n - 1 - i$ kez döner: $i = 0$ için $n - 1$, $i = n - 1$ için hiç.' },
+            { title: 'Toplam', body: '$\\sum_{i=0}^{n-1} (n-1-i) = (n-1) + (n-2) + \\dots + 1 + 0 = \\frac{n(n-1)}{2}$.' },
+            { title: 'Büyüme', body: '$n = 1000$ için $499\\,500$ karşılaştırma. $n$ iki katına çıkınca sayı yaklaşık dört katına çıkar: süre $n^2$ ile ölçeklenir.' },
+            { title: 'Daha iyisi', body: 'Önce sıralayıp ($O(n\\log n)$, Ders 2) sonra yalnızca yan yana duranları karşılaştırmak $n - 1$ karşılaştırma ekler: toplam $O(n\\log n)$. Ders 8’deki hash tablolarıyla beklenen süre $O(n)$’e iner.' },
+          ],
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'Tekrarı olmayan $n = 10$ elemanlı bir dizide bu algoritma kaç karşılaştırma yapar?',
+              answer: 45,
+              hint: '$\\frac{n(n-1)}{2}$.',
+              explanation: '$\\frac{10 \\cdot 9}{2} = 45$: $9 + 8 + \\dots + 1$.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- “Bilgisayarım hızlı, algoritma önemli değil.” — Donanım hızlandıkça daha büyük problemler çözmek isteriz; büyüme hızı farkı o zaman daha çok hissedilir.
@@ -168,6 +190,12 @@ Aynı makine, aynı veri; fark yalnızca algoritmanın büyüme hızında. Bu y�
           prompt: `Bir algoritma $100\\,n\\log_2 n$, diğeri $n^2$ adım atıyor. $n = 2^k$ biçimindeki değerler için ilk algoritma hangi $n$’den itibaren kesinlikle daha hızlıdır? (Kendi örneğimiz; ders notlarında yoktur.)`,
           hints: ['$100 n \\log_2 n < n^2 \\iff 100 \\log_2 n < n$.', '$n = 2^k$ koyun: $100k < 2^k$ eşitsizliğini sağlayan en küçük $k$ nedir?'],
           solution: `$100k < 2^k$: $k = 9$ için $900 > 512$, $k = 10$ için $1000 < 1024$. Dolayısıyla $n = 2^{10} = 1024$ ve sonrasında (2’nin kuvvetleri arasında) ilk algoritma daha hızlıdır. Bu sınır gerçek olsa da asimptotik kıyas $n \\log n$’in $n^2$’den yavaş büyüdüğünü söyler; kesişmenin tam yeri sabitlere bağlıdır.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: Bir program $n = 1000$ için 2 saniye, $n = 2000$ için 16 saniye sürüyor. Süre $c \\cdot n^k$ biçimindeyse $k$ kaçtır? $n = 4000$ için ne kadar sürmesini beklersiniz?`,
+          hints: ['$n$ iki katına çıkınca süre kaç katına çıkıyor?', '$2^k = 8$.'],
+          solution: `Süre $16 / 2 = 8$ katına çıktı ve $2^k = 8$, yani $k = 3$: algoritma kübik davranıyor. $n = 4000$ için bir kez daha 8 kat: yaklaşık $128$ saniye. Bu “ikiye katlama deneyi”, ölçüm yaparak üssü tahmin etmenin pratik bir yoludur; sabit $c$ hesaba hiç girmez.`,
         },
       ],
       sources: [SRC.l1.notes, SRC.l1.slides, SRC.l1.concept],

@@ -15,7 +15,7 @@ export const lecture5: Lecture = {
       title: 'QuickSort ve pivot seçimi',
       titleEn: 'QuickSort and pivot selection',
       summary: 'Bölümle, pivotu yerine koy, iki tarafa özyinele.',
-      minutes: 40,
+      minutes: 45,
       objectives: [
         'QuickSort’un bölümleme (partition) adımını ve yerinde (in-place) gerçekleştirimi izlemek.',
         'Pivot seçiminin çalışma süresini nasıl belirlediğini görmek: $T(n) \\le cn + T(k-1) + T(n-k)$.',
@@ -152,6 +152,23 @@ Slaytlardaki karşılaştırma: QuickSort (rastgele pivot) yerinde kolayca uygul
           ],
         },
         {
+          kind: 'text',
+          title: 'Eşit anahtarlar ve üç yollu bölümleme',
+          body: `Lomuto bölümlemesi pivota **eşit** elemanları sağ tarafa koyar. Bütün elemanlar eşitse her bölümlemede sol taraf boş kalır, pivot en sola gider ve özyineleme $n - 1$ elemanla sürer: $T(n) = T(n-1) + (n-1)$, yani $\\Theta(n^2)$. Rastgele pivot bunu düzeltmez, çünkü hangi eleman seçilirse seçilsin hepsi aynıdır.
+
+Çözüm **üç yollu bölümleme**dir (Dijkstra’nın “Hollanda bayrağı” problemi): dizi $< p$, $= p$ ve $> p$ olmak üzere üçe ayrılır ve özyineleme yalnızca ilk ve son parçada sürer. Hepsi eşit bir dizi tek geçişte biter: $\\Theta(n)$. Çok tekrarlı anahtarlar (yaş, şehir kodu, not) gerçek veride sık görüldüğü için kütüphane sıralamaları bu fikri kullanır.`,
+          check: [
+            {
+              id: 'c7',
+              kind: 'numeric',
+              prompt: '10 elemanın hepsi eşitken Lomuto bölümlemeli QuickSort toplam kaç karşılaştırma yapar?',
+              answer: 45,
+              hint: 'Çağrıların boyları 10, 9, …, 2; boyu $k$ olan çağrı $k - 1$ karşılaştırma yapar.',
+              explanation: '$9 + 8 + \\dots + 1 = 45 = \\binom{10}{2}$: sıralı dizideki en kötü durumla aynı.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- “Rastgele QuickSort her zaman $O(n\\log n)$.” — Hayır: garanti **beklenen** süre içindir; tek bir çalışma kötü olabilir.
@@ -193,6 +210,15 @@ Slaytlardaki karşılaştırma: QuickSort (rastgele pivot) yerinde kolayca uygul
           hint: 'Notlar: “We still consider the running time for a worst-case input…”',
           explanation: 'Garanti her girdi için geçerlidir; rastgelelik yalnızca algoritmanın kendi yazı-turalarından gelir.',
         },
+        {
+          id: 'q4',
+          kind: 'mcq',
+          prompt: 'Üç yollu bölümlemeli QuickSort, $n$ elemanın hepsi eşit olan bir dizide ne kadar sürer?',
+          options: ['$\\Theta(1)$', '$\\Theta(n)$', '$\\Theta(n\\log n)$', '$\\Theta(n^2)$'],
+          answer: 1,
+          hint: 'İlk bölümlemeden sonra $< p$ ve $> p$ parçaları ne kadar büyüktür?',
+          explanation: 'Tek bir doğrusal bölümleme bütün elemanları $= p$ parçasına koyar; iki taraf da boştur ve özyineleme hemen biter: $\\Theta(n)$.',
+        },
       ],
       practice: [
         {
@@ -210,7 +236,7 @@ Slaytlardaki karşılaştırma: QuickSort (rastgele pivot) yerinde kolayca uygul
       title: 'Beklenen çalışma süresi: göstergeç değişkenleri',
       titleEn: 'Expected running time via indicator variables',
       summary: 'Her çift kaç kez karşılaştırılır? Beklentinin doğrusallığı ile $E[C] \\le 2n\\ln n$.',
-      minutes: 45,
+      minutes: 50,
       objectives: [
         'Rastgele değişken, beklenti ve göstergeç (indicator) değişkeni kavramlarını QuickSort’a uygulamak.',
         'Her $(z_i, z_j)$ çiftinin en fazla bir kez karşılaştırıldığını açıklamak.',
@@ -220,6 +246,26 @@ Slaytlardaki karşılaştırma: QuickSort (rastgele pivot) yerinde kolayca uygul
       ],
       prerequisites: ['QuickSort dersi', 'Temel olasılık: beklenti', 'Harmonik seri $\\sum 1/k \\approx \\ln n$'],
       sections: [
+        {
+          kind: 'intuition',
+          title: 'Sezgi: göstergeçlerle saymak',
+          label: 'intuition',
+          body: `Bir vestiyerde $n$ kişinin şapkası karışıyor ve herkese rastgele bir şapka veriliyor. Ortalama kaç kişi **kendi** şapkasını alır?
+
+Doğrudan hesaplamak zor, çünkü kimin hangi şapkayı aldığı birbirine bağlı. Ama soruyu parçalara bölebiliriz: $X_i$, $i$. kişi kendi şapkasını alırsa 1, yoksa 0 olsun. Toplam $X = X_1 + \\dots + X_n$ ve her biri için $E[X_i] = P(X_i = 1) = \\frac1n$. Beklentinin doğrusallığıyla
+$$E[X] = \\sum_{i=1}^n E[X_i] = n \\cdot \\frac1n = 1.$$
+$X_i$’ler bağımsız **değildir**, ama doğrusallık bağımsızlık istemez. QuickSort’un analizi aynı kalıbı izler: karşılaştırma sayısını, her çift için bir göstergeç değişkenin toplamı olarak yazarız.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: '$n = 100$ kişide ortalama kaç kişi kendi şapkasını alır?',
+              answer: 1,
+              hint: '$n$ göstergeç, her birinin olasılığı $1/n$.',
+              explanation: '$100 \\cdot \\frac{1}{100} = 1$: cevap $n$’ye bağlı değildir.',
+            },
+          ],
+        },
         {
           kind: 'formal',
           title: 'Kurulum (Ders 5 notları)',
@@ -383,6 +429,12 @@ ve güçlü tümevarımla $T(n) \\le 2n\\ln n$ kanıtlanır (toplamı $\\int 2x\
           prompt: `Kendi örneğimiz: $n = 4$ için $E[C] = \\sum_{i<j} \\frac{2}{j-i+1}$’i tam olarak hesaplayın ve deney panelinde $n = 4$ ile karşılaştırın.`,
           hints: ['Uzaklık 1 olan 3 çift, uzaklık 2 olan 2 çift, uzaklık 3 olan 1 çift var.'],
           solution: `$3\\cdot\\frac22 + 2\\cdot\\frac23 + 1\\cdot\\frac24 = 3 + \\frac43 + \\frac12 = \\frac{29}{6} \\approx 4.83$. Formül $2(n+1)H_n - 4n$ ile: $H_4 = \\frac{25}{12}$, $2\\cdot5\\cdot\\frac{25}{12} - 16 = \\frac{125}{6} - 16 = \\frac{29}{6}$ ✓.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: Rastgele bir permütasyonda, kendinden önceki herkesten büyük olan elemanlara “rekor” diyelim (ilk eleman her zaman rekordur). $n = 4$ için beklenen rekor sayısı kaçtır? Genel $n$ için?`,
+          hints: ['$R_i$: $i$. eleman rekorsa 1. $P(R_i = 1)$ nedir?', 'İlk $i$ elemanın en büyüğünün $i$. konumda olma olasılığını düşünün.'],
+          solution: `$i$. eleman, ilk $i$ elemanın en büyüğüyse rekordur; simetriden bu olasılık $\\frac1i$. Doğrusallıkla $E[R] = 1 + \\frac12 + \\frac13 + \\frac14 = \\frac{25}{12} \\approx 2{,}08$. Genel olarak $H_n = \\sum_{i=1}^n \\frac1i \\approx \\ln n$: QuickSort analizindeki harmonik toplamın aynısı.`,
         },
       ],
       sources: [SRC.l5.notes, SRC.l5.slides, SRC.l5.concept, SRC.sec.s3, SRC.hw.hw3],

@@ -14,7 +14,7 @@ export const lecture1: Lecture = {
       title: 'Algorithms and how we measure running time',
       titleEn: 'Algorithms and how we measure running time',
       summary: 'What makes an algorithm “better”? Why do we measure growth rate instead of seconds?',
-      minutes: 20,
+      minutes: 25,
       objectives: [
         'Explain why algorithm design and analysis show up in every area of computer science.',
         'Understand why we express running time by how it scales with the input size, not in milliseconds.',
@@ -115,6 +115,28 @@ Multiplication is an everyday example too: the encryption in banking apps (RSA) 
           ],
         },
         {
+          kind: 'steps',
+          title: 'Worked example: counting steps',
+          label: 'formal',
+          body: `Does an array contain a repeated element? The most direct way is to compare every pair: an outer loop $i = 0, \\dots, n-1$, an inner loop $j = i+1, \\dots, n-1$, and one comparison \`A[i] == A[j]\` per step. Without repeats the algorithm runs to the end; how many comparisons does it make in this worst case?`,
+          proof: [
+            { title: 'Inner loop', body: 'For a fixed $i$ the inner loop runs $n - 1 - i$ times: $n - 1$ times for $i = 0$, not at all for $i = n - 1$.' },
+            { title: 'Total', body: '$\\sum_{i=0}^{n-1} (n-1-i) = (n-1) + (n-2) + \\dots + 1 + 0 = \\frac{n(n-1)}{2}$.' },
+            { title: 'Growth', body: '$499\\,500$ comparisons for $n = 1000$. Doubling $n$ roughly quadruples the count: the time scales like $n^2$.' },
+            { title: 'Doing better', body: 'Sorting first ($O(n\\log n)$, Lecture 2) and then comparing only neighbors adds $n - 1$ comparisons: $O(n\\log n)$ in total. With the hash tables of Lecture 8 the expected time drops to $O(n)$.' },
+          ],
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'How many comparisons does this algorithm make on an array of $n = 10$ elements without repeats?',
+              answer: 45,
+              hint: '$\\frac{n(n-1)}{2}$.',
+              explanation: '$\\frac{10 \\cdot 9}{2} = 45$: $9 + 8 + \\dots + 1$.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- “My computer is fast, the algorithm doesn’t matter.” — As hardware gets faster we want to solve bigger problems; the difference in growth rate is felt even more then.
@@ -168,6 +190,12 @@ Multiplication is an everyday example too: the encryption in banking apps (RSA) 
           prompt: `One algorithm takes $100\\,n\\log_2 n$ steps, another $n^2$. For values of the form $n = 2^k$, from which $n$ on is the first algorithm strictly faster? (Our own example; not from the lecture notes.)`,
           hints: ['$100 n \\log_2 n < n^2 \\iff 100 \\log_2 n < n$.', 'Substitute $n = 2^k$: what is the smallest $k$ with $100k < 2^k$?'],
           solution: `$100k < 2^k$: for $k = 9$, $900 > 512$; for $k = 10$, $1000 < 1024$. So from $n = 2^{10} = 1024$ on (among powers of 2) the first algorithm is faster. The threshold is real, but the asymptotic comparison says $n \\log n$ grows more slowly than $n^2$; exactly where they cross depends on the constants.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Our own example: a program takes 2 seconds for $n = 1000$ and 16 seconds for $n = 2000$. If the time has the form $c \\cdot n^k$, what is $k$? How long do you expect it to take for $n = 4000$?`,
+          hints: ['By what factor does the time grow when $n$ doubles?', '$2^k = 8$.'],
+          solution: `The time grew by a factor $16 / 2 = 8$ and $2^k = 8$, so $k = 3$: the algorithm behaves cubically. For $n = 4000$ another factor of 8: about $128$ seconds. This “doubling experiment” is a practical way to estimate the exponent from measurements; the constant $c$ never enters the calculation.`,
         },
       ],
       sources: [SRC.l1.notes, SRC.l1.slides, SRC.l1.concept],

@@ -14,7 +14,7 @@ export const lecture3: Lecture = {
       title: 'Özyineleme ağaçları ve Master Teoremi',
       titleEn: 'Recursion trees and the Master Theorem',
       summary: 'Seviye toplamlarının geometrik dizisi: eşit mi, azalan mı, artan mı?',
-      minutes: 45,
+      minutes: 50,
       objectives: [
         'Böl-ve-fethet algoritmalarının çalışma süresini özyineleme bağıntısı (recurrence relation) olarak yazmak.',
         'Bir özyineleme ağacında seviye başına alt problem sayısını, boyutu ve toplam işi hesaplamak.',
@@ -144,6 +144,27 @@ Alt problemler farklı boyutlardaysa Master Teoremi yetmez; yerine koyma yöntem
           ],
         },
         {
+          kind: 'steps',
+          title: 'Teorem uygulanamadığında: $T(n) = 2T(n/2) + n\\log_2 n$',
+          label: 'proofIdea',
+          proof: [
+            { title: 'Neden uymuyor?', body: 'İş terimi $n\\log n$, hiçbir $d$ için $\\Theta(n^d)$ değildir: $n$’den hızlı, her $n^{1+\\varepsilon}$’dan yavaş büyür. Teorem 1’in koşulu sağlanmaz; ama özyineleme ağacı hâlâ çalışır.' },
+            { title: 'Seviye j', body: '$2^j$ alt problem, her biri $n/2^j$ boyutunda ve $\\frac{n}{2^j}\\log_2\\frac{n}{2^j}$ iş yapıyor: seviye toplamı $n(\\log_2 n - j)$.' },
+            { title: 'Toplam', body: '$L = \\log_2 n$ ile $\\sum_{j=0}^{L-1} n(L - j) = n\\,(L + (L-1) + \\dots + 1) = n\\frac{L(L+1)}{2}$.' },
+            { title: 'Sonuç', body: '$T(n) = \\Theta(n\\log^2 n)$: ne $n\\log n$ ne de $n^{1+\\varepsilon}$. Seviyeler eşit değil ama yavaşça küçülüyor, bu yüzden toplam “seviye sayısı × kök” mertebesinde kalıyor.' },
+          ],
+          check: [
+            {
+              id: 'c6',
+              kind: 'numeric',
+              prompt: '$n = 8$ için yapraklar hariç seviye toplamlarının toplamı $\\sum_{j=0}^{2} n(\\log_2 n - j)$ kaçtır?',
+              answer: 48,
+              hint: '$8 \\cdot 3 + 8 \\cdot 2 + 8 \\cdot 1$.',
+              explanation: '$24 + 16 + 8 = 48 = 8 \\cdot \\frac{3 \\cdot 4}{2}$.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- $T(n) = T(n/5) + T(7n/10) + n$ gibi **farklı boyutlu** alt problemlere Master Teoremi uygulamak. (Ders 4’te bu tam olarak Select’in bağıntısı; yerine koyma yöntemiyle çözülür.)
@@ -220,7 +241,7 @@ Alt problemler farklı boyutlardaysa Master Teoremi yetmez; yerine koyma yöntem
       title: 'Yerine koyma yöntemi',
       titleEn: 'The substitution method',
       summary: 'Bir sınır tahmin et, tümevarımla doğrula — Master Teoremi işe yaramadığında.',
-      minutes: 35,
+      minutes: 40,
       objectives: [
         'Yerine koyma (substitution) yönteminin adımlarını sıralamak: tahmin, taban durumu, tümevarım hipotezi, yerine koyma, sadeleştirme, sabit seçimi.',
         'Farklı boyutlu alt problemli bağıntılar için doğrusal (ya da polinom) bir sınırı kanıtlamak.',
@@ -320,6 +341,34 @@ Alt problemler farklı boyutlardaysa Master Teoremi yetmez; yerine koyma yöntem
           ],
         },
         {
+          kind: 'steps',
+          title: 'Klasik tuzak: Big-O’yu tümevarımın içine koymak',
+          label: 'proofIdea',
+          proof: [
+            { title: 'Yanlış iddia', body: '“$T(n) = 2T(n/2) + n$ ise $T(n) = O(n)$.” Gerçekte $T(n) = \\Theta(n\\log n)$, yani aşağıdaki kanıtta bir hata olmalı.' },
+            { title: 'Sahte kanıt', body: 'Hipotez: $m < n$ için $T(m) = O(m)$. O hâlde $T(n) = 2\\,O(n/2) + n = O(n) + n = O(n)$.' },
+            { title: 'Hata', body: 'Her satırdaki $O$ farklı bir sabit saklıyor. Hipotezi $T(m) \\le c\\,m$ diye açık yazarsak adım $T(n) \\le cn + n = (c + 1)n$ verir: hipotezdeki **aynı** $c$ ile $T(n) \\le cn$ elde edilemedi.' },
+            { title: 'Sabit büyüyor', body: 'Her seviyede sabit 1 artar: $c, c + 1, c + 2, \\dots$; $\\log_2 n$ seviye sonra $c + \\log_2 n$ olur. Bu bir sabit değildir ve karşımıza çıkan $n\\log n$’nin ta kendisidir.' },
+            { title: 'Kural', body: 'Tümevarım hipotezini **her zaman açık bir sabitle** yazın ($T(m) \\le D\\,m$) ve adımın sonunda aynı $D$’yi elde edin. $O(\\cdot)$ yalnızca sonuç cümlesinde kullanılır.' },
+          ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'mcq',
+              prompt: 'Bir öğrenci $T(n) = T(n-1) + n$ için “hipotez $T(n-1) = O(n)$, dolayısıyla $T(n) = O(n) + n = O(n)$” yazıyor. Hangisi doğrudur?',
+              options: [
+                'Kanıt doğrudur: $T(n) = O(n)$',
+                'Kanıt yanlıştır; gerçekte $T(n) = \\Theta(n^2)$ ve hata, $O$’nun her adımda farklı bir sabit saklaması',
+                'Kanıt doğrudur ama taban durumu eksiktir',
+                'Kanıt yanlıştır; gerçekte $T(n) = \\Theta(n\\log n)$',
+              ],
+              answer: 1,
+              hint: 'Bağıntıyı açın: $n + (n-1) + \\dots$',
+              explanation: '$T(n) = n + (n-1) + \\dots + 1 = \\Theta(n^2)$. Açık sabitle: $T(n-1) \\le c(n-1)$ ise $T(n) \\le cn - c + n$ ve bu, $c \\ge n$ olmadıkça $cn$’yi aşar; $c$ sabit kalamaz.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Başarısız tahminler (notlardaki örnekler)',
           body: `- **Yanlış sınır:** $T(n) = 2T(n/2) + n$ için $T(n) \\le Dn$ denersek $n + Dn \\le Dn$ gerekir — imkânsız. Tahmin fazla küçük; doğru cevap $\\Theta(n\\log n)$.
@@ -380,6 +429,12 @@ Alt problemler farklı boyutlardaysa Master Teoremi yetmez; yerine koyma yöntem
           prompt: `Kendi örneğimiz: $T(n) \\le T(n/4) + T(n/2) + T(n/8) + n$, $T(1) = 1$. $T(n) = O(n)$ olduğunu yerine koyma ile gösterin ve uygun $D$’yi bulun.`,
           hints: ['$1/4 + 1/2 + 1/8 = ?$', 'Koşul $D(1 - s) \\ge 1$.'],
           solution: `$s = \\frac14 + \\frac12 + \\frac18 = \\frac78$. Adım: $\\frac78 D n + n \\le Dn \\iff D \\ge 8$. Taban $D \\ge 1$. Seçim $D = 8$: $T(n) \\le 8n$. (Aracı bu terimlerle çalıştırarak kontrol edin.)`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: $T(n) = 4T(n/2) + n$, $T(1) = 1$. $T(n) \\le cn^2$ tahmini tümevarımda neden takılır? Hipotezi güçlendirerek $T(n) = O(n^2)$ olduğunu kanıtlayın.`,
+          hints: ['Yerine koyun: $4c(n/2)^2 + n = ?$', '$T(n) \\le cn^2 - dn$ deneyin.'],
+          solution: `$4c\\frac{n^2}{4} + n = cn^2 + n > cn^2$: fazladan $n$’den kurtulamıyoruz. Daha güçlü hipotez $T(m) \\le cm^2 - dm$: $4\\left(c\\frac{n^2}{4} - d\\frac{n}{2}\\right) + n = cn^2 - 2dn + n \\le cn^2 - dn \\iff d \\ge 1$. Taban $T(1) = 1 \\le c - d$; örneğin $d = 1$, $c = 2$. Böylece $T(n) \\le 2n^2 - n = O(n^2)$; aslında $n$ ikinin kuvvetiyken eşitlik vardır ($T(2) = 6$, $T(4) = 28$). Master Teoremi de $a = 4 > b^d = 2$ ile $\\Theta(n^2)$ der.`,
         },
       ],
       sources: [SRC.l3.notes, SRC.l3.slides, SRC.l4.notes, SRC.l3.concept, SRC.sec.s2],

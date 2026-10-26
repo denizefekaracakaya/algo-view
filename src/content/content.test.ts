@@ -149,4 +149,34 @@ describe('numeric claims made in the lesson content', () => {
     const chain = bstFromSequence([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
     expect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].reduce((s, k) => s + searchCost(chain, k), 0) / 12).toBe(6.5)
   })
+  it('worked examples and practice problems added to Lectures 1–6', () => {
+    const perms = (n: number): number[][] => (n === 0 ? [[]] : perms(n - 1).flatMap((p) => Array.from({ length: n }, (_, i) => [...p.slice(0, i), n, ...p.slice(i)])))
+    const inv = (a: number[]) => a.reduce((s, x, i) => s + a.slice(i + 1).filter((y) => y < x).length, 0)
+    // L1: all-pairs duplicate check on 10 elements
+    let pairs = 0
+    for (let i = 0; i < 10; i++) for (let j = i + 1; j < 10; j++) pairs++
+    expect(pairs).toBe(45)
+    // L2: average inversions for n = 8; sorted input costs n − 1 comparisons; MergeSort worst case for n = 8
+    const p8 = perms(8)
+    expect(p8.reduce((s, p) => s + inv(p), 0) / p8.length).toBe(14)
+    expect(insertionSortComparisons([1, 2, 3, 4, 5, 6, 7, 8])).toBe(7)
+    expect(Math.max(...p8.map((p) => mergeSortComparisons(p)))).toBe(17)
+    expect(mergeSortComparisons([1, 5, 3, 7, 2, 6, 4, 8])).toBe(17)
+    // L2: witnesses for n²/2 − 3n
+    const f = (n: number) => n * n / 2 - 3 * n
+    const firstFrom = (ok: (n: number) => boolean) => Array.from({ length: 100 }, (_, i) => i + 1).find((n) => Array.from({ length: 200 }, (_, k) => n + k).every(ok))
+    expect(firstFrom((n) => f(n) >= (n * n) / 4)).toBe(12)
+    expect(firstFrom((n) => f(n) >= (n * n) / 5)).toBe(10)
+    // L3: 2T(n/2) + n log n level totals for n = 8; 4T(n/2) + n equals 2n² − n on powers of two
+    expect([0, 1, 2].reduce((s, j) => s + 8 * (3 - j), 0)).toBe(48)
+    const T = (n: number): number => (n === 1 ? 1 : 4 * T(n / 2) + n)
+    for (const n of [1, 2, 4, 8, 16, 32]) expect(T(n)).toBe(2 * n * n - n)
+    // L5: QuickSort on 10 equal keys; expected fixed points and records over all permutations
+    expect(quickSort(Array(10).fill(5), 'last').comparisons).toBe(45)
+    const p6 = perms(6)
+    expect(p6.reduce((s, p) => s + p.filter((x, i) => x === i + 1).length, 0) / p6.length).toBeCloseTo(1, 12)
+    const p4 = perms(4)
+    const records = (p: number[]) => p.filter((x, i) => p.slice(0, i).every((y) => y < x)).length
+    expect(p4.reduce((s, p) => s + records(p), 0) / p4.length).toBeCloseTo(25 / 12, 12)
+  })
 })

@@ -179,6 +179,12 @@ Sonuç: karşılaştırma modelinde MergeSort **asimptotik olarak optimaldir**.`
           hints: ['$5! = 120$ ve $2^6 = 64$.'],
           solution: `Hayır. 6 karşılaştırmalık bir karar ağacının en fazla $2^6 = 64$ yaprağı olur, ama $5! = 120$ farklı sıra ayırt edilmelidir. En az $\\lceil\\log_2 120\\rceil = 7$ karşılaştırma gerekir.`,
         },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: $n$ sayının en büyüğünü bulmak için karar ağacı argümanı hangi alt sınırı verir? Bu sınır sıkı mıdır?`,
+          hints: ['Kaç farklı çıktı (yaprak) gerekir?', 'Maksimum olmayan her elemanın en az bir karşılaştırmada küçük çıkması gerekir.'],
+          solution: `$n$ olası cevap olduğundan ağaçta en az $n$ yaprak vardır: yükseklik $\\ge \\lceil\\log_2 n\\rceil$. Bu sınır **sıkı değildir**. Daha güçlü bir argüman: algoritma cevabından emin olabilmek için maksimum olmayan $n - 1$ elemanın her birini en az bir karşılaştırmada “yenilmiş” görmelidir ve her karşılaştırmada yalnızca bir eleman yenilir. Dolayısıyla en az $n - 1$ karşılaştırma gerekir; basit tarama da tam $n - 1$ yapar. Karar ağacı argümanı her zaman bir alt sınır verir, ama her zaman en iyisini değil.`,
+        },
       ],
       sources: [SRC.l6.pre, SRC.l6.slides, SRC.l6.notes, SRC.l6.blum, SRC.l6.concept, SRC.sec.s4],
     },

@@ -16,7 +16,7 @@ export const lecture2: Lecture = {
       title: 'InsertionSort ve döngü değişmezi',
       titleEn: 'InsertionSort and loop invariants',
       summary: 'Basit bir sıralama algoritmasının doğru olduğunu tümevarımla kanıtlamak.',
-      minutes: 35,
+      minutes: 40,
       objectives: [
         'InsertionSort’un her adımda ne yaptığını izlemek ve tahmin etmek.',
         '“Her iterasyondan sonra A[:i+1] sıralıdır” döngü değişmezini (loop invariant) ifade etmek.',
@@ -175,6 +175,29 @@ Rastgele bir dizide her çift $\\tfrac12$ olasılıkla terstir, yani beklenen $I
           ],
         },
         {
+          kind: 'formal',
+          title: 'En iyi, en kötü ve ortalama durum',
+          box: 'formal',
+          label: 'formal',
+          body: `InsertionSort’un işi ters çift sayısı $I$ ile belirlenir: tam $I$ kaydırma ve en fazla $I + (n - 1)$ karşılaştırma.
+
+- **En iyi durum (sıralı dizi):** $I = 0$ ve her $i$ için tek karşılaştırma: $n - 1$ karşılaştırma, $\\Theta(n)$.
+- **En kötü durum (ters sıralı dizi):** her çift ters, $I = \\frac{n(n-1)}{2}$: $\\Theta(n^2)$.
+- **Ortalama durum (rastgele permütasyon):** iki elemanın göreli sırası eşit olasılıklıdır, yani her çift olasılık $\\tfrac12$ ile terstir. Beklentinin doğrusallığıyla $E[I] = \\binom{n}{2} \\cdot \\frac12 = \\frac{n(n-1)}{4}$: yine $\\Theta(n^2)$, en kötü durumun tam yarısı.
+
+“Ortalamada hızlıdır” umudu InsertionSort’u kurtarmaz; ama girdi **neredeyse sıralıysa** ($I$ küçükse) gerçekten hızlıdır. Bu dersin en kötü duruma odaklanması da bu yüzden makuldür: ortalama çoğu zaman aynı mertebededir.`,
+          check: [
+            {
+              id: 'c7',
+              kind: 'numeric',
+              prompt: 'Rastgele sıralanmış 8 farklı elemanlı bir dizide InsertionSort ortalama kaç kaydırma yapar?',
+              answer: 14,
+              hint: '$E[I] = \\frac{n(n-1)}{4}$.',
+              explanation: '$\\frac{8 \\cdot 7}{4} = 14$: 28 çiftin ortalama yarısı terstir.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- Değişmezi “$A[:i+1]$ dizinin en küçük $i+1$ elemanını içerir” sanmak. Hayır: yalnızca **kendi içinde** sıralıdır; daha küçük elemanlar sağda bekliyor olabilir.
@@ -215,6 +238,15 @@ Rastgele bir dizide her çift $\\tfrac12$ olasılıkla terstir, yani beklenen $I
           hint: 'Her $i$ için `current` dizinin başına kadar gider: $i$ karşılaştırma.',
           explanation: '$\\sum_{i=1}^{7} i = 28 = \\frac{8\\cdot 7}{2}$.',
         },
+        {
+          id: 'q4',
+          kind: 'mcq',
+          prompt: 'Zaten sıralı $n$ elemanlı bir dizide InsertionSort kaç karşılaştırma (`A[j] > current`) yapar?',
+          options: ['$0$', '$n - 1$', '$n\\log_2 n$', '$\\frac{n(n-1)}{2}$'],
+          answer: 1,
+          hint: 'Her $i$ için iç döngünün koşulu kaç kez test edilir?',
+          explanation: 'Her $i$ için `A[i-1] > current` bir kez test edilir ve yanlış çıkar: toplam $n - 1$, yani $\\Theta(n)$.',
+        },
       ],
       practice: [
         {
@@ -232,7 +264,7 @@ Rastgele bir dizide her çift $\\tfrac12$ olasılıkla terstir, yani beklenen $I
       title: 'MergeSort ve özyineleme ağacı',
       titleEn: 'MergeSort and the recursion tree',
       summary: 'Böl, özyinele, birleştir — ve her seviyede eşit iş: $O(n\\log n)$.',
-      minutes: 40,
+      minutes: 45,
       objectives: [
         'MergeSort’un bölme ve birleştirme aşamalarını adım adım izlemek.',
         'Merge’ün iki sıralı listeyi doğrusal zamanda birleştirdiğini görmek ve tükenen liste durumunu ele almak.',
@@ -355,6 +387,25 @@ Bu bir **en kötü durum** sınırıdır: girdinin ne olduğuna bakılmaksızın
           ],
         },
         {
+          kind: 'text',
+          title: 'Kararlılık ve ek bellek',
+          body: `İki özellik MergeSort’u pratikte tanımlar:
+
+- **Kararlılık:** Merge eşitlikte sol listeden alır (\`L[i] <= R[j]\`). Eşit anahtarlı iki kayıttan girdide önce geleni hep soldadır, bu yüzden çıktıda da önce gelir. Kayıtları önce isme, sonra bölüme göre sıralamak gibi çok anahtarlı işler buna dayanır.
+- **Ek bellek:** Merge sonucu yeni bir listeye yazar: $\\Theta(n)$ ek alan. InsertionSort ve QuickSort ise dizinin içinde çalışır. Yerinde birleştirme yöntemleri vardır ama karmaşıktır ve sabitleri büyüktür; kütüphaneler genellikle ek belleği kabul eder.`,
+          check: [
+            {
+              id: 'c6',
+              kind: 'mcq',
+              prompt: 'Merge eşitlikte sağ listeden alsaydı (yalnızca `L[i] < R[j]` ise L’den) ne değişirdi?',
+              options: ['Dizi artık sıralanmazdı', 'Hâlâ sıralar ama kararlı olmaz', 'Çalışma süresi $\\Theta(n^2)$ olurdu', 'Hiçbir şey değişmezdi'],
+              answer: 1,
+              hint: 'Eşit anahtarların göreli sırasına bakın.',
+              explanation: 'Çıktı yine sıralıdır ve süre aynıdır; ama eşit anahtarlarda sağdaki (girdide sonra gelen) önce yazılır, yani göreli sıra bozulabilir.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- Merge’de bir liste bittiğinde dizinin sonuna erişmeye çalışmak (notlardaki sözde kodun bilerek bıraktığı boşluk).
@@ -411,6 +462,12 @@ Bu bir **en kötü durum** sınırıdır: girdinin ne olduğuna bakılmaksızın
           hints: ['Seviye $t$’de kaç alt problem, her biri hangi boyutta?', 'Kaç seviye var? $\\log_3 n$ ile $\\log_2 n$ arasındaki ilişki nedir?'],
           solution: `Seviye $t$’de $3^t$ alt problem, boyut $n/3^t$; Merge3 doğrusal olduğundan seviye işi $c\\cdot 3^t \\cdot n/3^t = cn$. $\\log_3 n + 1$ seviye var → $O(n\\log_3 n) = O(n \\log n)$, çünkü $\\log_3 n = \\log_2 n / \\log_2 3$ yalnızca sabit bir çarpan farkıdır. Asimptotik bir iyileşme **değildir**.`,
         },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: $n = 8$ için MergeSort en kötü durumda tam olarak kaç anahtar karşılaştırması yapar? Hangi girdi bu sayıya ulaşır?`,
+          hints: ['Toplam uzunluğu $m$ olan iki listeyi birleştirmek en fazla $m - 1$ karşılaştırma ister.', 'Seviyeleri ayrı ayrı toplayın: 2’şer elemanlı dört, 4’er elemanlı iki ve 8 elemanlı bir birleştirme.'],
+          solution: `Seviyeler: 2’şer elemanlı dört birleştirme ($4 \\cdot 1$), 4’er elemanlı iki birleştirme ($2 \\cdot 3$), 8 elemanlı bir birleştirme ($7$): toplam $4 + 6 + 7 = 17$. Genel olarak $n = 2^k$ için $n\\log_2 n - n + 1$. Örneğin $[1, 5, 3, 7, 2, 6, 4, 8]$ her birleştirmede iki listeyi dönüşümlü tüketir ve tam 17 karşılaştırma yapar.`,
+        },
       ],
       sources: [SRC.l2.notes, SRC.l2.slides, SRC.l2.notebook, SRC.l2.conceptSort, SRC.hw.hw2],
     },
@@ -420,7 +477,7 @@ Bu bir **en kötü durum** sınırıdır: girdinin ne olduğuna bakılmaksızın
       title: 'En kötü durum ve asimptotik gösterim',
       titleEn: 'Worst-case analysis and asymptotic notation',
       summary: 'Big-O, Big-Ω ve Big-Θ: sabitleri ve düşük mertebeli terimleri neden ve nasıl yok sayarız?',
-      minutes: 40,
+      minutes: 45,
       objectives: [
         'En kötü durum analizini “rakip (adversary) oyunu” olarak açıklamak.',
         'Big-O, Big-Ω, Big-Θ tanımlarını $c$ ve $n_0$ tanıkları (witness) ile yazmak ve uygulamak.',
@@ -559,6 +616,28 @@ Sezgisel olarak: O bir **üst sınır**, Ω bir **alt sınır**, Θ ise **sıkı
           ],
         },
         {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: $\\frac{n^2}{2} - 3n = \\Theta(n^2)$',
+          label: 'formalProof',
+          proof: [
+            { title: 'Hedef', body: 'İki tanık çifti bulmalıyız: üst sınır için $(c_1, n_1)$, alt sınır için $(c_2, n_2)$.' },
+            { title: 'Üst sınır', body: '$n \\ge 1$ için $-3n \\le 0$, yani $\\frac{n^2}{2} - 3n \\le \\frac12 n^2$: $c_1 = \\frac12$, $n_1 = 1$.' },
+            { title: 'Alt sınır: c seç', body: 'Baştaki katsayıdan küçük bir sabit seçelim: $c_2 = \\frac14$. İstenen: $\\frac{n^2}{2} - 3n \\ge \\frac{n^2}{4}$.' },
+            { title: 'Alt sınır: n₀ bul', body: '$\\frac{n^2}{4} \\ge 3n \\iff n \\ge 12$: $n_2 = 12$. ($n = 12$’de iki taraf da 36.)' },
+            { title: 'Sonuç', body: '$n \\ge 12$ için $\\frac14 n^2 \\le \\frac{n^2}{2} - 3n \\le \\frac12 n^2$: $\\Theta(n^2)$. Tanıklar tek değildir: $c_2$ baştaki katsayıya ($\\frac12$) yaklaştıkça gereken $n_0$ büyür.' },
+          ],
+          check: [
+            {
+              id: 'c6',
+              kind: 'numeric',
+              prompt: '$c_2 = \\frac15$ seçilirse $\\frac{n^2}{2} - 3n \\ge \\frac{n^2}{5}$ en küçük hangi $n$’den itibaren sağlanır?',
+              answer: 10,
+              hint: '$\\frac{n^2}{2} - \\frac{n^2}{5} = \\frac{3n^2}{10} \\ge 3n$.',
+              explanation: '$\\frac{3n^2}{10} \\ge 3n \\iff n \\ge 10$. Daha küçük $c_2$ daha küçük bir $n_0$ verir.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- $O$’yu “tam olarak” anlamında kullanmak: $n = O(n^2)$ doğrudur ama sıkı değildir; sıkılık için $\\Theta$ kullanılır.
@@ -625,6 +704,12 @@ Sezgisel olarak: O bir **üst sınır**, Ω bir **alt sınır**, Θ ise **sıkı
 **Ω:** $T(n) \\ge 11\\,n\\log_2 n$ her $n \\ge 1$ için. Tanık $c = 11$, $n_0 = 1$.
 
 İkisi birlikte $T(n) = \\Theta(n\\log n)$ verir.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: $2^{n+5} = O(2^n)$ midir? Peki $3^n = O(2^n)$?`,
+          hints: ['Oranlara bakın: $2^{n+5} / 2^n$ ve $3^n / 2^n$.', 'Big-O, oranın bir sabitle sınırlı kalmasını ister.'],
+          solution: `$2^{n+5} = 32 \\cdot 2^n$: $c = 32$, $n_0 = 1$ ile $O(2^n)$. Ama $3^n / 2^n = (3/2)^n$ sınırsız büyür; hangi $c$’yi seçerseniz seçin $(3/2)^n > c$ olan bir $n$ vardır, yani $3^n \\ne O(2^n)$. Üsse **eklenen** bir sabit, sabit bir çarpandır; **tabandaki** fark ise değildir.`,
         },
       ],
       sources: [SRC.l2.notes, SRC.l2.slides, SRC.l2.conceptAsym, SRC.sec.s1, SRC.hw.hw2],
