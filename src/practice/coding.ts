@@ -11,6 +11,7 @@ import { bstInsert } from '../engines/bst'
 import { isBST, type TNode } from '../engines/tree'
 import { inversionPairs, lomutoPartition } from './generators'
 import { tx } from '../i18n/lang'
+import { LATER_EXERCISES } from './codingLater'
 
 /**
  * How the result is checked: 'return' compares the return value; 'inPlace' compares the
@@ -467,6 +468,7 @@ export const EXERCISES: Exercise[] = [
       return pairs.map(([x, y]) => ({ args: [x, y], expected: x * y }))
     },
   },
+  ...LATER_EXERCISES,
 ]
 
 function hasDuplicateKey(t: TNode | null, seen = new Set<number>()): boolean {

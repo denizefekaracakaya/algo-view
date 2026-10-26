@@ -153,8 +153,8 @@ test('practice lab: every hand-tracing drill can be completed, and the generator
   await page.goto('/#/alistirma')
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Elle iz sür')
   const cards = page.locator('.drill-card')
-  await expect(cards).toHaveCount(6)
-  for (let c = 0; c < 6; c++) {
+  await expect(cards).toHaveCount(14)
+  for (let c = 0; c < 14; c++) {
     await cards.nth(c).click()
     const show = page.getByRole('button', { name: 'Bu adımı göster' })
     for (let i = 0; i < 40 && (await show.count()); i++) await show.click()
@@ -185,6 +185,32 @@ test('code exercises run in a worker: an infinite loop is stopped, a correct sol
   await page.reload()
   await expect(page.getByRole('button', { name: /Partition/ }).getByLabel('çözüldü')).toBeVisible()
   await noHorizontalOverflow(page)
+})
+
+test('later lectures: a hand-tracing drill answered step by step and a coding exercise solved', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (e) => errors.push(e.message))
+  await page.goto('/#/alistirma?ders=l15-mst')
+  await expect(page.locator('.drill-card')).toHaveCount(1)
+  // Kruskal: answer every step by clicking until the drill is done; wrong clicks only cost a mistake.
+  for (let i = 0; i < 40 && !(await page.locator('.drill-done').count()); i++) {
+    const add = page.getByRole('button', { name: 'Ağaca ekle' })
+    await add.click()
+    if (await page.locator('.drill-fb.no').count()) await page.getByRole('button', { name: /Atla/ }).click()
+  }
+  await expect(page.locator('.drill-done')).toContainText('Tamamlandı')
+  await noHorizontalOverflow(page)
+
+  await page.goto('/#/ders/l11-dijkstra')
+  await page.getByRole('link', { name: 'Kodla', exact: true }).click()
+  const editor = page.getByRole('textbox', { name: /dijkstra fonksiyonunun kodu/ })
+  await editor.fill(
+    'function dijkstra(n, edges, s) {\n  const d = Array(n).fill(Infinity)\n  d[s] = 0\n  for (let k = 0; k < n; k++)\n    for (const [u, v, w] of edges) if (d[u] + w < d[v]) d[v] = d[u] + w\n  return d.map((x) => (x === Infinity ? null : x))\n}\n',
+  )
+  await page.getByRole('button', { name: /Çalıştır ve test et/ }).click()
+  await expect(page.getByText(/^(\d+) \/ \1 test geçti\./)).toBeVisible()
+  await noHorizontalOverflow(page)
+  expect(errors).toEqual([])
 })
 
 test('exam mode and notes', async ({ page }) => {

@@ -14,9 +14,9 @@ Algo View, algoritma analizi dersine çalışanlar için hazırlanmış Türkçe
 |---|---|
 | **Etkileşimli dersler** | Her konu sezgiyle başlar, sonra tanım, sözde kod, doğruluk kanıtı ve karmaşıklık analizi gelir. Kanıtlar adım adım açılır, aradaki “Kendini dene” soruları anlayıp anlamadığını yoklar. |
 | **Görselleştiriciler** | MergeSort, QuickSort, Select, kırmızı-siyah ağaç (ekleme ve silme), hash tablosu, BFS/DFS, Dijkstra, Bellman–Ford, Floyd–Warshall, LCS ve sırt çantası tabloları, Huffman, Prim/Kruskal, Ford–Fulkerson ve Gale–Shapley gibi algoritmaları kendi girdinle adım adım oynat. Bir sonraki adımı tahmin etmeni isteyen bir *tahmin modu* da var. |
-| **Elle iz sürme** | Algoritmanın her kararını sen verirsin: hangi eleman nereye gider, pivot nereye oturur, düğüm hangi tarafa eklenir. Takılırsan ipucu var. |
+| **Elle iz sürme** | Algoritmanın her kararını sen verirsin: hangi eleman nereye gider, pivot nereye oturur, BFS kuyruğundan sıradaki kim çıkar, Dijkstra hangi düğümü kesinleştirir, Kruskal kenarı alır mı? 14 alıştırma, her seferinde yeni girdiyle. Takılırsan ipucu var. |
 | **Soru üreteci** | 36 soru türü, her seferinde yeni sayılarla. Bitmeyen bir alıştırma kaynağı. |
-| **Kod alıştırmaları** | 13 algoritmayı JavaScript ile kendin yaz, testler tarayıcıda anında çalışsın. Sonsuz döngüye girsen bile sayfa donmaz. |
+| **Kod alıştırmaları** | MergeSort’tan Dijkstra’ya, LCS’den maksimum akışa 27 algoritmayı JavaScript ile kendin yaz, testler tarayıcıda anında çalışsın. Sonsuz döngüye girsen bile sayfa donmaz. |
 | **Deneme sınavı** | Dersleri, soru sayısını ve süreyi seç; sonunda ders ders puanını ve her sorunun çözümünü gör. |
 | **Notlar** | Her dersin sonuna kendi özetini yaz, hepsini tek bir Markdown dosyası olarak indir. |
 | **Türkçe / English, açık / karanlık tema** | Üst çubuktan tek tıkla değiştirilir. Telefonda da rahatça kullanılır. |

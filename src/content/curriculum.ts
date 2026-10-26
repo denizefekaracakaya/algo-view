@@ -36,8 +36,8 @@ import { lecture16 as en16 } from './en/lecture16'
 import { lecture17 as en17 } from './en/lecture17'
 
 /**
- * Lectures 1–7 of CS161 Winter 2026, in course order, per language. Lecture 8 (Hashing) is
- * intentionally out of scope. The English files mirror the Turkish ones structurally
+ * Lectures 1–17 of CS161 Winter 2026, in course order, per language. Lecture 18 is a wrap-up and
+ * has no lesson. The English files mirror the Turkish ones structurally
  * (same ids, answers and visualizers) — `content.test.ts` enforces this.
  */
 export const LECTURES_BY_LANG: Record<Lang, Lecture[]> = {

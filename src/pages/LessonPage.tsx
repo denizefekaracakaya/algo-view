@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { GENERATORS } from '../practice/generators'
 import { DRILL_LESSON } from '../practice/drills'
+import { EXERCISES } from '../practice/coding'
 import { ArrowLeft, ArrowRight, CheckCircle2, Circle, ExternalLink, ListChecks, ListTree, RotateCcw } from 'lucide-react'
 import { allLessons, lectures, findLesson } from '../content/curriculum'
 import { tx } from '../i18n/lang'
@@ -17,7 +18,8 @@ import { LessonNotes } from '../components/LessonNotes'
 import { StatusIcon } from './Dashboard'
 
 const DRILLS_BY_LESSON = new Set(Object.values(DRILL_LESSON))
-const hasPractice = (id: string) => DRILLS_BY_LESSON.has(id) || GENERATORS.some((g) => g.lessonId === id)
+const hasCode = (id: string) => EXERCISES.some((e) => e.lessonId === id)
+const hasPractice = (id: string) => DRILLS_BY_LESSON.has(id) || GENERATORS.some((g) => g.lessonId === id) || hasCode(id)
 
 const kindLabel = (k: SourceRef['kind']): string =>
   ({
@@ -278,7 +280,7 @@ function LessonBody({ lesson, lecture, index }: { lesson: Lesson; lecture: Lectu
         {hasPractice(lesson.id) && (
           <section className="card card-pad section practice-cta" aria-label={tx('Alıştırma laboratuvarı', 'Practice lab')}>
             <span className="grow small">
-              {tx('Bu dersin konusunu elle iz sürerek ve her seferinde yeni girdiyle üretilen sorularla çalış.', 'Practise this lesson by tracing it by hand and with questions generated from a fresh input every time.')}
+              {tx('Bu dersin konusunu elle iz sürerek, her seferinde yeni girdiyle üretilen sorularla ve kod yazarak çalış.', 'Practise this lesson by tracing it by hand, with questions generated from a fresh input every time, and by writing code.')}
             </span>
             {DRILLS_BY_LESSON.has(lesson.id) && (
               <Link className="btn sm" to={`/alistirma?ders=${lesson.id}`}>
@@ -288,6 +290,11 @@ function LessonBody({ lesson, lecture, index }: { lesson: Lesson; lecture: Lectu
             {GENERATORS.some((g) => g.lessonId === lesson.id) && (
               <Link className="btn sm" to={`/alistirma?mod=soru&ders=${lesson.id}`}>
                 {tx('Soru üret', 'Generate questions')}
+              </Link>
+            )}
+            {hasCode(lesson.id) && (
+              <Link className="btn sm" to={`/alistirma?mod=kod&ders=${lesson.id}`}>
+                {tx('Kodla', 'Code it')}
               </Link>
             )}
           </section>

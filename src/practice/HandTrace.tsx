@@ -1,108 +1,12 @@
 import { useMemo, useState, type ReactNode } from 'react'
-import { CheckCircle2, Eye, RefreshCw, RotateCcw, XCircle } from 'lucide-react'
 import { ArrayView, type CellSpec } from '../components/ArrayView'
 import { TreeView } from '../components/TreeView'
 import type { NodeRole } from '../engines/bst'
-import { useProgress } from '../state/ProgressContext'
 import { tx } from '../i18n/lang'
-import { bstDrill, drillInput, insertionDrill, mergeDrill, momDrill, partitionDrill, radixDrill, type DrillId, type DrillStepBase } from './drills'
-
-interface Feedback {
-  ok: boolean
-  text: string
-}
-
-/** Step machine shared by all drills: a wrong choice costs a mistake and shows a hint; a right one advances. */
-function useDrill<S extends DrillStepBase>(steps: S[], id: DrillId) {
-  const { dispatch } = useProgress()
-  const [idx, setIdx] = useState(0)
-  const [mistakes, setMistakes] = useState(0)
-  const [fb, setFb] = useState<Feedback | null>(null)
-  const step = idx < steps.length ? steps[idx] : null
-  const advance = (m: number) => {
-    const next = idx + 1
-    setIdx(next)
-    if (next === steps.length) dispatch({ type: 'drill', id, mistakes: m })
-  }
-  const choose = (v: number) => {
-    if (!step) return
-    if (v === step.answer) {
-      setFb({ ok: true, text: step.why })
-      advance(mistakes)
-    } else {
-      setMistakes(mistakes + 1)
-      setFb({ ok: false, text: step.hint })
-    }
-  }
-  const reveal = () => {
-    if (!step) return
-    setMistakes(mistakes + 1)
-    setFb({ ok: true, text: tx('Gösterildi (hata sayıldı): ', 'Shown (counted as a mistake): ') + step.why })
-    advance(mistakes + 1)
-  }
-  return { idx, step, total: steps.length, done: !step, mistakes, fb, choose, reveal }
-}
-
-type Drill = ReturnType<typeof useDrill>
-
-function DrillFrame({ d, prompt, stage, controls, onNew, onRestart }: { d: Drill; prompt: ReactNode; stage: ReactNode; controls: ReactNode; onNew: () => void; onRestart: () => void }) {
-  return (
-    <div className="card viz drill">
-      <div className="viz-toolbar">
-        <span className="step-count mono">
-          {tx('Adım', 'Step')} {Math.min(d.idx + 1, d.total)} / {d.total}
-        </span>
-        <span className={'badge ' + (d.mistakes ? 'progress' : 'done')}>
-          {d.mistakes} {tx('hata', d.mistakes === 1 ? 'mistake' : 'mistakes')}
-        </span>
-        <span className="spacer" />
-        <button className="btn sm ghost" onClick={onRestart}>
-          <RotateCcw size={14} aria-hidden /> {tx('Baştan', 'Restart')}
-        </button>
-        <button className="btn sm" onClick={onNew}>
-          <RefreshCw size={14} aria-hidden /> {tx('Yeni girdi', 'New input')}
-        </button>
-      </div>
-      <div className="viz-stage">{stage}</div>
-      <div className="drill-panel">
-        {d.done ? (
-          <div className="feedback ok drill-done" role="status">
-            <CheckCircle2 size={16} aria-hidden />{' '}
-            <strong>
-              {d.mistakes === 0
-                ? tx('Tamamlandı, hiç hata yok!', 'Done, without a single mistake!')
-                : tx(`Tamamlandı: ${d.total} adımda ${d.mistakes} hata.`, `Done: ${d.mistakes} mistake(s) in ${d.total} steps.`)}
-            </strong>{' '}
-            {d.mistakes > 0 ? tx('Aynı girdiyle baştan dene ya da yeni bir girdi al.', 'Try the same input again or get a new one.') : tx('Yeni bir girdiyle tekrar dene.', 'Try again with a new input.')}
-          </div>
-        ) : (
-          <>
-            <p className="drill-prompt">{prompt}</p>
-            <div className="drill-controls" role="group" aria-label={tx('Seçenekler', 'Choices')}>
-              {controls}
-            </div>
-            <button className="btn sm ghost" onClick={d.reveal}>
-              <Eye size={14} aria-hidden /> {tx('Bu adımı göster', 'Show this step')}
-            </button>
-          </>
-        )}
-        <div aria-live="polite">
-          {d.fb && !d.done && (
-            <div key={d.idx + ':' + d.mistakes} className={'feedback drill-fb ' + (d.fb.ok ? 'ok' : 'no')}>
-              {d.fb.ok ? <CheckCircle2 size={15} aria-hidden /> : <XCircle size={15} aria-hidden />} <strong>{d.fb.ok ? tx('Doğru. ', 'Right. ') : tx('Olmadı. ', 'Not quite. ')}</strong>
-              {d.fb.text}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-interface DrillProps {
-  seed: number
-  onNew: () => void
-}
+import { bstDrill, drillInput, insertionDrill, mergeDrill, momDrill, partitionDrill, radixDrill, type DrillId } from './drills'
+import { useDrill, type DrillProps } from './useDrill'
+import { DrillFrame } from './DrillFrame'
+import { BfsDrillView, DfsDrillView, DijkstraDrillView, GsDrillView, HashDrillView, HuffmanDrillView, KruskalDrillView, LcsDrillView } from './HandTraceLater'
 
 /** Remount on restart so the step machine resets with the same input. */
 function Restartable({ render }: { render: (restart: () => void) => ReactNode }) {
@@ -110,7 +14,7 @@ function Restartable({ render }: { render: (restart: () => void) => ReactNode })
   return <div key={run}>{render(() => setRun((r) => r + 1))}</div>
 }
 
-function InsertionDrillView({ seed, onNew, onRestart }: DrillProps & { onRestart: () => void }) {
+function InsertionDrillView({ seed, onNew, onRestart }: DrillProps) {
   const { steps, final } = useMemo(() => insertionDrill(drillInput('insertion', seed)), [seed])
   const d = useDrill(steps, 'insertion')
   const s = d.step
@@ -135,7 +39,7 @@ function InsertionDrillView({ seed, onNew, onRestart }: DrillProps & { onRestart
   )
 }
 
-function MergeDrillView({ seed, onNew, onRestart }: DrillProps & { onRestart: () => void }) {
+function MergeDrillView({ seed, onNew, onRestart }: DrillProps) {
   const { L, R } = useMemo(() => {
     const A = drillInput('merge', seed)
     return { L: A.slice(0, 4).sort((x, y) => x - y), R: A.slice(4).sort((x, y) => x - y) }
@@ -184,7 +88,7 @@ function MergeDrillView({ seed, onNew, onRestart }: DrillProps & { onRestart: ()
   )
 }
 
-function PartitionDrillView({ seed, onNew, onRestart }: DrillProps & { onRestart: () => void }) {
+function PartitionDrillView({ seed, onNew, onRestart }: DrillProps) {
   const { steps, final, pivotIndex } = useMemo(() => partitionDrill(drillInput('partition', seed)), [seed])
   const d = useDrill(steps, 'partition')
   const s = d.step
@@ -231,7 +135,7 @@ function PartitionDrillView({ seed, onNew, onRestart }: DrillProps & { onRestart
   )
 }
 
-function MomDrillView({ seed, onNew, onRestart }: DrillProps & { onRestart: () => void }) {
+function MomDrillView({ seed, onNew, onRestart }: DrillProps) {
   const { steps, pivot } = useMemo(() => momDrill(drillInput('select-mom', seed)), [seed])
   const d = useDrill(steps, 'select-mom')
   const s = d.step
@@ -282,7 +186,7 @@ function MomDrillView({ seed, onNew, onRestart }: DrillProps & { onRestart: () =
   )
 }
 
-function RadixDrillView({ seed, onNew, onRestart }: DrillProps & { onRestart: () => void }) {
+function RadixDrillView({ seed, onNew, onRestart }: DrillProps) {
   const { steps, final } = useMemo(() => radixDrill(drillInput('radix', seed), 10), [seed])
   const d = useDrill(steps, 'radix')
   const s = d.step
@@ -322,7 +226,7 @@ function RadixDrillView({ seed, onNew, onRestart }: DrillProps & { onRestart: ()
   )
 }
 
-function BstDrillView({ seed, onNew, onRestart }: DrillProps & { onRestart: () => void }) {
+function BstDrillView({ seed, onNew, onRestart }: DrillProps) {
   const keys = useMemo(() => drillInput('bst', seed), [seed])
   const { steps, final } = useMemo(() => bstDrill(keys), [keys])
   const d = useDrill(steps, 'bst')
@@ -369,13 +273,21 @@ function BstDrillView({ seed, onNew, onRestart }: DrillProps & { onRestart: () =
   )
 }
 
-const VIEWS: Record<DrillId, (p: DrillProps & { onRestart: () => void }) => ReactNode> = {
+const VIEWS: Record<DrillId, (p: DrillProps) => ReactNode> = {
   insertion: InsertionDrillView,
   merge: MergeDrillView,
   partition: PartitionDrillView,
   'select-mom': MomDrillView,
   radix: RadixDrillView,
   bst: BstDrillView,
+  hash: HashDrillView,
+  bfs: BfsDrillView,
+  dfs: DfsDrillView,
+  dijkstra: DijkstraDrillView,
+  lcs: LcsDrillView,
+  huffman: HuffmanDrillView,
+  kruskal: KruskalDrillView,
+  'gale-shapley': GsDrillView,
 }
 
 export function DrillRunner({ id }: { id: DrillId }) {

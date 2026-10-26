@@ -9,6 +9,7 @@ import { digitCount, digitOf } from '../engines/bucketSort'
 import { makeRng, randomPermutation } from '../engines/random'
 import { distinctInts } from './generators'
 import { tx } from '../i18n/lang'
+import { LATER_DRILL_LESSON, LATER_DRILLS, type LaterDrillId } from './drillsLater'
 
 export interface DrillStepBase {
   /** Index of the correct choice. */
@@ -19,7 +20,10 @@ export interface DrillStepBase {
   why: string
 }
 
-export type DrillId = 'insertion' | 'merge' | 'partition' | 'select-mom' | 'radix' | 'bst'
+/** Drills over a plain array of numbers (Lectures 2–7); their inputs come from `drillInput`. */
+export type ArrayDrillId = 'insertion' | 'merge' | 'partition' | 'select-mom' | 'radix' | 'bst'
+
+export type DrillId = ArrayDrillId | LaterDrillId
 
 export const DRILL_LESSON: Record<DrillId, string> = {
   insertion: 'l2-insertion',
@@ -28,6 +32,7 @@ export const DRILL_LESSON: Record<DrillId, string> = {
   partition: 'l5-quicksort',
   radix: 'l6-bucketsort',
   bst: 'l7-bst',
+  ...LATER_DRILL_LESSON,
 }
 
 /** Drill catalogue, in course order. */
@@ -38,6 +43,7 @@ export const DRILLS: { id: DrillId; title: () => string; blurb: () => string }[]
   { id: 'partition', title: () => 'Partition', blurb: () => tx('Her A[j] için takas mı, bekle mi? Sonunda pivotu yerleştir.', 'For each A[j]: swap or skip? Then place the pivot.') },
   { id: 'radix', title: () => 'RadixSort', blurb: () => tx('Her elemanı bu geçişin basamağına göre kovasına at.', 'Drop each element into the bucket of this pass’s digit.') },
   { id: 'bst', title: () => tx('BST’ye ekleme', 'BST insertion'), blurb: () => tx('Her düğümde sola mı sağa mı ineceğine karar ver.', 'At every node decide whether to go left or right.') },
+  ...LATER_DRILLS,
 ]
 
 /* ───────────── InsertionSort: where does `current` land? ───────────── */
@@ -294,7 +300,7 @@ export function bstDrill(keys: readonly number[]): { steps: BstStep[]; final: TN
 
 /* ───────────── Random inputs ───────────── */
 
-export function drillInput(id: DrillId, seed: number): number[] {
+export function drillInput(id: ArrayDrillId, seed: number): number[] {
   const rng = makeRng(seed)
   switch (id) {
     case 'insertion':
