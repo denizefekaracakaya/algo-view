@@ -71,6 +71,16 @@ $k = 0$ için cevap açık: yalnızca $s$’ye (maliyet 0). $k$ kenarlık en iyi
             { title: 'n − 1 tur yeter', body: 'Negatif döngü yoksa her en kısa yoldaki döngü atılabilir (pozitifse yolu kısaltır, sıfırsa değiştirmez): en kısa yollar basittir, en fazla $n - 1$ kenarlıdır. Demek ki $d^{(n-1)}[v] = d(s, v)$.' },
             { title: 'Negatif döngü tespit edilir', body: 'Ulaşılabilir bir $v_1 \\to \\dots \\to v_k \\to v_1$ negatif döngüsü olsun ve son kontrol hiçbir şey bulmasın: her $i$ için $d[v_{i+1}] \\le d[v_i] + w(v_i, v_{i+1})$. Döngü boyunca toplayınca $d$ terimleri sadeleşir ve $0 \\le \\sum w(v_i, v_{i+1})$ çıkar — döngünün negatif olmasıyla çelişki.' },
           ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'Döngü $a \\to b$ (2), $b \\to c$ ($-4$), $c \\to a$ (1) $s$’den ulaşılabilir. Döngü negatif, bu yüzden son kontrol bir kenarı hâlâ gevşetebilir. $c \\to a$ kenarının ağırlığı **en az** kaç olursa döngü artık negatif olmaz?',
+              answer: 2,
+              hint: 'Şu an döngünün toplam ağırlığı kaç?',
+              explanation: 'Şu an $2 - 4 + 1 = -1 < 0$; ağırlık $w$ olunca toplam $w - 2$, yani $w \\ge 2$ gerekir. Ağırlık 1 iken hiçbir kenar gevşetilemeseydi üç eşitsizliği toplayınca $0 \\le -1$ çıkardı: çelişki. Demek ki son turda en az bir kenar hâlâ iyileşir.',
+            },
+          ],
         },
         {
           kind: 'formal',
@@ -108,6 +118,16 @@ Ad hakkında: “programming” burada bilgisayar programı değil, **plan** dem
           body: `$n - 1$ tur, her turda $m$ kenar: **$O(nm)$**. Son kontrol $O(m)$. Dijkstra’dan yavaştır ama negatif kenarlarla çalışır, negatif döngüyü bulur ve uygulaması çok basittir.
 
 Bellek: tablo $n \\times n$ olsa da yalnızca son iki satır gerekir: $O(n)$. Bir tur hiçbir değeri değiştirmediyse algoritma erken durabilir.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: '$n = 1000$ düğüm ve $m = 5000$ kenarlı bir grafikte erken durma olmadan $n - 1$ tur kaç kenar gevşetmesi yapar?',
+              answer: 4995000,
+              hint: 'Her turda her kenar bir kez.',
+              explanation: '$(n - 1) \\cdot m = 999 \\cdot 5000 = 4\\,995\\,000$. Son kontrol $5000$ daha ekler. Dijkstra yığınla yaklaşık $m \\log_2 n \\approx 5 \\cdot 10^4$ işlem yapardı; negatif kenarların bedeli bu.',
+            },
+          ],
         },
         {
           kind: 'text',
@@ -272,6 +292,17 @@ $k = 0$’da hiç ara durak yok: yalnızca doğrudan kenarlar. Her adımda bir d
 **$n$ kez Dijkstra ile karşılaştırma:** ağırlıklar negatif değilse $n$ kez Dijkstra $O(nm + n^2\\log n)$ sürer; seyrek grafiklerde bu $O(n^3)$’ten iyidir. Floyd–Warshall’ın üstünlükleri: üç satırlık uygulama ve negatif kenarlarla çalışması. (Johnson yöntemi, ağırlıkları yeniden düzenleyerek negatif kenarlarda da $n$ kez Dijkstra kullanmayı sağlar.)
 
 **En uzun basit yol neden DP ile çözülmez?** $s \\to k \\to t$ en uzun yolunun parçaları en uzun yollar olmak zorunda değildir ve iki parça ortak düğüm kullanamaz: alt problemler bağımsız değildir. Problem NP-zordur.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'mcq',
+              prompt: 'Negatif kenarı olmayan, $n = 10^4$ kavşaklı ve $m = 3 \\cdot 10^4$ yollu bir şehir ağında tüm çiftler arası uzaklıklar gerekiyor. Hangisi daha hızlıdır?',
+              options: ['Floyd–Warshall', '$n$ kez Dijkstra', 'İkisi aynı', '$n$ kez Bellman–Ford'],
+              answer: 1,
+              hint: '$n^3$ ile $nm + n^2\\log n$’yi karşılaştırın.',
+              explanation: 'Floyd–Warshall $n^3 = 10^{12}$ adım. $n$ kez Dijkstra yaklaşık $nm + n^2 \\log_2 n \\approx 3 \\cdot 10^8 + 1.3 \\cdot 10^9$: yaklaşık 600 kat daha az. $n$ kez Bellman–Ford ise $n \\cdot nm = 3 \\cdot 10^{12}$ olurdu.',
+            },
+          ],
         },
         {
           kind: 'text',
@@ -279,6 +310,17 @@ $k = 0$’da hiç ara durak yok: yalnızca doğrudan kenarlar. Her adımda bir d
           body: `- **Uzaklık tabloları:** bir şehir haritasındaki tüm kavşaklar arası uzaklıklar, oyunlarda yol bulma için önceden hesaplanan tablolar, ağ gecikme matrisleri.
 - **Geçişli kapanış (Warshall):** ağırlık yerine “ulaşılabilir mi?” sorulursa aynı üç döngü, $\\min$/$+$ yerine “veya”/“ve” ile çalışır.
 - **En dar darboğaz yolu** ya da **en güvenilir yol** gibi problemler de aynı kalıba, farklı işlemlerle uyar.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: '**En geniş darboğaz yolu:** bir yolun değeri, üzerindeki en küçük kenar kapasitesidir ve en büyük değerli yol aranıyor. Floyd–Warshall’da $\\min$ ve $+$ yerine hangi işlemler kullanılır?',
+              options: ['$\\max$ ve $\\min$', '$\\min$ ve $+$', '“veya” ve “ve”', '$\\max$ ve $+$'],
+              answer: 0,
+              hint: '$k$ üzerinden giden yolun değeri iki parçanın hangisiyle sınırlı?',
+              explanation: '$k$ üzerinden giden yolun darboğazı iki parçanın küçüğüdür: $\\min(D[i][k], D[k][j])$. Mevcut değerle bunların büyüğü alınır: $D[i][j] \\leftarrow \\max(D[i][j], \\min(D[i][k], D[k][j]))$.',
+            },
+          ],
         },
         {
           kind: 'steps',

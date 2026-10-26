@@ -273,6 +273,17 @@ DFS’e iki zaman damgası ekleriz: düğüme ilk vardığımız an $d(v)$ (**ke
             { title: 'Aralıklar iç içe', body: '$v$, $u$ gri iken keşfedildiyse $v$’nin tüm işi $u$ bitmeden biter: $d(u) < d(v) < f(v) < f(u)$. İki aralık ya iç içedir ya da ayrıktır (parantez yapısı).' },
             { title: 'Erişilebilirlik', body: 'DFS($s$) bittiğinde $s$’den ulaşılabilen her düğüm siyahtır, ulaşılamayanlar beyaz kalır.' },
           ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'mcq',
+              prompt: 'Aynı DFS’te iki düğümün $[d, f]$ aralıkları hangisi **olamaz**?',
+              options: ['$[1, 8]$ ve $[2, 5]$', '$[1, 4]$ ve $[5, 8]$', '$[1, 6]$ ve $[3, 9]$', '$[2, 7]$ ve $[3, 4]$'],
+              answer: 2,
+              hint: 'İki aralık ya iç içedir ya da ayrıktır.',
+              explanation: '$[1, 6]$ ile $[3, 9]$ kesişiyor ama biri diğerinin içinde değil. 3. zamanda keşfedilen düğüm, 1’de keşfedilenin torunudur ve ondan önce bitmeliydi: $f \\le 5$. Diğer üçü ya iç içe ya ayrık.',
+            },
+          ],
         },
         {
           kind: 'viz',
@@ -310,6 +321,17 @@ DFS’e iki zaman damgası ekleriz: düğüme ilk vardığımız an $d(v)$ (**ke
 - **Süre:** ikisi de $O(n + m)$.
 - **BFS verir:** katmanlar ve ağırlıksız uzaklıklar → en az adımlı yollar.
 - **DFS verir:** $d/f$ zamanları ve döngü tespiti → topolojik sıra, güçlü bağlı bileşenler (Ders 10).`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'Ağırlıksız bir grafikte $s$’den $t$’ye **en az kenarlı** yolu hangisi bulur?',
+              options: ['Yalnızca BFS', 'Yalnızca DFS', 'İkisi de', 'Hiçbiri'],
+              answer: 0,
+              hint: 'DFS bir dala girince sonuna kadar gider.',
+              explanation: 'BFS katman katman ilerler ve $t$’yi ilk bulduğu katman uzaklıktır. DFS de $t$’ye bir yol bulur ama uzun olabilir: $s$–$t$ kenarı olan bir döngüde DFS önce döngünün öbür yanından dolanabilir.',
+            },
+          ],
         },
         {
           kind: 'text',

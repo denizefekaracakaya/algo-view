@@ -433,3 +433,40 @@ describe('encoding and decoding with the Huffman code of the notes (l14-huffman)
     expect(decode('1001100111')).toBe('ced')
   })
 })
+
+describe('more try-it-yourself questions in Lectures 9 and 12', () => {
+  it('DFS intervals are nested or disjoint (l9-dfs c4)', () => {
+    const ok = ([a, b]: number[], [c, d]: number[]) => b < c || d < a || (a < c && d < b) || (c < a && b < d)
+    const pairs = [[[1, 8], [2, 5]], [[1, 4], [5, 8]], [[1, 6], [3, 9]], [[2, 7], [3, 4]]]
+    expect(pairs.map(([x, y]) => ok(x, y))).toEqual([true, true, false, true])
+  })
+
+  it('Bellman–Ford: a cycle of weight −1 and the cost of n − 1 rounds (l12-bellman-ford c4, c5)', () => {
+    const cyc = (w: number) => g(true, [['s', 'a', 0], ['a', 'b', 2], ['b', 'c', -4], ['c', 'a', w]])
+    expect(bellmanFordTrace(cyc(1), 's').negativeCycle).toBe(true)
+    expect(bellmanFordTrace(cyc(2), 's').negativeCycle).toBe(false)
+    expect(999 * 5000).toBe(4_995_000)
+    expect(5000 * Math.log2(1000)).toBeCloseTo(5e4, -4)
+  })
+
+  it('Floyd–Warshall vs n × Dijkstra, and the widest bottleneck path (l12-floyd c4, c5)', () => {
+    const n = 1e4
+    const m = 3e4
+    const dijkstra = n * m + n * n * Math.log2(n)
+    expect(dijkstra).toBeCloseTo(1.63e9, -8)
+    expect(n ** 3 / dijkstra).toBeGreaterThan(550)
+    expect(n ** 3 / dijkstra).toBeLessThan(650)
+    // max/min Floyd–Warshall against brute force over all simple paths
+    const V = ['a', 'b', 'c', 'd', 'e']
+    const E: [string, string, number][] = [['a', 'b', 4], ['b', 'c', 7], ['a', 'c', 2], ['c', 'd', 5], ['b', 'd', 3], ['d', 'e', 6], ['a', 'e', 1]]
+    const cap = (u: string, v: string) => E.find(([x, y]) => (x === u && y === v) || (x === v && y === u))?.[2] ?? 0
+    const D = V.map((u) => V.map((v) => (u === v ? Infinity : cap(u, v))))
+    for (let k = 0; k < V.length; k++)
+      for (let i = 0; i < V.length; i++) for (let j = 0; j < V.length; j++) D[i][j] = Math.max(D[i][j], Math.min(D[i][k], D[k][j]))
+    const brute = (u: string, t: string, seen: Set<string>, bott: number): number =>
+      u === t ? bott : Math.max(0, ...V.filter((v) => !seen.has(v) && cap(u, v) > 0).map((v) => brute(v, t, new Set([...seen, v]), Math.min(bott, cap(u, v)))))
+    for (let i = 0; i < V.length; i++)
+      for (let j = 0; j < V.length; j++) if (i !== j) expect(D[i][j]).toBe(brute(V[i], V[j], new Set([V[i]]), Infinity))
+    expect(D[0][4]).toBe(4)
+  })
+})

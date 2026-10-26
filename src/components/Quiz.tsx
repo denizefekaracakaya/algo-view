@@ -179,7 +179,8 @@ function NumericBody({ q, onAnswer }: { q: NumericQ; onAnswer: (c: boolean) => v
       style={{ margin: '8px 0' }}
       onSubmit={(e) => {
         e.preventDefault()
-        const v = Number(val.replace(',', '.'))
+        // accept “4 995 000”, a decimal comma and the typographic minus
+        const v = Number(val.replace(/[\s_]/g, '').replace(',', '.').replace('−', '-'))
         if (val.trim() === '' || !Number.isFinite(v)) {
           setErr(tx('Lütfen bir sayı girin.', 'Please enter a number.'))
           return

@@ -273,6 +273,17 @@ We add two timestamps to DFS: the moment we first arrive at a node, $d(v)$ (**di
             { title: 'Nested intervals', body: 'If $v$ is discovered while $u$ is gray, all of $v$’s work ends before $u$ finishes: $d(u) < d(v) < f(v) < f(u)$. Two intervals are either nested or disjoint (parenthesis structure).' },
             { title: 'Reachability', body: 'When DFS($s$) returns, every node reachable from $s$ is black and the unreachable ones are still white.' },
           ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'mcq',
+              prompt: 'Which pair **cannot** be the $[d, f]$ intervals of two vertices in the same DFS?',
+              options: ['$[1, 8]$ and $[2, 5]$', '$[1, 4]$ and $[5, 8]$', '$[1, 6]$ and $[3, 9]$', '$[2, 7]$ and $[3, 4]$'],
+              answer: 2,
+              hint: 'Two intervals are either nested or disjoint.',
+              explanation: '$[1, 6]$ and $[3, 9]$ overlap, but neither contains the other. The vertex discovered at time 3 is a descendant of the one discovered at 1 and must finish before it: $f \\le 5$. The other three pairs are nested or disjoint.',
+            },
+          ],
         },
         {
           kind: 'viz',
@@ -310,6 +321,17 @@ We add two timestamps to DFS: the moment we first arrive at a node, $d(v)$ (**di
 - **Time:** both $O(n + m)$.
 - **BFS gives:** layers and unweighted distances → paths with the fewest steps.
 - **DFS gives:** $d/f$ times and cycle detection → topological order, strongly connected components (Lecture 10).`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'In an unweighted graph, which one finds a path from $s$ to $t$ with the **fewest edges**?',
+              options: ['Only BFS', 'Only DFS', 'Both', 'Neither'],
+              answer: 0,
+              hint: 'DFS follows a branch all the way down.',
+              explanation: 'BFS proceeds layer by layer, and the layer where it first finds $t$ is the distance. DFS also finds a path to $t$, but it may be long: on a cycle with an $s$–$t$ edge, DFS may first walk around the other side of the cycle.',
+            },
+          ],
         },
         {
           kind: 'text',

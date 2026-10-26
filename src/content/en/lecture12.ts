@@ -71,6 +71,16 @@ For $k = 0$ the answer is obvious: only $s$ itself (cost 0). A best path with $k
             { title: 'n − 1 rounds suffice', body: 'Without negative cycles, any cycle on a shortest path can be removed (a positive one shortens the path, a zero one does not change it): shortest paths are simple and have at most $n - 1$ edges. So $d^{(n-1)}[v] = d(s, v)$.' },
             { title: 'A negative cycle is detected', body: 'Let $v_1 \\to \\dots \\to v_k \\to v_1$ be a reachable negative cycle and suppose the final check finds nothing: $d[v_{i+1}] \\le d[v_i] + w(v_i, v_{i+1})$ for every $i$. Summing around the cycle, the $d$ terms cancel and $0 \\le \\sum w(v_i, v_{i+1})$ — contradicting that the cycle is negative.' },
           ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'The cycle $a \\to b$ (2), $b \\to c$ ($-4$), $c \\to a$ (1) is reachable from $s$. The cycle is negative, so the final check can still relax an edge. What is the **smallest** weight of $c \\to a$ for which the cycle is no longer negative?',
+              answer: 2,
+              hint: 'What is the total weight of the cycle now?',
+              explanation: 'Now $2 - 4 + 1 = -1 < 0$; with weight $w$ the total is $w - 2$, so $w \\ge 2$ is needed. With weight 1, if no edge could be relaxed, adding the three inequalities would give $0 \\le -1$: a contradiction. So at least one edge still improves in the last round.',
+            },
+          ],
         },
         {
           kind: 'formal',
@@ -108,6 +118,16 @@ About the name: “programming” here means a **plan**, not a computer program;
           body: `$n - 1$ rounds, $m$ edges per round: **$O(nm)$**. The final check is $O(m)$. It is slower than Dijkstra but works with negative edges, detects negative cycles and is very simple to implement.
 
 Memory: although the table is $n \\times n$, only the last two rows are needed: $O(n)$. If a round changes no value, the algorithm can stop early.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'In a graph with $n = 1000$ vertices and $m = 5000$ edges, how many edge relaxations do the $n - 1$ rounds make without early stopping?',
+              answer: 4995000,
+              hint: 'Every edge once per round.',
+              explanation: '$(n - 1) \\cdot m = 999 \\cdot 5000 = 4\\,995\\,000$. The final check adds $5000$ more. Dijkstra with a heap would make about $m \\log_2 n \\approx 5 \\cdot 10^4$ operations; that is the price of negative edges.',
+            },
+          ],
         },
         {
           kind: 'text',
@@ -272,6 +292,17 @@ At $k = 0$ there are no intermediate stops: direct edges only. At each step one 
 **Compared with Dijkstra $n$ times:** with non-negative weights, $n$ runs of Dijkstra take $O(nm + n^2\\log n)$; on sparse graphs that beats $O(n^3)$. Floyd–Warshall’s strengths: a three-line implementation, and it works with negative edges. (Johnson’s method reweights the edges so that Dijkstra can be run $n$ times even with negative edges.)
 
 **Why doesn’t DP solve the longest simple path?** The pieces of a longest path $s \\to k \\to t$ need not be longest paths, and the two pieces may not share nodes: the subproblems are not independent. The problem is NP-hard.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'mcq',
+              prompt: 'A city network with no negative edges, $n = 10^4$ junctions and $m = 3 \\cdot 10^4$ roads needs all-pairs distances. Which one is faster?',
+              options: ['Floyd–Warshall', 'Dijkstra $n$ times', 'They are the same', 'Bellman–Ford $n$ times'],
+              answer: 1,
+              hint: 'Compare $n^3$ with $nm + n^2\\log n$.',
+              explanation: 'Floyd–Warshall takes $n^3 = 10^{12}$ steps. Dijkstra $n$ times takes about $nm + n^2 \\log_2 n \\approx 3 \\cdot 10^8 + 1.3 \\cdot 10^9$: about 600 times fewer. Bellman–Ford $n$ times would take $n \\cdot nm = 3 \\cdot 10^{12}$.',
+            },
+          ],
         },
         {
           kind: 'text',
@@ -279,6 +310,17 @@ At $k = 0$ there are no intermediate stops: direct edges only. At each step one 
           body: `- **Distance tables:** distances between all junctions of a city map, tables precomputed for pathfinding in games, network latency matrices.
 - **Transitive closure (Warshall):** asking “is it reachable?” instead of weights, the same three loops work with “or”/“and” instead of $\\min$/$+$.
 - Problems like the **widest bottleneck path** or the **most reliable path** fit the same pattern with different operations.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: '**Widest bottleneck path:** the value of a path is the smallest edge capacity on it, and we want the path of largest value. Which operations replace $\\min$ and $+$ in Floyd–Warshall?',
+              options: ['$\\max$ and $\\min$', '$\\min$ and $+$', '“or” and “and”', '$\\max$ and $+$'],
+              answer: 0,
+              hint: 'Which of the two parts limits the value of the path through $k$?',
+              explanation: 'The bottleneck of the path through $k$ is the smaller of the two parts: $\\min(D[i][k], D[k][j])$. Take the larger of that and the current value: $D[i][j] \\leftarrow \\max(D[i][j], \\min(D[i][k], D[k][j]))$.',
+            },
+          ],
         },
         {
           kind: 'steps',
