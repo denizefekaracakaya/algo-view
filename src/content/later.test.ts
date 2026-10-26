@@ -407,3 +407,29 @@ describe('worked examples and practice problems added to Lectures 7–17', () =>
     expect(blockingPairs(p, { X: 'Bora', Y: 'Ada' })).toEqual([])
   })
 })
+
+describe('encoding and decoding with the Huffman code of the notes (l14-huffman)', () => {
+  const { codes } = huffmanTrace(HUFFMAN_EXAMPLE)
+  const encode = (w: string) => [...w].map((c) => codes[c]).join('')
+  const decode = (bits: string) => {
+    const byCode = Object.fromEntries(Object.entries(codes).map(([c, k]) => [k, c]))
+    let out = ''
+    let cur = ''
+    for (const b of bits) {
+      cur += b
+      if (byCode[cur]) {
+        out += byCode[cur]
+        cur = ''
+      }
+    }
+    return cur ? null : out
+  }
+  it('matches the worked example', () => {
+    expect(codes).toEqual({ a: '0', b: '101', c: '100', d: '111', e: '1100', f: '1101' })
+    expect(encode('face')).toBe('110101001100')
+    expect(encode('fee').length).toBe(12)
+    expect(decode('0101100111')).toBe('abcd')
+    expect(decode('1101100111')).toBe('fcd')
+    expect(decode('1001100111')).toBe('ced')
+  })
+})

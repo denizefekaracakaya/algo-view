@@ -269,3 +269,33 @@ describe('second round of worked examples in Lectures 1–7', () => {
     expect([2 ** 3 - 1, 2 ** 6 - 1]).toEqual([7, 63])
   })
 })
+
+describe('worked examples in the comparison lessons', () => {
+  it('sorting a million 32-bit integers (l6-compare)', () => {
+    const n = 1e6
+    expect(n * Math.log2(n)).toBeGreaterThan(1.9e7)
+    expect(n * Math.log2(n)).toBeLessThan(2.1e7)
+    const passes = (bits: number, b: number) => digitCount(2 ** bits - 1, 2 ** b)
+    expect([8, 11, 16].map((b) => passes(32, b))).toEqual([4, 3, 2])
+    expect(passes(48, 16)).toBe(3) // 2 ** 64 - 1 is not exact in floating point
+    expect(Math.ceil(64 / 16)).toBe(4)
+    expect(4 * (n + 256)).toBeCloseTo(4e6, -4)
+    expect(2 * (n + 65536)).toBeCloseTo(2.13e6, -4)
+    expect(3 * (n + 2048)).toBeCloseTo(3.01e6, -4)
+  })
+
+  it('inserting 1…7 and then 8 into a red-black tree (l7-compare)', () => {
+    const ks = [1, 2, 3, 4, 5, 6, 7]
+    const rb = rbFromSequence(ks)!
+    expect([rb.key, rb.color, rb.left?.key, rb.right?.key, rb.right?.color]).toEqual([2, 'B', 1, 4, 'R'])
+    expect([rb.right?.left?.key, rb.right?.right?.key, rb.right?.right?.left?.key, rb.right?.right?.right?.key]).toEqual([3, 6, 5, 7])
+    expect(height(rb)).toBe(3)
+    expect(ks.map((k) => searchCost(rb, k))).toEqual([2, 1, 3, 2, 4, 3, 4])
+    expect(ks.reduce((s, k) => s + searchCost(rb, k), 0)).toBe(19)
+    expect(ks.reduce((s, k) => s + searchCost(bstFromSequence(ks), k), 0)).toBe(28)
+    const rb8 = rbFromSequence([...ks, 8])!
+    expect([rb8.key, rb8.left?.key, rb8.left?.color, rb8.right?.key, rb8.right?.color, height(rb8)]).toEqual([4, 2, 'R', 6, 'R', 3])
+    const orders = [ks, [4, 2, 6, 1, 3, 5, 7], [7, 6, 5, 4, 3, 2, 1], [1, 7, 2, 6, 3, 5, 4]]
+    expect(orders.map((o) => height(bstFromSequence(o)))).toEqual([6, 2, 6, 6])
+  })
+})

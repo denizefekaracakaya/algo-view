@@ -407,7 +407,7 @@ The “BucketSort” in the lecture title is this bucket idea; the notes and sli
       title: 'Comparing the sorting algorithms so far',
       titleEn: 'Comparing the sorting algorithms so far',
       summary: 'Model, kind of guarantee and assumptions: which one when?',
-      minutes: 25,
+      minutes: 30,
       objectives: [
         'Compare the sorting algorithms of Lectures 2–6 by model, worst case, expected time and assumptions.',
         'Distinguish worst-case, expected and input-distribution-dependent performance.',
@@ -465,6 +465,29 @@ The common lesson: no algorithm is best in every situation; the model (compariso
             },
           ],
         },
+        {
+          kind: 'steps',
+          title: 'Worked example: sorting a million integers',
+          label: 'formal',
+          body: `Our own example: $n = 10^6$ non-negative 32-bit integers. Let us ask the questions of the comparison table in order and compare the candidates with a rough operation count.`,
+          proof: [
+            { title: 'Model', body: 'The keys are fixed-length integers; we can look at their values directly. So the $\\Omega(n\\log n)$ lower bound for comparison-based sorting does not bind us: RadixSort is a candidate too.' },
+            { title: 'Comparison-based', body: 'MergeSort or randomized QuickSort make about $n\\log_2 n \\approx 10^6 \\cdot 20 = 2 \\cdot 10^7$ comparisons.' },
+            { title: 'RadixSort, base 256', body: '$r = 2^8$: 32 bits are four bytes, $d = 4$ passes. Each pass is $O(n + r)$: about $4(10^6 + 256) \\approx 4 \\cdot 10^6$ operations in total.' },
+            { title: 'RadixSort, base 65536', body: '$r = 2^{16}$: $d = 2$ passes, $2(10^6 + 65\\,536) \\approx 2.1 \\cdot 10^6$ in total. Growing the base further does not help: $r = 2^{32}$ means a single pass but more than 4 billion buckets, and $r$ dominates $O(n + r)$.' },
+            { title: 'Conclusion', body: 'In operation count RadixSort is ahead by a factor of 5–10. But these are step counts, not seconds: RadixSort copies the whole array in every pass and needs $O(n + r)$ extra memory. That is why RadixSort is common on GPUs while general-purpose libraries usually use comparison-based sorting. If stability is needed, both work: MergeSort and RadixSort are both stable.' },
+          ],
+          check: [
+            {
+              id: 'c3',
+              kind: 'numeric',
+              prompt: 'For the same 32-bit keys, how many passes does RadixSort make with base $r = 2^{11} = 2048$?',
+              answer: 3,
+              hint: 'Each pass handles 11 bits.',
+              explanation: '$\\lceil 32/11 \\rceil = 3$ passes (11 + 11 + 10 bits). About $3(10^6 + 2048) \\approx 3 \\cdot 10^6$ operations in total.',
+            },
+          ],
+        },
       ],
       quiz: [
         {
@@ -484,6 +507,14 @@ The common lesson: no algorithm is best in every situation; the model (compariso
           answer: 2,
           hint: 'Does the randomness come from the algorithm or from the input?',
           explanation: 'There is no randomness in the algorithm; the claim rests on the assumption that the inputs are random. On sorted input it is $\\Theta(n^2)$.',
+        },
+        {
+          id: 'q3',
+          kind: 'numeric',
+          prompt: 'In how many passes does RadixSort with base $r = 2^{16}$ sort non-negative 64-bit integers?',
+          answer: 4,
+          hint: 'Each pass handles one “digit”, i.e. 16 bits.',
+          explanation: '$64 / 16 = 4$ passes, each $O(n + 2^{16})$.',
         },
       ],
       practice: [

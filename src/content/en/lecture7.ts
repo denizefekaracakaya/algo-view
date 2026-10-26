@@ -506,7 +506,7 @@ Final tree: 10 (B) → left 5 (R) [left 3 (B) → left 1 (R); right 7 (B)], righ
       title: 'Comparing a BST and a red-black tree',
       titleEn: 'Comparing a BST and a red-black tree',
       summary: 'The same insertion order, very different heights.',
-      minutes: 20,
+      minutes: 25,
       objectives: [
         'Compare the shapes the same insertion order produces in a plain BST and in a red-black tree.',
         'Observe the link between height and search cost through measurements, and relate it to the proven guarantee.',
@@ -563,6 +563,28 @@ But real data is often not random: timestamps, increasing ID numbers and alphabe
             },
           ],
         },
+        {
+          kind: 'steps',
+          title: 'Worked example: 1…7 in order, two trees',
+          label: 'formal',
+          body: `A small version of the “Sorted” scenario in the comparison panel: insert the keys 1, 2, …, 7 in order. In a plain BST the result is a chain (height 6). Let us follow what happens at each insertion in the red-black tree; the new node is inserted red and the case numbers are those of the insertion lesson.`,
+          proof: [
+            { title: '1, 2, 3', body: '1 becomes the root and is colored black. 2: the parent is black, case 1. 3: the parent 2 is red, the uncle is NIL (black), a straight line: case 3. Rotate left at 1; 2 is the black root, 1 and 3 are red.' },
+            { title: '4 and 5', body: '4: the parent 3 and the uncle 1 are red, case 2: 1 and 3 become black, 2 red; 2 is the root, so it is colored black again. 5: the parent 4 is red, the uncle is NIL, case 3: rotate left at 3; 4 is black, 3 and 5 are red.' },
+            { title: '6 and 7', body: '6: the parent 5 and the uncle 3 are red, case 2: 3 and 5 black, 4 red; the parent of 4 is the black 2, done. 7: the parent 6 is red, the uncle is NIL, case 3: rotate left at 5; 6 is black, 5 and 7 are red.' },
+            { title: 'Result', body: 'The root is 2; 1 on its left; a red 4 on its right, with 3 and 6 below it and 5 and 7 below 6. Height 3 (6 in the BST). Comparisons for successful searches: 1 → 2, 2 → 1, 3 → 3, 4 → 2, 5 → 4, 6 → 3, 7 → 4: 19 in total, about 2.71 on average. The chain needs 28 in total, 4 on average. A perfectly balanced tree would need $1 + 2 \\cdot 2 + 4 \\cdot 3 = 17$: the red-black tree is not perfect, but far better than the chain.' },
+          ],
+          check: [
+            {
+              id: 'c3',
+              kind: 'numeric',
+              prompt: 'Which key becomes the root when 8 is inserted into this tree?',
+              answer: 4,
+              hint: 'The parent 7 and the uncle 5 of 8 are red: case 2 first. Where does the problem move?',
+              explanation: 'Case 2: 5 and 7 black, 6 red. Now 6 and its parent 4 are red, the sibling 1 of 4 is black and 2 → 4 → 6 is a straight line: case 3, rotate left at 2. 4 becomes the black root; 2 is red (with 1 and 3 below), 6 is red (with 5 and 7 below, and 8 below 7). The height is still 3.',
+            },
+          ],
+        },
       ],
       quiz: [
         {
@@ -582,6 +604,15 @@ But real data is often not random: timestamps, increasing ID numbers and alphabe
           answer: 2,
           hint: 'The height bound + operations are $O(h)$.',
           explanation: '$h = O(\\log n)$ and operations are $O(h)$; moreover every binary tree has $h = \\Omega(\\log n)$, so search is $\\Theta(\\log n)$ in the worst case.',
+        },
+        {
+          id: 'q3',
+          kind: 'mcq',
+          prompt: 'Which insertion order of the keys 1…7 makes a **plain** BST perfectly balanced (height 2)?',
+          options: ['1, 2, 3, 4, 5, 6, 7', '4, 2, 6, 1, 3, 5, 7', '7, 6, 5, 4, 3, 2, 1', '1, 7, 2, 6, 3, 5, 4'],
+          answer: 1,
+          hint: 'The root is the first key inserted. Which key is the median?',
+          explanation: 'First the median 4 becomes the root, then the medians 2 and 6 of the two halves, and the leaves last. The other three orders give chains of height 6 (the last one zigzags).',
         },
       ],
       practice: [

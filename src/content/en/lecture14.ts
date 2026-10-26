@@ -222,7 +222,7 @@ Example: choosing the **shortest** activity, on the input [0, 5), [4, 6), [5, 10
       title: 'Huffman codes',
       titleEn: 'Huffman codes',
       summary: 'Prefix-free codes, code trees, and merging the two smallest frequencies.',
-      minutes: 35,
+      minutes: 40,
       objectives: [
         'Explain why prefix-free codes are needed and how binary trees represent them.',
         'Compute the cost of a code as $B(T) = \\sum_c f(c)\\, d_T(c)$.',
@@ -310,6 +310,29 @@ A tree minimizing $B(T)$ is **optimal**. An optimal tree is **full**: every inte
               answer: 1,
               hint: 'Check whether any codeword is the beginning of another one.',
               explanation: '0, 10, 11: none is the beginning of another; they are the leaves of a tree. In the others 0 is a prefix of 01, 1 of 10, and 0 of 00.',
+            },
+          ],
+        },
+        {
+          kind: 'steps',
+          title: 'Worked example: encoding and decoding',
+          label: 'formal',
+          body: `Let us use the code the visualizer builds for the frequencies in the notes (a 45, b 13, c 12, d 16, e 5, f 9): a → 0, c → 100, b → 101, d → 111, e → 1100, f → 1101.`,
+          proof: [
+            { title: 'Encoding', body: '“face” → 1101 · 0 · 100 · 1100 = 110101001100, 12 bits. A fixed 3-bit code also needs 12 bits: this word is made of rare letters. Huffman only wins **on average** (2.24 bits per character instead of 3); a single word can even be longer: “fee” takes 12 bits, 9 with the fixed code.' },
+            { title: 'Decoding', body: 'Let us decode 0101100111: start at the root, go left (0) or right (1) on each bit; on reaching a leaf, write its letter and return to the root. 0 → a; 1, 0, 1 → b; 1, 0, 0 → c; 1, 1, 1 → d. The result is “abcd”.' },
+            { title: 'Why is there no ambiguity?', body: 'The code is prefix-free, so the moment we reach a leaf no other codeword can continue along this path. No separator is needed and decoding takes $O(1)$ per bit.' },
+            { title: 'A single bit error', body: 'If the first bit is read as 1 instead of 0: 1101100111 → 1101 · 100 · 111 = “fcd”. The error does not just change one letter; by shifting the parse it can corrupt everything after it. That is why compressed files carry a checksum (CRC-32 in gzip).' },
+          ],
+          check: [
+            {
+              id: 'c3',
+              kind: 'mcq',
+              prompt: 'Which word does 1001100111 decode to with this code?',
+              options: ['ced', 'cfd', 'bed', 'acd'],
+              answer: 0,
+              hint: 'Start at the root: do 1, 0, 0 reach a leaf?',
+              explanation: '100 → c, 1100 → e, 111 → d: “ced”.',
             },
           ],
         },

@@ -407,7 +407,7 @@ Ders başlığındaki “BucketSort” bu kova fikridir; notlar ve slaytlar onu 
       title: 'Sıralama algoritmalarını karşılaştırmak',
       titleEn: 'Comparing the sorting algorithms so far',
       summary: 'Model, garanti türü ve varsayımlar: hangi durumda hangisi?',
-      minutes: 25,
+      minutes: 30,
       objectives: [
         'Ders 2–6’daki sıralama algoritmalarını model, en kötü durum, beklenen süre ve varsayımlara göre karşılaştırmak.',
         'En kötü durum, beklenen ve girdi dağılımına bağlı performansı ayırt etmek.',
@@ -465,6 +465,29 @@ Ortak ders: hiçbir algoritma her durumda en iyisi değildir; model (karşılaş
             },
           ],
         },
+        {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: bir milyon tam sayıyı sıralamak',
+          label: 'formal',
+          body: `Kendi örneğimiz: $n = 10^6$ tane 32 bitlik, negatif olmayan tam sayı. Karşılaştırma tablosundaki soruları sırayla soralım ve adayları kaba bir işlem sayısıyla karşılaştıralım.`,
+          proof: [
+            { title: 'Model', body: 'Anahtarlar sabit uzunlukta tam sayılar; değerlerine doğrudan bakabiliriz. Yani karşılaştırma tabanlı sıralamanın $\\Omega(n\\log n)$ alt sınırı bizi bağlamaz: RadixSort da bir aday.' },
+            { title: 'Karşılaştırma tabanlı', body: 'MergeSort ya da rastgele QuickSort yaklaşık $n\\log_2 n \\approx 10^6 \\cdot 20 = 2 \\cdot 10^7$ karşılaştırma yapar.' },
+            { title: 'RadixSort, taban 256', body: '$r = 2^8$: 32 bit dört bayttır, $d = 4$ geçiş. Her geçiş $O(n + r)$: toplam yaklaşık $4(10^6 + 256) \\approx 4 \\cdot 10^6$ işlem.' },
+            { title: 'RadixSort, taban 65536', body: '$r = 2^{16}$: $d = 2$ geçiş, toplam $2(10^6 + 65\\,536) \\approx 2.1 \\cdot 10^6$. Tabanı daha da büyütmek işe yaramaz: $r = 2^{32}$ tek geçiş demektir ama 4 milyardan fazla kova ister ve $O(n + r)$’de $r$ hâkim olur.' },
+            { title: 'Sonuç', body: 'İşlem sayısında RadixSort 5–10 kat önde. Ama bunlar adım sayıları, saniye değil: RadixSort her geçişte bütün diziyi kopyalar ve $O(n + r)$ ek bellek ister. Bu yüzden GPU’larda RadixSort, genel amaçlı kütüphanelerde ise karşılaştırma tabanlı sıralama yaygındır. Kararlılık gerekiyorsa ikisi de uygundur: MergeSort da RadixSort da kararlıdır.' },
+          ],
+          check: [
+            {
+              id: 'c3',
+              kind: 'numeric',
+              prompt: 'Aynı 32 bitlik anahtarlar için taban $r = 2^{11} = 2048$ seçilirse RadixSort kaç geçiş yapar?',
+              answer: 3,
+              hint: 'Her geçiş 11 bit işler.',
+              explanation: '$\\lceil 32/11 \\rceil = 3$ geçiş (11 + 11 + 10 bit). Toplam yaklaşık $3(10^6 + 2048) \\approx 3 \\cdot 10^6$ işlem.',
+            },
+          ],
+        },
       ],
       quiz: [
         {
@@ -484,6 +507,14 @@ Ortak ders: hiçbir algoritma her durumda en iyisi değildir; model (karşılaş
           answer: 2,
           hint: 'Rastgelelik algoritmadan mı, girdiden mi geliyor?',
           explanation: 'Algoritmada rastgelelik yok; iddia girdilerin rastgele olduğu varsayımına dayanıyor. Sıralı girdide $\\Theta(n^2)$.',
+        },
+        {
+          id: 'q3',
+          kind: 'numeric',
+          prompt: '64 bitlik negatif olmayan tam sayıları taban $r = 2^{16}$ ile RadixSort kaç geçişte sıralar?',
+          answer: 4,
+          hint: 'Her geçiş bir “basamak”, yani 16 bit işler.',
+          explanation: '$64 / 16 = 4$ geçiş, her biri $O(n + 2^{16})$.',
         },
       ],
       practice: [

@@ -222,7 +222,7 @@ Yani işler **$l / w$ oranına göre artan** sırada yapılmalıdır: kısa ve �
       title: 'Huffman kodları',
       titleEn: 'Huffman codes',
       summary: 'Önek içermeyen kodlar, kod ağaçları ve en küçük iki sıklığı birleştirmek.',
-      minutes: 35,
+      minutes: 40,
       objectives: [
         'Önek içermeyen (prefix-free) kodların neden gerektiğini ve ikili ağaçlarla gösterimini açıklamak.',
         'Bir kodun maliyetini $B(T) = \\sum_c f(c)\\, d_T(c)$ olarak hesaplamak.',
@@ -310,6 +310,29 @@ $B(T)$’yi en küçük yapan ağaç **optimaldir**. Optimal ağaç **dolu**dur:
               answer: 1,
               hint: 'Her kod kelimesinin başka bir kod kelimesinin başlangıcı olup olmadığına bakın.',
               explanation: '0, 10, 11: hiçbiri diğerinin başı değil; bir ağacın yapraklarıdır. Diğerlerinde 0, 01’in; 1, 10’un; 0, 00’ın önekidir.',
+            },
+          ],
+        },
+        {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: kodlama ve kod çözme',
+          label: 'formal',
+          body: `Görselleştiricinin notlardaki sıklıklarla (a 45, b 13, c 12, d 16, e 5, f 9) ürettiği kodu kullanalım: a → 0, c → 100, b → 101, d → 111, e → 1100, f → 1101.`,
+          proof: [
+            { title: 'Kodlama', body: '“face” → 1101 · 0 · 100 · 1100 = 110101001100, 12 bit. Sabit 3 bitlik kodla da 12 bit: bu kelime seyrek harflerden oluşuyor. Huffman yalnızca **ortalamada** kazandırır (karakter başına 3 yerine 2.24 bit); tek bir kelime daha uzun bile olabilir: “fee” 12 bit tutar, sabit kodla 9.' },
+            { title: 'Kod çözme', body: '0101100111 dizisini çözelim: kökten başla, her bitte sola (0) ya da sağa (1) in; bir yaprağa varınca harfi yaz ve köke dön. 0 → a; 1, 0, 1 → b; 1, 0, 0 → c; 1, 1, 1 → d. Sonuç “abcd”.' },
+            { title: 'Neden belirsizlik yok?', body: 'Kod önek içermediği için bir yaprağa vardığımız anda başka hiçbir kod kelimesi bu yoldan devam edemez. Ayırıcı işarete gerek kalmaz ve çözme bit başına $O(1)$ sürer.' },
+            { title: 'Tek bir bit hatası', body: 'İlk bit 0 yerine 1 okunursa 1101100111 → 1101 · 100 · 111 = “fcd”. Hata yalnızca bir harfi değil, ayrışmayı kaydırarak sonrasını da bozabilir. Bu yüzden sıkıştırılmış dosyalar bir sağlama toplamı taşır (gzip’te CRC-32).' },
+          ],
+          check: [
+            {
+              id: 'c3',
+              kind: 'mcq',
+              prompt: '1001100111 dizisi bu kodla hangi kelimeye çözülür?',
+              options: ['ced', 'cfd', 'bed', 'acd'],
+              answer: 0,
+              hint: 'Kökten başlayın: 1, 0, 0 bir yaprağa ulaşır mı?',
+              explanation: '100 → c, 1100 → e, 111 → d: “ced”.',
             },
           ],
         },

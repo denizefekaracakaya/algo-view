@@ -506,7 +506,7 @@ Son ağaç: 10 (S) → sol 5 (K) [sol 3 (S) → sol 1 (K); sağ 7 (S)], sağ 15 
       title: 'BST ve kırmızı-siyah ağaç karşılaştırması',
       titleEn: 'Comparing a BST and a red-black tree',
       summary: 'Aynı ekleme sırası, çok farklı yükseklikler.',
-      minutes: 20,
+      minutes: 25,
       objectives: [
         'Aynı ekleme sırasının sıradan bir BST ve bir kırmızı-siyah ağaçta ürettiği şekilleri karşılaştırmak.',
         'Yükseklik ile arama maliyeti arasındaki bağı ölçümlerle gözlemlemek ve kanıtlanmış garantiyle ilişkilendirmek.',
@@ -563,6 +563,28 @@ Ama gerçek veriler çoğu zaman rastgele değildir: zaman damgaları, artan kim
             },
           ],
         },
+        {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: 1…7 sırayla, iki ağaç',
+          label: 'formal',
+          body: `Karşılaştırma panelindeki “Sıralı” senaryonun küçük bir hâli: 1, 2, …, 7 anahtarlarını sırayla ekleyelim. Sıradan BST’de sonuç bir zincirdir (yükseklik 6). Kırmızı-siyah ağaçta her eklemede ne olduğunu izleyelim; yeni düğüm kırmızı eklenir ve durum numaraları ekleme dersindeki gibidir.`,
+          proof: [
+            { title: '1, 2, 3', body: '1 kök olur ve siyaha boyanır. 2: ebeveyn siyah, Durum 1. 3: ebeveyn 2 kırmızı, amca NIL (siyah), düz çizgi: Durum 3. 1’de sola rotasyon; 2 siyah kök, 1 ve 3 kırmızı.' },
+            { title: '4 ve 5', body: '4: ebeveyn 3 ve amca 1 kırmızı, Durum 2: 1 ve 3 siyaha, 2 kırmızıya boyanır; 2 kök olduğu için yeniden siyah olur. 5: ebeveyn 4 kırmızı, amca NIL, Durum 3: 3’te sola rotasyon; 4 siyah, 3 ve 5 kırmızı.' },
+            { title: '6 ve 7', body: '6: ebeveyn 5 ve amca 3 kırmızı, Durum 2: 3 ve 5 siyah, 4 kırmızı; 4’ün ebeveyni 2 siyah, bitti. 7: ebeveyn 6 kırmızı, amca NIL, Durum 3: 5’te sola rotasyon; 6 siyah, 5 ve 7 kırmızı.' },
+            { title: 'Sonuç', body: 'Kök 2; solunda 1; sağında kırmızı 4, onun altında 3 ve 6, 6’nın altında 5 ve 7. Yükseklik 3 (BST’de 6). Başarılı aramaların karşılaştırma sayıları 1 → 2, 2 → 1, 3 → 3, 4 → 2, 5 → 4, 6 → 3, 7 → 4: toplam 19, ortalama yaklaşık 2.71. Zincirde toplam 28, ortalama 4. Mükemmel dengeli ağaçta toplam $1 + 2 \\cdot 2 + 4 \\cdot 3 = 17$ olurdu: kırmızı-siyah ağaç mükemmel değil ama zincirden çok daha iyi.' },
+          ],
+          check: [
+            {
+              id: 'c3',
+              kind: 'numeric',
+              prompt: 'Bu ağaca 8 eklenince kök hangi anahtar olur?',
+              answer: 4,
+              hint: '8’in ebeveyni 7 ve amcası 5 kırmızı: önce Durum 2. Sorun nereye taşınır?',
+              explanation: 'Durum 2: 5 ve 7 siyah, 6 kırmızı. Şimdi 6 ile ebeveyni 4 kırmızı, 4’ün kardeşi 1 siyah ve 2 → 4 → 6 düz çizgi: Durum 3, 2’de sola rotasyon. 4 siyah kök olur; 2 kırmızı (altında 1 ve 3), 6 kırmızı (altında 5 ve 7, 7’nin altında 8). Yükseklik yine 3.',
+            },
+          ],
+        },
       ],
       quiz: [
         {
@@ -582,6 +604,15 @@ Ama gerçek veriler çoğu zaman rastgele değildir: zaman damgaları, artan kim
           answer: 2,
           hint: 'Yükseklik sınırı + işlemler $O(h)$.',
           explanation: '$h = O(\\log n)$ ve işlemler $O(h)$; ayrıca her ikili ağaçta $h = \\Omega(\\log n)$ olduğundan arama en kötü durumda $\\Theta(\\log n)$.',
+        },
+        {
+          id: 'q3',
+          kind: 'mcq',
+          prompt: '1…7 anahtarlarının hangi ekleme sırası **sıradan** bir BST’yi mükemmel dengeli yapar (yükseklik 2)?',
+          options: ['1, 2, 3, 4, 5, 6, 7', '4, 2, 6, 1, 3, 5, 7', '7, 6, 5, 4, 3, 2, 1', '1, 7, 2, 6, 3, 5, 4'],
+          answer: 1,
+          hint: 'Kök, ilk eklenen anahtardır. Ortanca anahtar hangisi?',
+          explanation: 'Önce ortanca 4 kök olur, sonra iki yarının ortancaları 2 ve 6, en son yapraklar. Diğer üç sıra yükseklik 6’lık zincirler verir (sonuncusu zikzak çizer).',
         },
       ],
       practice: [
