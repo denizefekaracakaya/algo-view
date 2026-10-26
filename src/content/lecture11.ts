@@ -15,7 +15,7 @@ export const lecture11: Lecture = {
       title: 'Dijkstra algoritması',
       titleEn: 'Dijkstra’s algorithm',
       summary: 'Tahminleri gevşetmek, en küçük tahmini kesinleştirmek ve öncelik kuyruğu seçimleri.',
-      minutes: 50,
+      minutes: 55,
       objectives: [
         'Dijkstra’nın iki değişmezini ($d[t] \\ge d(s, t)$; bitmiş düğümlerde eşitlik) ifade etmek.',
         'Algoritmayı adım adım çalıştırıp gevşetme (relax) işlemini açıklamak.',
@@ -140,6 +140,28 @@ $$n \\cdot (T_{\\text{FindMin}} + T_{\\text{DeleteMin}}) + m \\cdot T_{\\text{De
 - **Negatif ağırlıklar:** döviz kurlarında $-\\log(\\text{kur})$ ağırlıklarıyla negatif bir döngü, kârlı bir arbitraj fırsatı demektir; Bellman–Ford bunu tespit eder.`,
         },
         {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: uzaklıklar ve ebeveynler',
+          label: 'formal',
+          body: `Kendi örneğimiz: $s \\to a$ (4), $s \\to b$ (1), $b \\to a$ (2), $a \\to c$ (1), $b \\to c$ (5). Dijkstra’yı çalıştırırken her $d[v]$ güncellemesinde $v$’nin **ebeveynini** de ($\\pi[v]$, güncellemeyi yapan düğüm) kaydedelim; yolları sonradan buradan okuyacağız.`,
+          proof: [
+            { title: 's kesinleşir (d = 0)', body: '$d[a] = 4$ ($\\pi[a] = s$), $d[b] = 1$ ($\\pi[b] = s$).' },
+            { title: 'b kesinleşir (d = 1)', body: '$a$: $1 + 2 = 3 < 4$ → $d[a] = 3$, $\\pi[a] = b$. $c$: $1 + 5 = 6$ → $d[c] = 6$, $\\pi[c] = b$.' },
+            { title: 'a kesinleşir (d = 3)', body: '$c$: $3 + 1 = 4 < 6$ → $d[c] = 4$, $\\pi[c] = a$. Son olarak $c$ kesinleşir ($d = 4$).' },
+            { title: 'Yolu geri okumak', body: '$c$’den ebeveynleri izle: $c \\leftarrow a \\leftarrow b \\leftarrow s$. Ters çevirince $s \\to b \\to a \\to c$, uzunluk $1 + 2 + 1 = 4$. Ebeveyn kenarları birlikte bir **en kısa yollar ağacı** oluşturur: her düğümün tek ebeveyni olması yeter, çünkü en kısa bir yolun her ön eki de en kısa yoldur.' },
+          ],
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'Bu örnekte $d[c]$ kaç kez güncellenir (sonsuzdan ilk değerine geçiş de dahil)?',
+              answer: 2,
+              hint: 'Önce $b$’den, sonra $a$’dan.',
+              explanation: '$\\infty \\to 6$ ($b$ kesinleşince) ve $6 \\to 4$ ($a$ kesinleşince). Son ebeveyn $\\pi[c] = a$.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- Dijkstra’yı negatif kenarlı grafiklerde kullanmak (negatif döngü olmasa bile yanlış sonuç verebilir).
@@ -192,6 +214,12 @@ $$n \\cdot (T_{\\text{FindMin}} + T_{\\text{DeleteMin}}) + m \\cdot T_{\\text{De
           prompt: `Kendi örneğimiz: yönlü kenarlar s→a (7), s→b (2), b→a (3), a→c (1), b→c (8), c→t (2), b→t (9). $s$’den Dijkstra’yı elle çalıştırın: her adımda seçilen düğümü ve tahminleri yazın. Son en kısa yollar ağacını çizin.`,
           hints: ['İlk seçilen $s$, sonra $b$ (tahmin 2).', '$a$’nın tahmini 7’den 5’e iner.'],
           solution: `Başta $d = (s: 0, a: \\infty, b: \\infty, c: \\infty, t: \\infty)$. $s$ seçilir: $a = 7$, $b = 2$. $b$ seçilir (2): $a = \\min(7, 5) = 5$, $c = 10$, $t = 11$. $a$ seçilir (5): $c = \\min(10, 6) = 6$. $c$ seçilir (6): $t = \\min(11, 8) = 8$. $t$ seçilir (8). Sonuç: $s$ 0, $b$ 2, $a$ 5, $c$ 6, $t$ 8. Ağaç: s→b, b→a, a→c, c→t.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: yukarıdaki grafikte ($s \\to a$ 4, $s \\to b$ 1, $b \\to a$ 2, $a \\to c$ 1, $b \\to c$ 5) $b \\to a$ kenarının ağırlığı 2’den 4’e çıkarsa uzaklıklar ve en kısa yollar ağacı nasıl değişir? Eşitlik olursa ne olur?`,
+          hints: ['$s \\to a$ doğrudan 4, $s \\to b \\to a$ artık $1 + 4 = 5$.', '$c$ için iki yolu karşılaştırın: $s \\to a \\to c$ ve $s \\to b \\to c$.'],
+          solution: `Artık $d[a] = 4$ ($\\pi[a] = s$, doğrudan kenar). $c$ için $s \\to a \\to c = 4 + 1 = 5$ ve $s \\to b \\to c = 1 + 5 = 6$: $d[c] = 5$, $\\pi[c] = a$. Yeni ağaç: $s \\to a$, $s \\to b$, $a \\to c$. Eşitlik olsaydı (örneğin $b \\to a$ ağırlığı 3: $1 + 3 = 4$) iki yol da en kısa olurdu; Dijkstra yalnızca **kesin iyileşmede** ($<$) günceller, yani hangi ebeveynin kalacağı işleme sırasına bağlıdır. Uzaklıklar ise her durumda tektir.`,
         },
       ],
       sources: [SRC.l11.notes, SRC.l11.slides, SRC.l11.pre, SRC.l11.notebook, SRC.l11.concept],

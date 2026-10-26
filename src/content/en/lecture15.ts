@@ -15,7 +15,7 @@ export const lecture15: Lecture = {
       title: 'Minimum spanning trees: Prim and Kruskal',
       titleEn: 'Minimum spanning trees: Prim and Kruskal',
       summary: 'Cuts, light edges, the cut property; priority queues and union-find.',
-      minutes: 55,
+      minutes: 60,
       objectives: [
         'State the minimum spanning tree (MST) problem and the general “add a safe edge” template.',
         'Define cuts, respecting a set and light edges; prove the cut property (Theorem 1).',
@@ -129,6 +129,29 @@ Good news: this problem is solved by greedy algorithms, in polynomial time and v
           ],
         },
         {
+          kind: 'steps',
+          title: 'Worked example: the cycle property and a cheaper edge',
+          label: 'formal',
+          body: `The cut property says which edges are **safe**. Its mirror image says which edges are **never** needed: the (unique) heaviest edge on a cycle is in no MST. Let us see it on the “small example” graph (ab 3, ad 1, bd 4, bc 5, be 2, ce 6, cf 2, de 7, ef 1; MST weight 9).`,
+          proof: [
+            { title: 'The cycle property', body: 'If $e$ is the unique heaviest edge of a cycle $C$ and $e$ were in a tree $T$: removing $e$ splits $T$ in two, and another edge of $C$ reconnects the two parts more cheaply. A lighter spanning tree: a contradiction.' },
+            { title: 'In the example', body: 'The cycle $a - d - e - b - a$: ad 1, de 7, eb 2, ba 3. Its heaviest edge de 7 is not in the MST. Kruskal skips it too, because it “would create a cycle”.' },
+            { title: 'If an edge gets cheaper', body: 'Let bd drop from 4 to 0. Adding bd to the old MST creates the cycle $b - d - a - b$ (bd 0, ad 1, ab 3); by the cycle property the heaviest edge ab 3 leaves. The new MST weighs $9 - 3 + 0 = 6$.' },
+            { title: 'The lesson', body: 'When an edge weight decreases there is no need to recompute the MST from scratch: add the edge and remove the heaviest edge on the single cycle it creates, in $O(n)$.' },
+          ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'mcq',
+              prompt: 'The small example has the cycle $b - c - f - e - b$ (bc 5, cf 2, fe 1, eb 2). Which edge can be in no MST?',
+              options: ['cf', 'ef', 'bc', 'be'],
+              answer: 2,
+              hint: 'The unique heaviest edge of the cycle.',
+              explanation: 'bc 5 is the unique heaviest edge of the cycle; by the cycle property it is in no MST.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- Confusing Prim with Dijkstra: in Prim, $key(v)$ is the weight of **one edge**, not a distance from the source. An MST is not a shortest-path tree.
@@ -185,6 +208,12 @@ Good news: this problem is solved by greedy algorithms, in polynomial time and v
           prompt: `Our own example (the “Small example” in the visualizer): edges ab 3, ad 1, bd 4, bc 5, be 2, ce 6, cf 2, de 7, ef 1. Run Kruskal by hand: write “added / skipped” for every edge and track the sets. Then run Prim starting from $a$.`,
           hints: ['Sorted edges: ad 1, ef 1, be 2, cf 2, ab 3, bd 4, bc 5, ce 6, de 7.', 'Prim: after $a$ comes $d$ (1), then $b$ (3)…'],
           solution: `**Kruskal:** ad 1 added {a,d}; ef 1 added {e,f}; be 2 added {b,e,f}; cf 2 added {b,c,e,f}; ab 3 added {a,b,c,d,e,f} — 5 edges, done. Total 9. (bd 4, bc 5, ce 6, de 7 would now close cycles.) **Prim (from $a$):** $a$; key(b) = 3, key(d) = 1 → add $d$ (ad 1); key(e) = 7 → $b$ (ab 3); key(c) = 5, key(e) = 2 → $e$ (be 2); key(f) = 1, key(c) = 5 → $f$ (ef 1); key(c) = 2 → $c$ (cf 2). The same tree, weight 9.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Our own example: four cities $p, q, r, s$ and a connection cost for every pair: pq 1, pr 4, ps 3, qr 2, qs 5, rs 6. Find the MST with Kruskal. Then use the cycle property to justify which edges can be in no MST.`,
+          hints: ['Sorted edges: pq 1, qr 2, ps 3, pr 4, qs 5, rs 6.', '$n - 1 = 3$ edges are enough.'],
+          solution: `Kruskal: pq 1 added, qr 2 added, ps 3 added: 3 edges, done. Weight $1 + 2 + 3 = 6$. The others: pr 4 is the heaviest edge of the cycle $p - q - r - p$ (1, 2, 4); qs 5 of the cycle $q - p - s - q$ (1, 3, 5); rs 6 of the cycle $r - q - p - s - r$ (2, 1, 3, 6). None of the three can be in an MST, and since all weights differ the MST is unique.`,
         },
       ],
       sources: [SRC.l15.notes, SRC.l15.slides, SRC.l15.pre, SRC.l15.notebook, SRC.l15.concept],

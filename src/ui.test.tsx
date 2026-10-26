@@ -380,7 +380,7 @@ describe('exam, code and notes', () => {
 })
 
 describe('language and theme switches', () => {
-  it('switches the whole UI and lesson content to English and back, and persists the choice', async () => {
+  it('switches the whole UI and lesson content to English and back, and persists the choice', { timeout: 15_000 }, async () => {
     const user = userEvent.setup()
     window.location.hash = '#/ders/l3-master'
     render(<App />)

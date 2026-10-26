@@ -15,7 +15,7 @@ export const lecture13: Lecture = {
       title: 'Longest common subsequence (LCS)',
       titleEn: 'Longest common subsequence (LCS)',
       summary: 'A table of prefixes, one value from three neighbours, and a walk back.',
-      minutes: 40,
+      minutes: 45,
       objectives: [
         'List the five steps of designing a DP algorithm.',
         'Derive the prefix subproblems for LCS and the recurrence for $C[i, j]$.',
@@ -120,6 +120,28 @@ This simple algorithm is the best known: improving $O(mn)$ by a polynomial facto
           ],
         },
         {
+          kind: 'steps',
+          title: 'Worked example: a related problem, edit distance',
+          label: 'formal',
+          body: `The same design recipe (subproblems, recurrence, table) applies to other sequence problems. **Edit distance** (Levenshtein): the fewest insertions, deletions and substitutions that turn $X$ into $Y$. Spell checkers find their “did you mean…?” suggestions this way.`,
+          proof: [
+            { title: 'Subproblem', body: '$E[i][j]$: the cost of turning the first $i$ letters of $X$ into the first $j$ letters of $Y$. Base: $E[i][0] = i$ ($i$ deletions), $E[0][j] = j$ ($j$ insertions).' },
+            { title: 'Recurrence', body: 'If the last letters agree, $E[i][j] = E[i-1][j-1]$. Otherwise the cheapest of three options: $1 + \\min(E[i-1][j]$ (delete), $E[i][j-1]$ (insert), $E[i-1][j-1]$ (substitute)$)$. Almost the same “two cases” as in LCS.' },
+            { title: 'Example', body: 'SUNDAY → SATURDAY: S stays; A and T are inserted; U stays; N is replaced by R; D, A, Y stay. 3 operations in total, and fewer is impossible: the bottom-right cell of the table is 3.' },
+            { title: 'Time', body: 'Again $(m + 1)(n + 1)$ cells at $O(1)$ each: $O(mn)$. Tracing back gives the list of operations.' },
+          ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'What is the edit distance between CAT and CUT?',
+              answer: 1,
+              hint: 'Which letters differ?',
+              explanation: 'Only the middle letter differs: A → U, a single substitution.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- Confusing a subsequence with a **substring** (contiguous).
@@ -173,6 +195,12 @@ This simple algorithm is the best known: improving $O(mn)$ by a polynomial facto
           hints: ['The first row (K) and the first column (K) start with a match.', 'The answer has length 4.'],
           solution: `Rows K, A, R, T, A, L; columns K, A, T, A, R. The last cell of the table is $C[6, 5] = 4$. The traceback gives “KATA”: letters 1, 2, 4, 5 of X and letters 1, 2, 3, 4 of Y. “KAR” is a common subsequence too, but it cannot be extended: in X only T, A, L follow the R, while in Y the R is the last letter. Check it in the visualizer with X = KARTAL, Y = KATAR.`,
         },
+        {
+          id: 'p2',
+          prompt: `Our own example: if only **insertions and deletions** are allowed (no substitutions), how many operations does it take to turn SUNDAY into SATURDAY? How do you compute this with LCS?`,
+          hints: ['The letters of an LCS stay in place; every other letter is deleted or inserted.', 'LCS(SUNDAY, SATURDAY) = SUDAY.'],
+          solution: `The letters of the LCS stay untouched; the remaining letters of $X$ are deleted and the remaining letters of $Y$ are inserted. The number of operations is $|X| + |Y| - 2\\,|LCS|$. LCS = SUDAY (length 5): $6 + 8 - 10 = 4$ operations (delete N; insert A, T, R). With substitutions allowed, one delete + insert pair (N → R) becomes a single operation and the edit distance is 3. The Unix diff tool uses exactly this insert/delete version.`,
+        },
       ],
       sources: [SRC.l13.notes, SRC.l13.slides, SRC.l13.concept],
     },
@@ -182,7 +210,7 @@ This simple algorithm is the best known: improving $O(mn)$ by a polynomial facto
       title: 'Knapsack and independent set in a tree',
       titleEn: 'Knapsack and independent set in a tree',
       summary: 'Subproblems by capacity, “take it or leave it”, and two values per subtree.',
-      minutes: 45,
+      minutes: 50,
       objectives: [
         'Write the subproblems and recurrences of unbounded and 0/1 knapsack.',
         'Explain why 0/1 knapsack needs a second dimension (the number of items).',
@@ -318,6 +346,28 @@ Values are computed from the leaves up (post-order); the answer is $A(r)$.`,
           body: `Every node is processed once and sums its children’s values; every edge is counted once: **$O(|V|)$**.`,
         },
         {
+          kind: 'steps',
+          title: 'Worked example: why greedy is not enough',
+          label: 'formal',
+          body: `The first rule that comes to mind: start with the item of highest value per weight. Our own example: capacity $W = 10$; A (weight 6, value 30), B (5, 20), C (5, 20).`,
+          proof: [
+            { title: 'Greedy', body: 'Ratios: A 5, B 4, C 4. A is taken first (weight 6); in the remaining 4 units neither B nor C fits. Value: 30.' },
+            { title: 'Optimal', body: 'Skipping A and taking B and C gives weight exactly 10 and value 40. The greedy choice (A) is in no optimal solution: the exchange argument fails here.' },
+            { title: 'Why DP saves us', body: '$K[i][x]$ keeps the best value for every capacity $x$ and tries both options, “take A” and “skip A”. The table finds $K[3][10] = 40$.' },
+            { title: 'The fractional version', body: 'If items could be split (powder, liquid), the greedy rule would be optimal: all of A and 4/5 of B, value $30 + 16 = 46$. The integrality constraint is what makes the problem hard.' },
+          ],
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'In this example (W = 10; A 6/30, B 5/20, C 5/20), what is the optimal 0/1 knapsack value?',
+              answer: 40,
+              hint: 'Try the options without A too.',
+              explanation: 'B + C: weight 10, value 40. With A at most 30 (A + B or A + C exceeds the capacity).',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- Trying to solve 0/1 knapsack with a one-dimensional $K(x)$: the same item gets counted several times.
@@ -369,6 +419,12 @@ Values are computed from the leaves up (post-order); the answer is $A(r)$.`,
           prompt: `Our own example: W = 7 and items X (3 kg, 9), Y (4 kg, 11), Z (2 kg, 5). Find the best value and the choice for both the 0/1 and the unbounded knapsack.`,
           hints: ['0/1: X + Y is exactly 7 kg.', 'Unbounded: X + X + ? or X + Z + Z?'],
           solution: `**0/1:** X + Y = 7 kg, value 20 (X + Z = 14, Y + Z = 16). **Unbounded:** $K(2) = 5$, $K(3) = 9$, $K(4) = 11$, $K(5) = 14$, $K(6) = 18$ (X + X) and $K(7) = \\max(K(4) + 9,\\ K(3) + 11,\\ K(5) + 5) = \\max(20, 20, 19) = 20$, i.e. X + Y again. Taking copies does not help here.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Our own example: the same items (A 6/30, B 5/20, C 5/20), but now each item is available in **unlimited** quantity, $W = 10$. What is the optimal value? What if $W = 11$?`,
+          hints: ['The recurrence of the unbounded version: $K[x] = \\max_i (K[x - w_i] + v_i)$.', 'Can you take two copies of B?'],
+          solution: `$W = 10$: B twice (weight 10, value 40) or B + C, again 40; with A at most 30 (only 4 units remain after A). Optimal: 40. $W = 11$: A + B (weight 11, value 50) is best; two Bs give 40, one A gives 30. The table: $K[x] = 0$ ($x < 5$), $20$ ($5 \\le x < 6$), $30$ ($6 \\le x < 10$), $40$ ($x = 10$), $50$ ($x = 11$). Increasing the capacity by one unit can change the optimal solution completely; a greedy rule cannot capture that.`,
         },
       ],
       sources: [SRC.l13.notes, SRC.l13.slides, SRC.l13.concept],

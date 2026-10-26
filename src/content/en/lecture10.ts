@@ -15,7 +15,7 @@ export const lecture10: Lecture = {
       title: 'Strongly connected components (SCC)',
       titleEn: 'Strongly connected components (SCC)',
       summary: 'The meta-graph of the components is a DAG; finishing times in the reversed graph peel off the SCCs one by one.',
-      minutes: 50,
+      minutes: 55,
       objectives: [
         'Define connected components of undirected graphs and strongly connected components (SCCs) of directed graphs.',
         'Explain why the meta-graph of the SCCs is acyclic.',
@@ -132,6 +132,28 @@ One DFS is not enough: a search from $u$ may leak **outside** $u$’s SCC. The f
           ],
         },
         {
+          kind: 'steps',
+          title: 'Worked example: the SCC graph (condensation)',
+          label: 'formal',
+          body: `Our own example: $a \\to b$, $b \\to c$, $c \\to a$, $c \\to d$, $d \\to e$, $e \\to d$, $e \\to f$. What do we get if we shrink every SCC to a single node?`,
+          proof: [
+            { title: 'The components', body: '$a \\to b \\to c \\to a$ is a cycle: $\\{a, b, c\\}$. $d \\leftrightarrow e$: $\\{d, e\\}$. Nothing is reachable from $f$: $\\{f\\}$. 3 SCCs in total.' },
+            { title: 'Condensation', body: 'Every SCC becomes one node and the edges between SCCs stay: $\\{a,b,c\\} \\to \\{d,e\\} \\to \\{f\\}$. This graph is **always a DAG**: if the SCC graph had a cycle, the components on it would be mutually reachable and would merge into one SCC.' },
+            { title: 'Link to the algorithm', body: 'The first DFS of the two-pass algorithm finds a topological order of this DAG (through finish times): the largest finish time lies in a source component. The second pass runs on the reversed graph in that order, so each time it “peels off” exactly one component.' },
+            { title: 'Adding an edge', body: 'Adding $f \\to a$ creates the cycle $a \\leadsto f \\to a$ and everything merges into a single SCC. Adding $f \\to d$ merges only $\\{d, e, f\\}$: 2 SCCs.' },
+          ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'How many SCCs remain after the edge $f \\to d$ is added to this graph?',
+              answer: 2,
+              hint: 'Are $d$, $e$ and $f$ now mutually reachable? And $a$?',
+              explanation: '$\\{a, b, c\\}$ and $\\{d, e, f\\}$: there is still no edge from $\\{d, e, f\\}$ back to $\\{a, b, c\\}$.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- Processing the nodes of pass 2 in **increasing** finishing time: then the first DFS may start in a “source” SCC and collect several SCCs at once.
@@ -189,6 +211,12 @@ One DFS is not enough: a search from $u$ may leak **outside** $u$’s SCC. The f
           prompt: `Our own example: edges 1→2, 2→3, 3→1, 3→4, 4→5, 5→6, 6→4, 6→7. Run the two-pass algorithm by hand (in pass 1 try the nodes of $G_{rev}$ from 7 down to 1). Write the finishing times, the order of pass 2 and the SCCs.`,
           hints: ['DFS from 7 in $G_{rev}$: 7 → 6 → 5 → 4 → 3 → 2 → 1.', 'Pass 2 starts from the largest $f$; where can you go from that node in $G$?'],
           solution: `Edges of $G_{rev}$: 2→1, 3→2, 1→3, 4→3, 5→4, 6→5, 4→6, 7→6. DFS from 7 discovers 7, 6, 5, 4, 3, 2, 1 in that order (4’s neighbors are 3 and 6; 6 is already explored). Finishing times: 1 → 1, 2 → 2, 3 → 3, 4 → 4, 5 → 5, 6 → 6, 7 → 7. Order of pass 2: 7, 6, 5, 4, 3, 2, 1. In $G$ nothing leaves 7: $\\{7\\}$. From 6: 6 → 4 → 5 (7 is explored): $\\{4, 5, 6\\}$. Then from 3: 3 → 1 → 2: $\\{1, 2, 3\\}$. Three SCCs; meta-graph $\\{1,2,3\\} \\to \\{4,5,6\\} \\to \\{7\\}$.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Our own example: we want to make the graph above ($a \\to b \\to c \\to a$, $c \\to d$, $d \\leftrightarrow e$, $e \\to f$) strongly connected by adding **a single edge**. Which edges work? Why?`,
+          hints: ['The SCC graph is a chain: $\\{a,b,c\\} \\to \\{d,e\\} \\to \\{f\\}$.', 'The new edge has to go from the end of the chain back to its start.'],
+          solution: `Since the SCC graph is a chain, the single edge must go from the **last** component (\\{f\\}) to the **first** one (\\{a, b, c\\}): $f \\to a$, $f \\to b$ or $f \\to c$. All three put every node on one cycle. $f \\to d$ only merges the last two components; $e \\to a$ leaves $\\{f\\}$ outside ($f$ has no outgoing edge). In general, one edge is enough when the SCC graph is a chain with one source and one sink; with many sources or sinks more edges are needed.`,
         },
       ],
       sources: [SRC.l10.notes, SRC.l10.slides, SRC.l10.pre, SRC.l10.notebook, SRC.l10.concept],

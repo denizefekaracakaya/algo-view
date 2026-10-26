@@ -15,7 +15,7 @@ export const lecture15: Lecture = {
       title: 'Minimum yayılan ağaçlar: Prim ve Kruskal',
       titleEn: 'Minimum spanning trees: Prim and Kruskal',
       summary: 'Kesmeler, hafif kenarlar, kesme özelliği; öncelik kuyruğu ve union-find.',
-      minutes: 55,
+      minutes: 60,
       objectives: [
         'Minimum yayılan ağaç (MST) problemini ve genel “güvenli kenar ekle” şablonunu ifade etmek.',
         'Kesme, kesmeye saygı ve hafif kenar kavramlarını tanımlamak; kesme özelliğini (Teorem 1) kanıtlamak.',
@@ -129,6 +129,29 @@ Bu, yönsüz ağırlıklı bir grafikte **minimum yayılan ağaç** (MST) proble
           ],
         },
         {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: döngü özelliği ve bir kenarın ucuzlaması',
+          label: 'formal',
+          body: `Kesme özelliği hangi kenarların **güvenli** olduğunu söyler. Ayna yüzü, hangi kenarların **hiçbir zaman** gerekmediğini söyler: bir döngüdeki (tek) en ağır kenar hiçbir MST’de yoktur. “Küçük örnek” grafiği üzerinde görelim (ab 3, ad 1, bd 4, bc 5, be 2, ce 6, cf 2, de 7, ef 1; MST ağırlığı 9).`,
+          proof: [
+            { title: 'Döngü özelliği', body: 'Bir $C$ döngüsünün en ağır kenarı $e$ tek ise ve $e$ bir $T$ ağacında olsaydı: $e$’yi çıkarmak $T$’yi ikiye böler, $C$’nin başka bir kenarı iki parçayı daha ucuza bağlar. Daha hafif bir yayılan ağaç: çelişki.' },
+            { title: 'Örnekte', body: '$a - d - e - b - a$ döngüsü: ad 1, de 7, eb 2, ba 3. En ağırı de 7: MST’de değildir. Kruskal da onu “döngü oluşturur” diye atlar.' },
+            { title: 'Bir kenar ucuzlarsa', body: 'bd’nin ağırlığı 4’ten 0’a insin. Eski MST’ye bd eklenince $b - d - a - b$ döngüsü oluşur (bd 0, ad 1, ab 3); döngü özelliğine göre en ağır kenar ab 3 çıkar. Yeni MST ağırlığı $9 - 3 + 0 = 6$.' },
+            { title: 'Ders', body: 'Bir kenar ağırlığı azalınca MST’yi baştan hesaplamaya gerek yok: kenarı ekle, oluşan tek döngüdeki en ağır kenarı çıkar, $O(n)$.' },
+          ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'mcq',
+              prompt: 'Küçük örnekte $b - c - f - e - b$ döngüsü (bc 5, cf 2, fe 1, eb 2) var. Hangi kenar hiçbir MST’de olamaz?',
+              options: ['cf', 'ef', 'bc', 'be'],
+              answer: 2,
+              hint: 'Döngünün tek en ağır kenarı.',
+              explanation: 'bc 5 döngüdeki tek en ağır kenardır; döngü özelliğine göre hiçbir MST’de yer almaz.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- Prim’i Dijkstra ile karıştırmak: Prim’de $key(v)$ **tek bir kenarın** ağırlığıdır, kaynaktan uzaklık değil. MST, en kısa yollar ağacı değildir.
@@ -185,6 +208,12 @@ Bu, yönsüz ağırlıklı bir grafikte **minimum yayılan ağaç** (MST) proble
           prompt: `Kendi örneğimiz (görselleştiricideki “Küçük örnek”): kenarlar ab 3, ad 1, bd 4, bc 5, be 2, ce 6, cf 2, de 7, ef 1. Kruskal’ı elle çalıştırın: her kenar için “eklendi / atlandı” yazın ve kümeleri izleyin. Sonra $a$’dan başlayarak Prim’i çalıştırın.`,
           hints: ['Sıralı kenarlar: ad 1, ef 1, be 2, cf 2, ab 3, bd 4, bc 5, ce 6, de 7.', 'Prim: $a$’dan sonra $d$ (1), sonra $b$ (3)…'],
           solution: `**Kruskal:** ad 1 eklendi {a,d}; ef 1 eklendi {e,f}; be 2 eklendi {b,e,f}; cf 2 eklendi {b,c,e,f}; ab 3 eklendi {a,b,c,d,e,f} — 5 kenar, bitti. Toplam 9. (bd 4, bc 5, ce 6, de 7 artık döngü oluşturur.) **Prim ($a$’dan):** $a$; key(b) = 3, key(d) = 1 → $d$ eklenir (ad 1); key(e) = 7 → $b$ (ab 3); key(c) = 5, key(e) = 2 → $e$ (be 2); key(f) = 1, key(c) = 5 → $f$ (ef 1); key(c) = 2 → $c$ (cf 2). Aynı ağaç, ağırlık 9.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: dört şehir $p, q, r, s$ ve her çift arasında bir bağlantı maliyeti: pq 1, pr 4, ps 3, qr 2, qs 5, rs 6. Kruskal’la MST’yi bulun. Sonra döngü özelliğiyle hangi kenarların hiçbir MST’de olamayacağını gerekçelendirin.`,
+          hints: ['Sıralı kenarlar: pq 1, qr 2, ps 3, pr 4, qs 5, rs 6.', '$n - 1 = 3$ kenar yeter.'],
+          solution: `Kruskal: pq 1 eklendi, qr 2 eklendi, ps 3 eklendi: 3 kenar, bitti. Ağırlık $1 + 2 + 3 = 6$. Diğerleri: pr 4, $p - q - r - p$ döngüsünün (1, 2, 4) en ağırı; qs 5, $q - p - s - q$ döngüsünün (1, 3, 5) en ağırı; rs 6, $r - q - p - s - r$ döngüsünün (2, 1, 3, 6) en ağırı. Üçü de hiçbir MST’de olamaz ve tüm ağırlıklar farklı olduğu için MST tektir.`,
         },
       ],
       sources: [SRC.l15.notes, SRC.l15.slides, SRC.l15.pre, SRC.l15.notebook, SRC.l15.concept],

@@ -15,7 +15,7 @@ export const lecture16: Lecture = {
       title: 'Maksimum akış, minimum kesme ve Ford–Fulkerson',
       titleEn: 'Max flow, min cut and Ford–Fulkerson',
       summary: 'Akış kısıtları, artık grafik, artırıcı yollar ve maksimum akış–minimum kesme teoremi.',
-      minutes: 55,
+      minutes: 60,
       objectives: [
         'Akışı (kapasite ve korunum kısıtları) ve $s$–$t$ kesmesini tanımlamak.',
         'Her akışın her kesmeden küçük ya da eşit olduğunu (Lemma 2) göstermek.',
@@ -157,6 +157,28 @@ Tam sayılık sayesinde akış her kenarda 0 ya da 1’dir; her $x$’e en fazla
 - **Spor eleme problemleri:** “Bu takım hâlâ lider olabilir mi?” sorusu bir akış problemine çevrilebilir.`,
         },
         {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: ters kenarlar neden gerekli?',
+          label: 'formal',
+          body: `Ters kenarlar olmadan, yalnızca “dolu olmayan bir yol bul ve doldur” diyen açgözlü bir algoritma takılabilir. Kendi örneğimiz, bütün kapasiteler 1: $s \\to a$, $s \\to b$, $a \\to c$, $a \\to d$, $b \\to c$, $c \\to t$, $d \\to t$.`,
+          proof: [
+            { title: 'Talihsiz ilk yol', body: '$s \\to a \\to c \\to t$ seçilir: akış 1. Şimdi $s \\to a$ ve $c \\to t$ dolu. $b$’den çıkan tek yol $b \\to c$, ama $c \\to t$ dolu: ters kenarsız grafikte başka yol yok. Açgözlü algoritma 1’de durur.' },
+            { title: 'Artık grafik', body: 'Ters kenarlarla $c \\to a$ (akışı geri alma) kullanılabilir: $s \\to b \\to c \\to a \\to d \\to t$. Bu yol, $a \\to c$ üzerindeki akışı iptal edip $a$’nın akışını $d$’ye yönlendirir.' },
+            { title: 'Sonuç', body: 'Akış 2: $s \\to a \\to d \\to t$ ve $s \\to b \\to c \\to t$. $\\{s\\}$ kesmesinin kapasitesi $1 + 1 = 2$: bu maksimumdur.' },
+            { title: 'Ders', body: 'Ters kenarlar, önceki kararları **geri alma** imkânıdır. Ford–Fulkerson’ın hangi yolları seçerse seçsin maksimuma ulaşmasının nedeni budur; açgözlü “doldur ve unut” ise yerel bir tuzağa düşer.' },
+          ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'Bu örnekte ters kenarlar kullanılmaz ve ilk yol $s \\to a \\to c \\to t$ seçilirse açgözlü algoritma hangi akış değerinde takılır?',
+              answer: 1,
+              hint: '$c \\to t$ dolunca $b$’den $t$’ye bir yol kalıyor mu?',
+              explanation: '$b$’nin tek çıkışı $c$, $c$’nin tek çıkışı dolu: akış 1’de kalır. Ters kenarla 2’ye çıkar.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- Ters (geri alma) kenarlarını unutmak: onlar olmadan açgözlü yol seçimi optimal olmayan bir akışta takılabilir.
@@ -208,6 +230,12 @@ Tam sayılık sayesinde akış her kenarda 0 ya da 1’dir; her $x$’e en fazla
           prompt: `Kendi örneğimiz: kenarlar s→a (3), s→b (2), a→b (1), a→t (2), b→t (3). Ford–Fulkerson’ı elle çalıştırın (kendi seçtiğiniz yollarla). Maksimum akışı ve bir minimum kesmeyi bulun.`,
           hints: ['Önce s→a→t ve s→b→t.', 'Kalan artık kapasitelerle s→a→b→t mümkün mü?'],
           solution: `s→a→t: darboğaz 2, $|f| = 2$. s→b→t: darboğaz 2, $|f| = 4$. s→a→b→t: artık kapasiteler 1, 1, 1 → $|f| = 5$. Artık grafikte $s$’den çıkan kenarların ikisi de dolu: $S = \\{s\\}$, kapasite $3 + 2 = 5 = |f|$. Maksimum akış 5; $(\\{s\\}, \\{a, b, t\\})$ bir minimum kesmedir ($\\{s, a, b\\}$ de kapasitesi $2 + 3 = 5$ olan bir başka minimum kesmedir).`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: şu ağda ($s \\to a$, $s \\to b$, $a \\to t$, $b \\to t$ kapasite $C = 100$, $a \\to b$ kapasite 1) bütün $s$–$t$ kesmelerini listeleyin ($s$ tarafına $a$ ve $b$’den hangilerinin girdiğine göre). Hangileri minimumdur?`,
+          hints: ['Dört kesme: $\\{s\\}$, $\\{s, a\\}$, $\\{s, b\\}$, $\\{s, a, b\\}$.', 'Yalnızca $s$ tarafından $t$ tarafına giden kenarlar sayılır.'],
+          solution: `$\\{s\\}$: $s \\to a$ + $s \\to b$ = 200. $\\{s, a\\}$: $s \\to b$ + $a \\to t$ + $a \\to b$ = 201. $\\{s, b\\}$: $s \\to a$ + $b \\to t$ = 200 ($a \\to b$ ters yönde, sayılmaz). $\\{s, a, b\\}$: $a \\to t$ + $b \\to t$ = 200. Üç kesme minimumdur (200) ve maksimum akış–minimum kesme teoremine uygun olarak maksimum akış da 200’dür. Ford–Fulkerson’ın sonunda $s$’den artık grafikte ulaşılabilen düğümler bu minimum kesmelerden birini verir: burada $\\{s\\}$.`,
         },
       ],
       sources: [SRC.l16.notes, SRC.l16.slides, SRC.l16.pre, SRC.l16.concept],

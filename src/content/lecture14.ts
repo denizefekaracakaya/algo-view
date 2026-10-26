@@ -15,7 +15,7 @@ export const lecture14: Lecture = {
       title: 'Açgözlü seçim: etkinlik seçimi ve zamanlama',
       titleEn: 'The greedy choice: activity selection and scheduling',
       summary: 'Yalnızca tek bir alt probleme bakmak; en erken biten etkinlik ve $l/w$ oranı.',
-      minutes: 40,
+      minutes: 45,
       objectives: [
         'Açgözlü algoritmayı dinamik programlamanın bir inceltmesi olarak görmek: her adımda yalnızca bir alt problem.',
         'Etkinlik seçiminde en erken bitenin bir optimal çözümde bulunduğunu değiştirme argümanıyla kanıtlamak.',
@@ -127,6 +127,28 @@ Yani işler **$l / w$ oranına göre artan** sırada yapılmalıdır: kısa ve �
           ],
         },
         {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: yanlış açgözlü kurallar',
+          label: 'formal',
+          body: `Etkinlik seçiminde “en erken biten” yerine başka makul görünen kurallar da düşünülebilir. Bir açgözlü kuralı çürütmek için **tek bir karşı örnek** yeter. (Aralıklar $[s, f)$: biri bittiği anda diğeri başlayabilir.)`,
+          proof: [
+            { title: 'En erken başlayan', body: '$[0, 10)$, $[1, 2)$, $[3, 4)$: kural $[0, 10)$’u seçer ve diğer ikisi çakışır → 1 etkinlik. Optimal: $[1, 2)$ ve $[3, 4)$ → 2.' },
+            { title: 'En kısa süren', body: '$[0, 5)$, $[4, 6)$, $[5, 10)$: en kısa olan $[4, 6)$ diğer ikisiyle de çakışır → 1 etkinlik. Optimal: $[0, 5)$ ve $[5, 10)$ → 2.' },
+            { title: 'En erken biten neden farklı?', body: 'Önerme 1’in değiştirme argümanı: herhangi bir optimal çözümdeki ilk etkinliği en erken bitenle değiştirmek hiçbir çakışma yaratmaz, çünkü en erken biten ondan daha geç bitmez. Diğer kurallar için böyle bir değiştirme yapılamaz.' },
+            { title: 'Ders', body: 'Açgözlü bir algoritma yazmadan önce ya bir kanıt (değiştirme argümanı) ya da küçük örneklerde kaba kuvvetle karşılaştırma yapın. Sezgi tek başına yanıltır.' },
+          ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: '$[0, 5)$, $[4, 6)$, $[5, 10)$ etkinliklerinde “en kısa süren önce” kuralı kaç etkinlik seçer?',
+              answer: 1,
+              hint: 'En kısa olan hangisi ve kimle çakışıyor?',
+              explanation: '$[4, 6)$ seçilir; $[0, 5)$ ve $[5, 10)$ ile çakıştığı için başka etkinlik eklenemez. Optimal 2.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- Bir açgözlü kuralı kanıtsız kabul etmek: birkaç örnekte çalışması yetmez.
@@ -184,6 +206,12 @@ Yani işler **$l / w$ oranına göre artan** sırada yapılmalıdır: kısa ve �
           prompt: `Kendi örneğimiz: dört iş — P ($l = 4$, $w = 2$), Q ($l = 1$, $w = 1$), R ($l = 3$, $w = 3$), S ($l = 2$, $w = 1$). En iyi sırayı ve $\\sum w_j c_j$’yi bulun.`,
           hints: ['Oranlar: P 2, Q 1, R 1, S 2.', 'Eşit oranlı işlerin sırası sonucu değiştirmez.'],
           solution: `Oranlar $l/w$: Q 1, R 1, P 2, S 2. Sıra Q, R, P, S: tamamlanma 1, 4, 8, 10 → $1 \\cdot 1 + 3 \\cdot 4 + 2 \\cdot 8 + 1 \\cdot 10 = 1 + 12 + 16 + 10 = 39$. (R, Q, P, S de 39 verir: $3 \\cdot 3 + 1 \\cdot 4 + 16 + 10 = 39$.)`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: üç iş, (süre $\\ell$, ağırlık $w$): A (3, 1), B (1, 2), C (2, 2). Ağırlıklı tamamlanma süresi $\\sum w_j c_j$’yi en aza indiren sıra hangisidir? Bütün 6 sırayı denemeden bulun, sonra birkaçıyla karşılaştırın.`,
+          hints: ['Oran kuralı: $\\ell / w$ küçükten büyüğe.', 'B: 0,5; C: 1; A: 3.'],
+          solution: `Oran sırası B, C, A. Tamamlanma süreleri $c_B = 1$, $c_C = 3$, $c_A = 6$: $2 \\cdot 1 + 2 \\cdot 3 + 1 \\cdot 6 = 14$. Karşılaştırma: C, B, A → $2 \\cdot 2 + 2 \\cdot 3 + 1 \\cdot 6 = 16$; B, A, C → $2 \\cdot 1 + 1 \\cdot 4 + 2 \\cdot 6 = 18$; A, B, C → $1 \\cdot 3 + 2 \\cdot 4 + 2 \\cdot 6 = 23$. En iyisi 14, oran kuralının verdiği sıra. Komşu iki işi yer değiştirmek yalnızca o ikisinin katkısını değiştirir; değiştirme argümanı tam burada çalışır.`,
         },
       ],
       sources: [SRC.l14.notes, SRC.l14.slides, SRC.l14.pre, SRC.l14.notebook, SRC.l14.concept],
@@ -331,6 +359,14 @@ $B(T)$’yi en küçük yapan ağaç **optimaldir**. Optimal ağaç **dolu**dur:
           hint: '$n - 1$ birleştirme, her biri birkaç kuyruk işlemi.',
           explanation: 'Her birleştirmede iki ExtractMin ve bir Insert: $O(\\log n)$. Toplam $O(n \\log n)$.',
         },
+        {
+          id: 'q5',
+          kind: 'numeric',
+          prompt: 'Frekanslar a: 8, b: 4, c: 2, d: 1, e: 1. Huffman kodlamasıyla bu 16 harflik metin toplam kaç bit tutar?',
+          answer: 30,
+          hint: 'Önce d ve e birleşir, sonra c ile, sonra b ile.',
+          explanation: 'Derinlikler a 1, b 2, c 3, d 4, e 4: $8 + 8 + 6 + 4 + 4 = 30$ bit. Sabit uzunlukta kod (3 bit) 48 bit tutardı.',
+        },
       ],
       practice: [
         {
@@ -338,6 +374,12 @@ $B(T)$’yi en küçük yapan ağaç **optimaldir**. Optimal ağaç **dolu**dur:
           prompt: `Kendi örneğimiz: “ABRACADABRA” kelimesindeki harf sıklıklarıyla bir Huffman kodu kurun. Kelime kaç bitle kodlanır? Sabit uzunluklu bir kodla kaç bit gerekirdi?`,
           hints: ['Sayımlar: A 5, B 2, R 2, C 1, D 1.', 'İlk birleştirme C ile D.'],
           solution: `Sayımlar A 5, B 2, R 2, C 1, D 1 (toplam 11). Birleştirmeler: C + D = 2; sonra en küçük iki: B (2) ve R (2) ya da CD (2) — eşitlik var, örneğin B + R = 4; CD (2) + BR (4) = 6; A (5) + 6 = 11. Kodlar: A 1 bit, B/R/C/D 3 bit. Toplam $5 \\cdot 1 + (2 + 2 + 1 + 1) \\cdot 3 = 23$ bit. Görselleştiricide “A:5, B:2, R:2, C:1, D:1” girerek kontrol edin (eşitlikler farklı bozulursa kodlar değişebilir ama toplam yine 23 bittir). Sabit uzunlukta 5 harf için 3 bit: $11 \\cdot 3 = 33$ bit.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: dört harf, her biri eşit sıklıkta (a, b, c, d: her biri 5). Huffman ağacını kurun. Sonuç sabit uzunluklu koddan daha iyi mi? Frekanslar 1, 1, 1, 1, …, hep eşitken ve $2^k$ harf varken ne olur?`,
+          hints: ['İlk iki birleşme: (a, b) ve (c, d).', 'Eşit frekanslar dengeli bir ağaç verir.'],
+          solution: `a + b = 10, c + d = 10, sonra 10 + 10 = 20. Her harf derinlik 2’de: her biri 2 bitlik kod, toplam $20 \\cdot 2 = 40$ bit, sabit uzunluklu 2 bitlik kodla aynı. $2^k$ eşit frekanslı harfte Huffman tam dengeli bir ağaç kurar ve her harf $k$ bit alır: kazanç yoktur. Huffman’ın kazancı **çarpık** dağılımlardan gelir (yukarıdaki a: 8, b: 4, … örneğindeki gibi); bilgi kuramında bu, entropinin $\\log_2(\\text{harf sayısı})$’ndan küçük olmasına karşılık gelir.`,
         },
       ],
       sources: [SRC.l14.notes, SRC.l14.slides, SRC.l14.notebook, SRC.l14.concept],

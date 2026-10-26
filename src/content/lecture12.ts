@@ -15,7 +15,7 @@ export const lecture12: Lecture = {
       title: 'Bellman–Ford ve dinamik programlama fikri',
       titleEn: 'Bellman–Ford and the idea of dynamic programming',
       summary: '$d^{(k)}[v]$: en fazla $k$ kenarlı en kısa yol. Tabloyu satır satır doldurmak.',
-      minutes: 45,
+      minutes: 50,
       objectives: [
         '$d^{(k)}[v]$’nin anlamını ve $d^{(k)}[v] = \\min_u (d^{(k-1)}[u] + w(u, v))$ bağıntısını açıklamak.',
         'Bellman–Ford’un neden $n - 1$ tur yaptığını ve negatif döngüyü nasıl tespit ettiğini göstermek.',
@@ -117,6 +117,28 @@ Bellek: tablo $n \\times n$ olsa da yalnızca son iki satır gerekir: $O(n)$. Bi
 - **Kısıt sistemleri:** $x_j - x_i \\le c$ biçimindeki eşitsizlik sistemlerinin çözülebilirliği, bir grafikte negatif döngü olmamasına denktir.`,
         },
         {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: kenar sırası ve erken durma',
+          label: 'formal',
+          body: `Bellman–Ford her turda bütün kenarları **bir sırayla** gevşetir. Bir turda yapılan güncelleme aynı turdaki sonraki kenarlarda hemen kullanılır, bu yüzden sıra, kaç tur gerektiğini etkiler. Kendi örneğimiz: bir yol $s \\to a \\to b \\to c \\to d$, her kenar 1.`,
+          proof: [
+            { title: 'İyi sıra', body: 'Kenarlar $s \\to a$, $a \\to b$, $b \\to c$, $c \\to d$ sırasıyla işlenirse ilk tur bütün uzaklıkları bulur: $1, 2, 3, 4$. İkinci turda hiçbir şey değişmez.' },
+            { title: 'Kötü sıra', body: 'Ters sırayla ($c \\to d$, $b \\to c$, $a \\to b$, $s \\to a$) her tur yalnızca bir adım ilerler: 1. turda $a$, 2. turda $b$, 3. turda $c$, 4. turda $d$ doğru olur. Bu tam $n - 1 = 4$ tur demektir; algoritmanın üst sınırı sıkıdır.' },
+            { title: 'Erken durma', body: 'Bir turda hiçbir $d$ değeri değişmezse sonraki turlar da hiçbir şey değiştirmez (aynı girdiyle aynı hesap): durabiliriz. İyi sırayla 2 turda biter.' },
+            { title: 'Ders', body: 'En kötü durum $O(nm)$ kalır, ama pratikte erken durma ve iyi bir sıra (örneğin DAG’de topolojik sıra: tek tur yeter) çok şey kazandırır.' },
+          ],
+          check: [
+            {
+              id: 'c3',
+              kind: 'numeric',
+              prompt: 'Kenarlar ters sırayla işlenirse $d[d]$ kaçıncı turun sonunda doğru değerini (4) alır?',
+              answer: 4,
+              hint: 'Her tur yalnızca bir adım ilerler.',
+              explanation: 'Tur $i$’nin sonunda yolun ilk $i$ kenarı doğru: $d$ için 4. tur, yani $n - 1$.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- $n - 1$ yerine $n$ ya da $m$ tur yapmak gerektiğini sanmak: basit bir yol en fazla $n - 1$ kenarlıdır.
@@ -169,6 +191,12 @@ Bellek: tablo $n \\times n$ olsa da yalnızca son iki satır gerekir: $O(n)$. Bi
           hints: ['$d^{(1)}$: yalnızca $s$’den çıkan kenarlar.', '$d^{(2)}[b] = \\min(3, d^{(1)}[a] - 2)$.'],
           solution: `$d^{(0)} = (s{:}\\,0, a{:}\\,\\infty, b{:}\\,\\infty, c{:}\\,\\infty)$. $d^{(1)} = (0, 4, 3, \\infty)$. $d^{(2)}$: $b = \\min(3, 4 - 2) = 2$, $c = \\min(\\infty, 3 + 2, 4 + 5) = 5$ → $(0, 4, 2, 5)$. $d^{(3)}$: $c = \\min(5, 2 + 2) = 4$ → $(0, 4, 2, 4)$. Son kontrolde iyileşme yok: negatif döngü yok. Dijkstra önce $b$’yi 3 ile kesinleştirir ve $c = 5$ yapar; ardından $a$ işlenince $b$’nin değeri 2’ye iner, ama $b$ zaten bittiği için $c$ yeniden gevşetilmez: $c = 5$ kalır (doğrusu 4).`,
         },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: düğümler $s, a, b$; kenarlar $s \\to a$ (2), $a \\to b$ (1), $b \\to a$ (−3). Bellman–Ford’u çalıştırın ($n - 1 = 2$ tur, sonra bir kontrol turu). Negatif döngü var mı? Hangi düğümlerin uzaklığı tanımsızdır?`,
+          hints: ['$a \\to b \\to a$ döngüsünün ağırlığı nedir?', 'Kontrol turunda hâlâ bir iyileşme oluyor mu?'],
+          solution: `Döngü $a \\to b \\to a$’nın ağırlığı $1 - 3 = -2 < 0$. Kenar sırası $s \\to a$, $a \\to b$, $b \\to a$ ile: 1. tur $d[a] = 2$, $d[b] = 3$, sonra $d[a] = 3 - 3 = 0$. 2. tur $d[b] = 1$, $d[a] = -2$. Kontrol turunda $d[b] = -2 + 1 = -1 < 1$: hâlâ iyileşme var, yani **negatif döngü** bildirilir. $a$ ve $b$’ye giden yollar döngüde dolaşarak istenildiği kadar ucuzlar: uzaklıkları $-\\infty$’dur; $d[s] = 0$ ise iyi tanımlıdır.`,
+        },
       ],
       sources: [SRC.l12.notes, SRC.l12.slides, SRC.l12.pre, SRC.l11.notes, SRC.l12.notebook, SRC.l12.concept],
     },
@@ -178,7 +206,7 @@ Bellek: tablo $n \\times n$ olsa da yalnızca son iki satır gerekir: $O(n)$. Bi
       title: 'Floyd–Warshall: tüm çiftler arası en kısa yollar',
       titleEn: 'Floyd–Warshall: all-pairs shortest paths',
       summary: '$d_k(u, v)$: ara düğümleri $\\{1, \\dots, k\\}$ ile sınırlı en kısa yol. $O(n^3)$, üç iç içe döngü.',
-      minutes: 35,
+      minutes: 40,
       objectives: [
         'Tüm çiftler arası en kısa yol (APSP) problemini ifade etmek.',
         '$d_k(u, v) = \\min(d_{k-1}(u, v),\\ d_{k-1}(u, k) + d_{k-1}(k, v))$ bağıntısının iki durumunu açıklamak.',
@@ -253,6 +281,29 @@ $k = 0$’da hiç ara durak yok: yalnızca doğrudan kenarlar. Her adımda bir d
 - **En dar darboğaz yolu** ya da **en güvenilir yol** gibi problemler de aynı kalıba, farklı işlemlerle uyar.`,
         },
         {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: köşegen ve geçişli kapanış',
+          label: 'formal',
+          body: `Floyd–Warshall’ın bitmiş matrisi, uzaklıkların ötesinde iki soruyu daha cevaplar: negatif döngü var mı ve kim kime ulaşabilir?`,
+          proof: [
+            { title: 'Köşegen', body: 'Başta $d(i, i) = 0$. Bir $i$ düğümü negatif bir döngü üzerindeyse, döngüdeki bütün ara düğümler açıldığında $d(i, i)$ döngünün ağırlığına iner: negatif olur. Yani sonunda **bir köşegen değeri negatifse negatif döngü vardır**, değilse yoktur.' },
+            { title: 'Örnek', body: '$a \\to b$ (1), $b \\to a$ (−3): $k = a$ adımında $d(b, b) = -3 + 1 = -2$. Köşegende negatif değer: negatif döngü.' },
+            { title: 'Geçişli kapanış', body: 'Ağırlıkları unutup yalnızca “ulaşılabilir mi?” diye sorarsak $\\min$ ve $+$ yerine “veya” ve “ve” kullanırız: $r(i, j) \\leftarrow r(i, j) \\lor (r(i, k) \\land r(k, j))$. Bu Warshall’ın algoritmasıdır, yine $O(n^3)$.' },
+            { title: 'Örnek', body: '$a \\to b$, $b \\to c$, $c \\to a$, $c \\to d$: $a, b, c$ birbirine ve $d$’ye ulaşır, $d$ kimseye. $u \\ne v$ olan 9 ulaşılabilir çift.' },
+          ],
+          check: [
+            {
+              id: 'c3',
+              kind: 'mcq',
+              prompt: 'Floyd–Warshall bittiğinde negatif bir döngünün varlığı nasıl anlaşılır?',
+              options: ['Bir değer $\\infty$ kalırsa', 'Köşegendeki bir $d(i, i)$ negatifse', 'Matris simetrik değilse', 'Son iki matris farklıysa'],
+              answer: 1,
+              hint: 'Bir düğümden kendisine giden en kısa yol.',
+              explanation: 'Negatif döngü üzerindeki her $i$ için $d(i, i) < 0$ olur; negatif döngü yoksa köşegen 0 kalır.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- Döngülerin sırasını karıştırmak: $k$ **en dışta** olmalıdır. $u, v$ dışta olursa $d_{k-1}$ değerleri henüz hazır olmayabilir.
@@ -304,6 +355,12 @@ $k = 0$’da hiç ara durak yok: yalnızca doğrudan kenarlar. Her adımda bir d
           prompt: `Kendi örneğimiz: 3 düğüm, kenarlar 1→2 (4), 2→3 (−1), 1→3 (5), 3→1 (2). $d_0, d_1, d_2, d_3$ matrislerini yazın. Negatif döngü var mı?`,
           hints: ['$d_0$: doğrudan kenarlar, köşegen 0.', '$k = 2$’de $d(1, 3) = \\min(5, 4 - 1)$.'],
           solution: `$d_0$: satırlar (0, 4, 5), (∞, 0, −1), (2, ∞, 0). $k = 1$: $d(3, 2) = 2 + 4 = 6$ → (2, 6, 0). $k = 2$: $d(1, 3) = \\min(5, 3) = 3$. $k = 3$: $d(2, 1) = -1 + 2 = 1$; diğerleri değişmez. $d_3$: (0, 4, 3), (1, 0, −1), (2, 6, 0). Köşegen 0: negatif döngü yok (döngü 1→2→3→1’in ağırlığı $4 - 1 + 2 = 5$).`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: kenarlar $a \\to b$, $b \\to c$, $c \\to a$, $c \\to d$ (hepsi 1). Warshall’ın algoritmasını ($k = a, b, c, d$) çalıştırıp her adımdan sonra yeni ulaşılabilir çiftleri yazın. Sonunda $u \\ne v$ olan kaç ulaşılabilir çift vardır?`,
+          hints: ['Başlangıçta 4 çift: kenarların kendisi.', '$k = a$: $c \\to a \\to b$ yeni bir çift verir.'],
+          solution: `Başta: $(a,b), (b,c), (c,a), (c,d)$. $k = a$: $(c, b)$. $k = b$: $(a, c)$ ($a \\to b \\to c$). $k = c$: $(a, d), (b, a), (b, d)$ ve $c$ üzerinden zaten bilinenler. $k = d$: $d$’den çıkış yok, yeni çift yok. Toplam $4 + 1 + 1 + 3 = 9$ çift: $a, b, c$’nin her biri diğer üç düğüme ulaşır, $d$ hiçbirine. ($a$ kendisine de bir döngüyle ulaşır, ama $u \\ne v$ istedik.)`,
         },
       ],
       sources: [SRC.l12.notes, SRC.l12.slides, SRC.l12.notebook, SRC.l12.concept],

@@ -15,7 +15,7 @@ export const lecture10: Lecture = {
       title: 'Güçlü bağlı bileşenler (SCC)',
       titleEn: 'Strongly connected components (SCC)',
       summary: 'Bileşenlerin meta-grafiği bir DAG’dir; ters grafikte bitiş zamanları SCC’leri sırayla soyar.',
-      minutes: 50,
+      minutes: 55,
       objectives: [
         'Yönsüz grafiklerde bağlı bileşeni ve yönlü grafiklerde güçlü bağlı bileşeni (SCC) tanımlamak.',
         'SCC’lerin meta-grafiğinin neden döngüsüz olduğunu açıklamak.',
@@ -132,6 +132,28 @@ Tek bir DFS yetmez: $u$’dan başlayan arama, $u$’nun SCC’sinin **dışına
           ],
         },
         {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: SCC grafiği (yoğunlaştırma)',
+          label: 'formal',
+          body: `Kendi örneğimiz: $a \\to b$, $b \\to c$, $c \\to a$, $c \\to d$, $d \\to e$, $e \\to d$, $e \\to f$. Her SCC’yi tek bir düğüme sıkıştırırsak ne elde ederiz?`,
+          proof: [
+            { title: 'Bileşenler', body: '$a \\to b \\to c \\to a$ bir döngü: $\\{a, b, c\\}$. $d \\leftrightarrow e$: $\\{d, e\\}$. $f$’den hiçbir yere gidilmez: $\\{f\\}$. Toplam 3 SCC.' },
+            { title: 'Yoğunlaştırma', body: 'Her SCC bir düğüm olur; SCC’ler arasındaki kenarlar kalır: $\\{a,b,c\\} \\to \\{d,e\\} \\to \\{f\\}$. Bu grafik **her zaman bir DAG’dir**: SCC grafiğinde bir döngü olsaydı, o döngüdeki bileşenler karşılıklı ulaşılabilir olur ve tek bir SCC’de birleşirdi.' },
+            { title: 'Algoritmayla bağlantı', body: 'İki geçişli algoritmanın ilk DFS’i, bu DAG’in topolojik sırasını (bitiş zamanlarıyla) bulur: en büyük bitiş zamanı kaynak bileşendedir. İkinci geçiş ters grafikte bu sırayla başladığı için her seferinde yalnızca bir bileşeni “soyar”.' },
+            { title: 'Bir kenar eklemek', body: '$f \\to a$ eklenirse $a \\leadsto f \\to a$ bir döngü olur ve her şey tek bir SCC’de birleşir. $f \\to d$ eklemek ise yalnızca $\\{d, e, f\\}$’i birleştirir: 2 SCC.' },
+          ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'Bu grafiğe $f \\to d$ kenarı eklenince kaç SCC kalır?',
+              answer: 2,
+              hint: '$d$, $e$ ve $f$ artık karşılıklı ulaşılabilir mi? Ya $a$?',
+              explanation: '$\\{a, b, c\\}$ ve $\\{d, e, f\\}$: $\\{d, e, f\\}$’den $\\{a, b, c\\}$’ye hâlâ kenar yok.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- 2. geçişte düğümleri bitiş zamanına göre **artan** sırada işlemek: o zaman ilk DFS bir “kaynak” SCC’den başlayıp birkaç SCC’yi birden toplayabilir.
@@ -189,6 +211,12 @@ Tek bir DFS yetmez: $u$’dan başlayan arama, $u$’nun SCC’sinin **dışına
           prompt: `Kendi örneğimiz: kenarlar 1→2, 2→3, 3→1, 3→4, 4→5, 5→6, 6→4, 6→7. İki geçişli algoritmayı elle çalıştırın (1. geçişte $G_{rev}$’de düğümleri 7’den 1’e doğru deneyin). Bitiş zamanlarını, 2. geçişin sırasını ve SCC’leri yazın.`,
           hints: ['$G_{rev}$’de 7’den başlayan DFS: 7 → 6 → 5 → 4 → 3 → 2 → 1.', '2. geçiş en büyük $f$’den başlar; $G$’de o düğümden nereye gidilebilir?'],
           solution: `$G_{rev}$ kenarları: 2→1, 3→2, 1→3, 4→3, 5→4, 6→5, 4→6, 7→6. 7’den DFS: 7, 6, 5, 4, 3, 2, 1 sırayla keşfedilir (4’ün komşuları 3 ve 6; 6 zaten keşfedildi). Bitişler: 1 → 1, 2 → 2, 3 → 3, 4 → 4, 5 → 5, 6 → 6, 7 → 7. 2. geçiş sırası: 7, 6, 5, 4, 3, 2, 1. $G$’de 7’den çıkış yok: $\\{7\\}$. 6’dan: 6 → 4 → 5 (7 keşfedildi): $\\{4, 5, 6\\}$. Sonra 3’ten: 3 → 1 → 2: $\\{1, 2, 3\\}$. Üç SCC; meta-grafik $\\{1,2,3\\} \\to \\{4,5,6\\} \\to \\{7\\}$.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: yukarıdaki grafiğe ($a \\to b \\to c \\to a$, $c \\to d$, $d \\leftrightarrow e$, $e \\to f$) **tek bir kenar** ekleyerek onu güçlü bağlı yapmak istiyoruz. Hangi kenarlar işe yarar? Neden?`,
+          hints: ['SCC grafiği bir zincir: $\\{a,b,c\\} \\to \\{d,e\\} \\to \\{f\\}$.', 'Yeni kenar, zincirin sonundan başına gitmeli.'],
+          solution: `SCC grafiği bir zincir olduğu için tek kenarın zincirin **son** bileşeninden (\\{f\\}) **ilk** bileşenine (\\{a, b, c\\}) gitmesi gerekir: $f \\to a$, $f \\to b$ ya da $f \\to c$. Üçü de bütün düğümleri tek bir döngüde birleştirir. $f \\to d$ yalnızca son iki bileşeni birleştirir; $e \\to a$ ise $\\{f\\}$’yi dışarıda bırakır ($f$’den çıkış yok). Genel olarak SCC grafiği bir kaynağa ve bir kuyuya sahip bir zincirse tek kenar yeter; çok sayıda kaynak/kuyu varsa daha fazlası gerekir.`,
         },
       ],
       sources: [SRC.l10.notes, SRC.l10.slides, SRC.l10.pre, SRC.l10.notebook, SRC.l10.concept],

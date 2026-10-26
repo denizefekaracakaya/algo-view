@@ -15,7 +15,7 @@ export const lecture17: Lecture = {
       title: 'Stable matching and the deferred acceptance algorithm',
       titleEn: 'Stable matching and the deferred acceptance algorithm',
       summary: 'Blocking pairs, revocable greedy choices, optimality for doctors and truthfulness.',
-      minutes: 45,
+      minutes: 50,
       objectives: [
         'Define a stable matching and a blocking pair.',
         'Run the deferred acceptance (Gale–Shapley) algorithm step by step.',
@@ -140,6 +140,28 @@ If none holds, $(i, j)$ is a **blocking pair**: $i$ prefers $j$ to its own hospi
           ],
         },
         {
+          kind: 'steps',
+          title: 'Worked example: when everybody agrees',
+          label: 'formal',
+          body: `Our own example: four doctors (Ada, Bora, Can, Deniz) and four hospitals (W, X, Y, Z). All doctors agree on the ranking W > X > Y > Z, and all hospitals on Deniz > Can > Bora > Ada. What does deferred acceptance do, and how many proposals are made?`,
+          proof: [
+            { title: 'Deniz', body: 'Deniz proposes to W. For W, Deniz is the best: W accepts and never lets go. 1 proposal.' },
+            { title: 'Can', body: 'Can proposes to W; W prefers Deniz and rejects. Can proposes to X and is accepted (nobody better will come to X). 2 proposals.' },
+            { title: 'Bora and Ada', body: 'Bora is rejected by W and X and stays at Y: 3 proposals. Ada is rejected by W, X, Y and stays at Z: 4 proposals. $1 + 2 + 3 + 4 = 10$ in total.' },
+            { title: 'Does the order of proposals matter?', body: 'No: whoever proposes first, the result (the doctor-optimal matching) is the same. Here it is Deniz–W, Can–X, Bora–Y, Ada–Z, and it is the **only** stable matching: Deniz and W are each other’s first choice, so they are together in every stable matching; the same argument repeats for the rest.' },
+          ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'How many proposals are made in total in this example?',
+              answer: 10,
+              hint: 'Deniz 1, Can 2, Bora 3, Ada 4.',
+              explanation: '$1 + 2 + 3 + 4 = 10$; with $n$ doctors this pattern gives $\\frac{n(n+1)}{2}$ proposals. The general upper bound is $n^2$.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- Treating a tentative acceptance as final: a hospital drops its current doctor if someone it prefers applies.
@@ -201,6 +223,12 @@ If none holds, $(i, j)$ is a **blocking pair**: $i$ prefers $j$ to its own hospi
           prompt: `Our own example: doctors D1: A > B > C, D2: A > C > B, D3: B > A > C; hospitals A: D2 > D3 > D1, B: D1 > D2 > D3, C: D3 > D1 > D2. Run the algorithm, picking free doctors in queue order. Is the result stable?`,
           hints: ['D2 replaces D1 at A.', 'D1 then goes to B and replaces D3 there.'],
           solution: `D1→A (accepted). D2→A: A prefers D2 to D1 → D2 accepted, D1 free. D3→B (accepted). D1→B: B prefers D1 to D3 → D1 accepted, D3 free. D3→A: A prefers D2 to D3 → rejected. D3→C (accepted). Result: A–D2, B–D1, C–D3 (6 proposals). Stable: D3 wants B and A more than C, but B holds D1 and A holds D2, both preferred to D3; D1 wants A, but A prefers D2 to D1; D2 already has her first choice.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Our own example: two doctors (Ada, Bora) and two hospitals (X, Y). Ada: X > Y, Bora: Y > X; X: Bora > Ada, Y: Ada > Bora. List all matchings and find which ones are stable. Which one comes out when doctors propose? When hospitals propose?`,
+          hints: ['There are only two matchings: (Ada–X, Bora–Y) and (Ada–Y, Bora–X).', 'Look for a blocking pair in each.'],
+          solution: `(Ada–X, Bora–Y): every doctor got their first choice, so no doctor wants to switch: stable. (Ada–Y, Bora–X): every hospital got its first choice, so no hospital wants to switch: stable. Both are stable! When doctors propose, the first proposals are accepted: (Ada–X, Bora–Y), the best for the doctors and the worst for the hospitals. When hospitals propose: (Ada–Y, Bora–X). The proposing side wins; this is why the NRMP switched from hospital-proposing to doctor-proposing in the 1990s.`,
         },
       ],
       sources: [SRC.l17.notes, SRC.l17.slides, SRC.l17.concept],

@@ -15,7 +15,7 @@ export const lecture7: Lecture = {
       title: 'Binary search trees',
       titleEn: 'Binary search trees',
       summary: 'Search, insert, delete — all follow one search path: $O(h)$.',
-      minutes: 40,
+      minutes: 45,
       objectives: [
         'Define the BST property and check whether a tree is a BST.',
         'Trace search, insert, delete (three cases) and min/max step by step.',
@@ -145,6 +145,28 @@ So a plain BST has **no $O(\\log n)$ guarantee**. Logarithmic height requires re
           ],
         },
         {
+          kind: 'steps',
+          title: 'Worked example: the insertion order decides the shape',
+          label: 'formal',
+          body: `Let us insert the same seven keys (1…7) into an empty BST in two different orders. Inserting a key compares it once with every node on the path from the root to its place, so the number of comparisons for a key is its **depth**.`,
+          proof: [
+            { title: 'Sorted insertion: 1, 2, …, 7', body: 'Every new key is larger than all earlier ones and always goes right: the tree is a chain of height $6 = n - 1$. The depths are $0, 1, \\dots, 6$; total comparisons $0 + 1 + \\dots + 6 = 21$.' },
+            { title: 'Balanced insertion: 4, 2, 6, 1, 3, 5, 7', body: 'First the median, then the medians of the two halves: a perfect tree of height 2. Depths: one 0, two 1s, four 2s; total $0 + 2 + 8 = 10$.' },
+            { title: 'The general picture', body: 'Sorted insertion costs $\\frac{n(n-1)}{2} = \\Theta(n^2)$ in total; balanced insertion costs $O(\\log n)$ per key, $\\Theta(n \\log n)$ in total. Same keys, but the shape of the tree depends entirely on the order.' },
+            { title: 'The lesson', body: 'In practice data often arrives (nearly) sorted: records by timestamp, ids in increasing order. That is exactly why we need self-balancing trees (red-black trees, the next lesson).' },
+          ],
+          check: [
+            {
+              id: 'c6',
+              kind: 'numeric',
+              prompt: 'How many key comparisons are made in total when 1, 2, …, 7 are inserted in this order into an empty BST?',
+              answer: 21,
+              hint: 'Each key makes as many comparisons as its depth.',
+              explanation: 'In the chain the depths are $0, 1, \\dots, 6$: $21$ in total. The balanced order needs only $10$.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- Checking the BST property only for direct children: “3’s right child is 7, 7’s left child is 2” looks fine locally, but it is not a BST because 2 < 3 (Example 5 in the notes).
@@ -197,6 +219,12 @@ So a plain BST has **no $O(\\log n)$ guarantee**. Logarithmic height requires re
           prompt: `Our own example: insert the keys $\\{1, 2, \\dots, 7\\}$ in an order that makes the height of the BST 2. Think about how many different orders give this tree (you don’t need to compute the answer).`,
           hints: ['Which key must be the root?', 'The same idea in every subtree.'],
           solution: `For example $4, 2, 6, 1, 3, 5, 7$: root 4, second level 2 and 6, leaves 1, 3, 5, 7 → height 2. Each node must be inserted before all nodes in its subtree; every order satisfying this constraint gives the same tree (e.g. $4, 6, 2, 7, 5, 3, 1$ also works). Try the “Balanced order” example in the visualizer.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Our own example: the keys 1, 2, 3 have $3! = 6$ insertion orders. Insert them into an empty BST in each order. How many different tree shapes appear? How many orders give a tree of height 1 (balanced)?`,
+          hints: ['Which key ends up at the root? The first one inserted.', 'If the root is 2, the tree is already balanced.'],
+          solution: `The root is the first key inserted. If the root is 2 (orders 2,1,3 and 2,3,1) both orders give the same balanced tree of height 1. If the root is 1, the remaining 2 and 3 form a chain in the right subtree, with two different shapes (1,2,3 and 1,3,2); the same holds for root 3 (3,2,1 and 3,1,2). In total $1 + 2 + 2 = 5$ different BST shapes (the 3rd Catalan number), and only **2** of the 6 orders are balanced. A random order is not always balanced, but as in Lecture 5 the expected depth is $O(\\log n)$.`,
         },
       ],
       sources: [SRC.l7.pre, SRC.l7.notes, SRC.l7.slides, SRC.l7.concept, SRC.sec.s4],

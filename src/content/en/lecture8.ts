@@ -15,7 +15,7 @@ export const lecture8: Lecture = {
       title: 'Hash tables and universal hashing',
       titleEn: 'Hash tables and universal hashing',
       summary: 'Chaining, a random hash function, universal families and the birthday paradox.',
-      minutes: 50,
+      minutes: 55,
       objectives: [
         'Relate the cost of insert, lookup and delete in a hash table with chaining to the length of a chain.',
         'Explain why a bad key set always exists for any fixed hash function.',
@@ -210,6 +210,28 @@ Once $m \\approx 1.18\\sqrt{n}$, the collision probability exceeds 1/2.
           ],
         },
         {
+          kind: 'steps',
+          title: 'Worked example: doubling the table when it is full',
+          label: 'formal',
+          body: `The expected $O(1)$ time holds as long as the load factor $\\alpha = m/n$ stays constant. If we do not know how many keys will arrive, the table has to grow: when it is full we **double** its size and reinsert all keys with a new hash function. That is an expensive step; what does it add up to?`,
+          proof: [
+            { title: 'The rule', body: 'Start with a table of size 1. Before inserting into a full table, double its size and reinsert all the old keys.' },
+            { title: '16 insertions', body: 'Resizes happen at the 2nd, 3rd, 5th and 9th insertions and move 1, 2, 4 and 8 keys: $1 + 2 + 4 + 8 = 15$ in total. At the 16th insertion the table (size 16) is not full yet.' },
+            { title: 'In general', body: 'Over $m$ insertions the number of moved keys is $1 + 2 + 4 + \\dots < 2m$ (a geometric series). Together with the insertions themselves the total work is $O(m)$: **amortized** $O(1)$ per insertion.' },
+            { title: 'Why doubling?', body: 'Growing by a fixed amount (say +100) would resize far too often and push the total work up to $\\Theta(m^2)$ (see the exercise below). Python dictionaries and Java’s HashMap grow geometrically too.' },
+          ],
+          check: [
+            {
+              id: 'c7',
+              kind: 'numeric',
+              prompt: 'With this rule, how many keys are reinserted during resizes in total while 16 keys are inserted?',
+              answer: 15,
+              hint: 'Resizes happen on full tables of size 1, 2, 4, 8.',
+              explanation: '$1 + 2 + 4 + 8 = 15 < 2 \\cdot 16$: amortized, fewer than one move per insertion.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- Saying “hash tables are $O(1)$ in the worst case”. The guarantee is **in expectation**, and the randomness is in the choice of the hash function.
@@ -269,6 +291,12 @@ Once $m \\approx 1.18\\sqrt{n}$, the collision probability exceeds 1/2.
           prompt: `Our own example: $p = 7$, $n = 3$ and $h_{a,b}(x) = ((ax+b) \\bmod 7) \\bmod 3$. For the keys $x_1 = 1$ and $x_2 = 4$, decide whether they collide for $a = 1, b = 0$ and for $a = 2, b = 1$. How many functions are in the family, and at most how many of them can make these two keys collide according to the bound?`,
           hints: ['First compute $(ax + b) \\bmod 7$, then take $\\bmod 3$.', 'The family has $p(p-1)$ members; the bound is $p(p-1)/n$.'],
           solution: `$a = 1, b = 0$: $1 \\bmod 7 = 1 \\to 1$ and $4 \\bmod 7 = 4 \\to 1$: they **collide**. $a = 2, b = 1$: $3 \\to 0$ and $9 \\bmod 7 = 2 \\to 2$: no collision. The family has $7 \\cdot 6 = 42$ functions; at most $42/3 = 14$ of them make these two keys collide, so the collision probability is $\\le 1/3$.`,
+        },
+        {
+          id: 'p3',
+          prompt: `Our own example: we start with a table of size 100 and insert 1000 keys. How many keys are moved during resizes in total if, when the table is full, we (a) **add 100** to its size, (b) **double** it? How does the comparison change for 10 000 keys?`,
+          hints: ['(a) Resizes happen on full tables of size 100, 200, …, 900.', '(b) 100, 200, 400, 800.'],
+          solution: `(a) $100 + 200 + \\dots + 900 = 4500$ moves. (b) $100 + 200 + 400 + 800 = 1500$ moves. With 10 000 keys the gap widens: (a) $100 + 200 + \\dots + 9900 = 495\\,000$, that is $\\Theta(m^2)$; (b) $100 + 200 + \\dots + 6400 = 12\\,700$, that is $< 2m$. Fixed growth means $\\Theta(m)$ amortized cost per insertion; geometric growth gives $O(1)$.`,
         },
       ],
       sources: [SRC.l8.notes, SRC.l8.slides, SRC.l8.pre, SRC.l8.notebook, SRC.l8.concept],

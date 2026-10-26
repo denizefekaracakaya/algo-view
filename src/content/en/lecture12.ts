@@ -15,7 +15,7 @@ export const lecture12: Lecture = {
       title: 'Bellman–Ford and the idea of dynamic programming',
       titleEn: 'Bellman–Ford and the idea of dynamic programming',
       summary: '$d^{(k)}[v]$: the shortest path with at most $k$ edges. Filling the table row by row.',
-      minutes: 45,
+      minutes: 50,
       objectives: [
         'Explain the meaning of $d^{(k)}[v]$ and the recurrence $d^{(k)}[v] = \\min_u (d^{(k-1)}[u] + w(u, v))$.',
         'Show why Bellman–Ford makes $n - 1$ rounds and how it detects a negative cycle.',
@@ -117,6 +117,28 @@ Memory: although the table is $n \\times n$, only the last two rows are needed: 
 - **Constraint systems:** a system of inequalities of the form $x_j - x_i \\le c$ is solvable exactly when a certain graph has no negative cycle.`,
         },
         {
+          kind: 'steps',
+          title: 'Worked example: edge order and early stopping',
+          label: 'formal',
+          body: `Every round, Bellman–Ford relaxes all edges **in some order**. An update made in a round is used immediately by later edges in the same round, so the order affects how many rounds are needed. Our own example: a path $s \\to a \\to b \\to c \\to d$, every edge of weight 1.`,
+          proof: [
+            { title: 'A good order', body: 'If the edges are processed as $s \\to a$, $a \\to b$, $b \\to c$, $c \\to d$, the first round finds every distance: $1, 2, 3, 4$. Nothing changes in the second round.' },
+            { title: 'A bad order', body: 'In the reverse order ($c \\to d$, $b \\to c$, $a \\to b$, $s \\to a$) each round advances only one step: $a$ is correct after round 1, $b$ after round 2, $c$ after round 3, $d$ after round 4. That is exactly $n - 1 = 4$ rounds; the algorithm’s bound is tight.' },
+            { title: 'Stopping early', body: 'If no $d$ value changes during a round, later rounds change nothing either (same input, same computation): we can stop. With the good order it finishes after 2 rounds.' },
+            { title: 'The lesson', body: 'The worst case stays $O(nm)$, but in practice early stopping and a good order (for a DAG a topological order: one round is enough) help a lot.' },
+          ],
+          check: [
+            {
+              id: 'c3',
+              kind: 'numeric',
+              prompt: 'If the edges are processed in reverse order, after which round does $d[d]$ reach its correct value (4)?',
+              answer: 4,
+              hint: 'Each round advances only one step.',
+              explanation: 'After round $i$ the first $i$ edges of the path are correct: for $d$ that is round 4, i.e. $n - 1$.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- Thinking $n$ or $m$ rounds are needed instead of $n - 1$: a simple path has at most $n - 1$ edges.
@@ -169,6 +191,12 @@ Memory: although the table is $n \\times n$, only the last two rows are needed: 
           hints: ['$d^{(1)}$: only the edges leaving $s$.', '$d^{(2)}[b] = \\min(3, d^{(1)}[a] - 2)$.'],
           solution: `$d^{(0)} = (s{:}\\,0, a{:}\\,\\infty, b{:}\\,\\infty, c{:}\\,\\infty)$. $d^{(1)} = (0, 4, 3, \\infty)$. $d^{(2)}$: $b = \\min(3, 4 - 2) = 2$, $c = \\min(\\infty, 3 + 2, 4 + 5) = 5$ → $(0, 4, 2, 5)$. $d^{(3)}$: $c = \\min(5, 2 + 2) = 4$ → $(0, 4, 2, 4)$. The final check finds no improvement: no negative cycle. Dijkstra first finalizes $b$ with 3 and sets $c = 5$; when $a$ is processed next, $b$’s value drops to 2, but since $b$ is already finished, $c$ is not relaxed again: $c$ stays 5 (the right answer is 4).`,
         },
+        {
+          id: 'p2',
+          prompt: `Our own example: nodes $s, a, b$; edges $s \\to a$ (2), $a \\to b$ (1), $b \\to a$ (−3). Run Bellman–Ford ($n - 1 = 2$ rounds, then one checking round). Is there a negative cycle? Which nodes have an undefined distance?`,
+          hints: ['What is the weight of the cycle $a \\to b \\to a$?', 'Does the checking round still improve something?'],
+          solution: `The cycle $a \\to b \\to a$ weighs $1 - 3 = -2 < 0$. With the edge order $s \\to a$, $a \\to b$, $b \\to a$: round 1 gives $d[a] = 2$, $d[b] = 3$, then $d[a] = 3 - 3 = 0$. Round 2 gives $d[b] = 1$, $d[a] = -2$. In the checking round $d[b] = -2 + 1 = -1 < 1$: there is still an improvement, so a **negative cycle** is reported. Paths to $a$ and $b$ get arbitrarily cheap by going around the cycle: their distance is $-\\infty$, while $d[s] = 0$ is well defined.`,
+        },
       ],
       sources: [SRC.l12.notes, SRC.l12.slides, SRC.l12.pre, SRC.l11.notes, SRC.l12.notebook, SRC.l12.concept],
     },
@@ -178,7 +206,7 @@ Memory: although the table is $n \\times n$, only the last two rows are needed: 
       title: 'Floyd–Warshall: all-pairs shortest paths',
       titleEn: 'Floyd–Warshall: all-pairs shortest paths',
       summary: '$d_k(u, v)$: the shortest path whose intermediate nodes are in $\\{1, \\dots, k\\}$. $O(n^3)$, three nested loops.',
-      minutes: 35,
+      minutes: 40,
       objectives: [
         'State the all-pairs shortest paths (APSP) problem.',
         'Explain the two cases of the recurrence $d_k(u, v) = \\min(d_{k-1}(u, v),\\ d_{k-1}(u, k) + d_{k-1}(k, v))$.',
@@ -253,6 +281,29 @@ At $k = 0$ there are no intermediate stops: direct edges only. At each step one 
 - Problems like the **widest bottleneck path** or the **most reliable path** fit the same pattern with different operations.`,
         },
         {
+          kind: 'steps',
+          title: 'Worked example: the diagonal and the transitive closure',
+          label: 'formal',
+          body: `Beyond distances, the finished Floyd–Warshall matrix answers two more questions: is there a negative cycle, and who can reach whom?`,
+          proof: [
+            { title: 'The diagonal', body: 'Initially $d(i, i) = 0$. If node $i$ lies on a negative cycle, then once all intermediate nodes of the cycle are allowed $d(i, i)$ drops to the weight of the cycle: it becomes negative. So at the end, **a negative diagonal entry means a negative cycle**, and otherwise there is none.' },
+            { title: 'Example', body: '$a \\to b$ (1), $b \\to a$ (−3): at step $k = a$ we get $d(b, b) = -3 + 1 = -2$. A negative diagonal value: a negative cycle.' },
+            { title: 'Transitive closure', body: 'If we forget the weights and only ask “reachable?”, we use “or” and “and” instead of $\\min$ and $+$: $r(i, j) \\leftarrow r(i, j) \\lor (r(i, k) \\land r(k, j))$. This is Warshall’s algorithm, again $O(n^3)$.' },
+            { title: 'Example', body: '$a \\to b$, $b \\to c$, $c \\to a$, $c \\to d$: $a, b, c$ reach each other and $d$, and $d$ reaches nobody. 9 reachable pairs with $u \\ne v$.' },
+          ],
+          check: [
+            {
+              id: 'c3',
+              kind: 'mcq',
+              prompt: 'When Floyd–Warshall finishes, how can you tell that there is a negative cycle?',
+              options: ['A value is still $\\infty$', 'Some diagonal entry $d(i, i)$ is negative', 'The matrix is not symmetric', 'The last two matrices differ'],
+              answer: 1,
+              hint: 'The shortest path from a node to itself.',
+              explanation: 'For every $i$ on a negative cycle $d(i, i) < 0$; without negative cycles the diagonal stays 0.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- Getting the loop order wrong: $k$ must be the **outermost** loop. With $u, v$ outside, the $d_{k-1}$ values may not be ready yet.
@@ -304,6 +355,12 @@ At $k = 0$ there are no intermediate stops: direct edges only. At each step one 
           prompt: `Our own example: 3 nodes, edges 1→2 (4), 2→3 (−1), 1→3 (5), 3→1 (2). Write the matrices $d_0, d_1, d_2, d_3$. Is there a negative cycle?`,
           hints: ['$d_0$: direct edges, diagonal 0.', 'At $k = 2$, $d(1, 3) = \\min(5, 4 - 1)$.'],
           solution: `$d_0$: rows (0, 4, 5), (∞, 0, −1), (2, ∞, 0). $k = 1$: $d(3, 2) = 2 + 4 = 6$ → (2, 6, 0). $k = 2$: $d(1, 3) = \\min(5, 3) = 3$. $k = 3$: $d(2, 1) = -1 + 2 = 1$; nothing else changes. $d_3$: (0, 4, 3), (1, 0, −1), (2, 6, 0). The diagonal is 0: no negative cycle (the cycle 1→2→3→1 weighs $4 - 1 + 2 = 5$).`,
+        },
+        {
+          id: 'p2',
+          prompt: `Our own example: edges $a \\to b$, $b \\to c$, $c \\to a$, $c \\to d$ (all of weight 1). Run Warshall’s algorithm ($k = a, b, c, d$) and after each step list the new reachable pairs. How many reachable pairs with $u \\ne v$ are there at the end?`,
+          hints: ['Initially 4 pairs: the edges themselves.', '$k = a$: $c \\to a \\to b$ gives a new pair.'],
+          solution: `Initially: $(a,b), (b,c), (c,a), (c,d)$. $k = a$: $(c, b)$. $k = b$: $(a, c)$ ($a \\to b \\to c$). $k = c$: $(a, d), (b, a), (b, d)$, plus pairs through $c$ that were already known. $k = d$: $d$ has no outgoing edge, so nothing new. In total $4 + 1 + 1 + 3 = 9$ pairs: each of $a, b, c$ reaches the other three nodes and $d$ reaches none. ($a$ also reaches itself through a cycle, but we asked for $u \\ne v$.)`,
         },
       ],
       sources: [SRC.l12.notes, SRC.l12.slides, SRC.l12.notebook, SRC.l12.concept],

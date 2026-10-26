@@ -15,7 +15,7 @@ export const lecture17: Lecture = {
       title: 'Kararlı eşleşme ve kabulü erteleme algoritması',
       titleEn: 'Stable matching and the deferred acceptance algorithm',
       summary: 'Engelleyen çiftler, geri alınabilir açgözlü seçimler, doktorlar için optimallik ve dürüstlük.',
-      minutes: 45,
+      minutes: 50,
       objectives: [
         'Kararlı eşleşmeyi ve engelleyen çifti tanımlamak.',
         'Kabulü erteleme (Gale–Shapley) algoritmasını adım adım çalıştırmak.',
@@ -140,6 +140,28 @@ Hiçbiri doğru değilse $(i, j)$ bir **engelleyen çifttir**: $i$, $j$’yi ken
           ],
         },
         {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: herkes aynı fikirdeyken',
+          label: 'formal',
+          body: `Kendi örneğimiz: dört doktor (Ada, Bora, Can, Deniz) ve dört hastane (W, X, Y, Z). Bütün doktorlar W > X > Y > Z sıralamasında, bütün hastaneler Deniz > Can > Bora > Ada sıralamasında anlaşıyor. Kabulü erteleme ne yapar ve kaç teklif yapılır?`,
+          proof: [
+            { title: 'Deniz', body: 'Deniz W’ye teklif eder. W için Deniz en iyisi: kabul eder ve onu bir daha asla bırakmaz. 1 teklif.' },
+            { title: 'Can', body: 'Can W’ye teklif eder; W Deniz’i tercih eder, reddeder. Can X’e teklif eder ve kabul edilir (X için artık daha iyisi gelmeyecek). 2 teklif.' },
+            { title: 'Bora ve Ada', body: 'Bora W ve X’ten reddedilir, Y’de kalır: 3 teklif. Ada W, X, Y’den reddedilir, Z’de kalır: 4 teklif. Toplam $1 + 2 + 3 + 4 = 10$.' },
+            { title: 'Teklif sırası önemli mi?', body: 'Hayır: kim önce teklif ederse etsin sonuç (doktorlar için optimal eşleşme) aynıdır. Burada sonuç Deniz–W, Can–X, Bora–Y, Ada–Z ve bu **tek** kararlı eşleşmedir: Deniz ile W birbirinin ilk tercihi olduğundan her kararlı eşleşmede birliktedir; geri kalanlar için aynı argüman tekrarlanır.' },
+          ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'Bu örnekte toplam kaç teklif yapılır?',
+              answer: 10,
+              hint: 'Deniz 1, Can 2, Bora 3, Ada 4.',
+              explanation: '$1 + 2 + 3 + 4 = 10$; $n$ doktorda bu desen $\\frac{n(n+1)}{2}$ teklif verir. Genel üst sınır $n^2$.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- Geçici kabulü kesin sanmak: bir hastane, daha çok istediği biri gelirse mevcut doktorunu bırakır.
@@ -201,6 +223,12 @@ Hiçbiri doğru değilse $(i, j)$ bir **engelleyen çifttir**: $i$, $j$’yi ken
           prompt: `Kendi örneğimiz: doktorlar D1: A > B > C, D2: A > C > B, D3: B > A > C; hastaneler A: D2 > D3 > D1, B: D1 > D2 > D3, C: D3 > D1 > D2. Boşta doktorları sırayla (kuyruk düzeniyle) seçerek algoritmayı çalıştırın. Sonuç kararlı mı?`,
           hints: ['D2, A’da D1’in yerini alır.', 'D1 sonra B’ye gider ve orada D3’ün yerini alır.'],
           solution: `D1→A (kabul). D2→A: A, D2’yi D1’e tercih eder → D2 kabul, D1 boşta. D3→B (kabul). D1→B: B, D1’i D3’e tercih eder → D1 kabul, D3 boşta. D3→A: A, D2’yi D3’e tercih eder → red. D3→C (kabul). Sonuç: A–D2, B–D1, C–D3 (6 teklif). Kararlı: D3, C yerine B ve A’yı ister ama B’de D1, A’da D2 var ve ikisi de D3’ten daha çok tercih ediliyor; D1, A’yı ister ama A, D2’yi D1’e tercih eder; D2 zaten ilk tercihinde.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: iki doktor (Ada, Bora) ve iki hastane (X, Y). Ada: X > Y, Bora: Y > X; X: Bora > Ada, Y: Ada > Bora. Bütün eşleşmeleri listeleyin ve hangilerinin kararlı olduğunu bulun. Doktorlar teklif ederse hangisi çıkar? Hastaneler teklif ederse?`,
+          hints: ['Yalnızca iki eşleşme var: (Ada–X, Bora–Y) ve (Ada–Y, Bora–X).', 'Her biri için engelleyen bir çift arayın.'],
+          solution: `(Ada–X, Bora–Y): her doktor ilk tercihini aldı, hiçbir doktor değiştirmek istemez: kararlı. (Ada–Y, Bora–X): her hastane ilk tercihini aldı, hiçbir hastane değiştirmek istemez: kararlı. İkisi de kararlıdır! Doktorlar teklif ederse ilk teklifler kabul edilir: (Ada–X, Bora–Y), doktorlar için en iyisi ve hastaneler için en kötüsü. Hastaneler teklif ederse: (Ada–Y, Bora–X). Teklif eden taraf kazanır; bu, NRMP’nin 1990’larda hastane tarafından teklif etmekten doktor tarafına geçmesinin nedenidir.`,
         },
       ],
       sources: [SRC.l17.notes, SRC.l17.slides, SRC.l17.concept],

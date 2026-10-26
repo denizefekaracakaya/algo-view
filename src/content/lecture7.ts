@@ -15,7 +15,7 @@ export const lecture7: Lecture = {
       title: 'İkili arama ağaçları',
       titleEn: 'Binary search trees',
       summary: 'Arama, ekleme, silme — hepsi bir arama yolunu izler: $O(h)$.',
-      minutes: 40,
+      minutes: 45,
       objectives: [
         'BST özelliğini tanımlamak ve bir ağacın BST olup olmadığını kontrol etmek.',
         'search, insert, delete (üç durum), min/max işlemlerini adım adım izlemek.',
@@ -145,6 +145,28 @@ Yani sıradan bir BST için **$O(\\log n)$ garantisi yoktur**. Logaritmik yükse
           ],
         },
         {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: ekleme sırası ağacın şeklini belirler',
+          label: 'formal',
+          body: `Aynı yedi anahtarı (1…7) iki farklı sırayla boş bir BST’ye ekleyelim. Bir anahtarı eklerken kökten yerine kadar yoldaki her düğümle bir kez karşılaştırırız; yani anahtar başına karşılaştırma sayısı, o anahtarın **derinliği**dir.`,
+          proof: [
+            { title: 'Sıralı ekleme: 1, 2, …, 7', body: 'Her yeni anahtar öncekilerin hepsinden büyüktür ve hep sağa gider: ağaç bir zincirdir, yükseklik $6 = n - 1$. Derinlikler $0, 1, \\dots, 6$; toplam karşılaştırma $0 + 1 + \\dots + 6 = 21$.' },
+            { title: 'Dengeli ekleme: 4, 2, 6, 1, 3, 5, 7', body: 'Önce ortanca, sonra iki yarının ortancaları: mükemmel bir ağaç, yükseklik 2. Derinlikler bir tane 0, iki tane 1, dört tane 2: toplam $0 + 2 + 8 = 10$.' },
+            { title: 'Genel tablo', body: 'Sıralı eklemede toplam $\\frac{n(n-1)}{2} = \\Theta(n^2)$; dengeli eklemede her anahtar $O(\\log n)$, toplam $\\Theta(n \\log n)$. Aynı anahtarlar, ama ağacın şekli tamamen ekleme sırasına bağlı.' },
+            { title: 'Ders', body: 'Pratikte veriler çoğu zaman (neredeyse) sıralı gelir: kayıtlar zaman damgasıyla, kimlikler artarak. İşte bu yüzden kendini dengeleyen ağaçlara (kırmızı-siyah ağaçlar, sıradaki ders) ihtiyaç duyarız.' },
+          ],
+          check: [
+            {
+              id: 'c6',
+              kind: 'numeric',
+              prompt: '1, 2, …, 7 sırayla boş bir BST’ye eklenince toplam kaç anahtar karşılaştırması yapılır?',
+              answer: 21,
+              hint: 'Her anahtar, derinliği kadar karşılaştırma yapar.',
+              explanation: 'Zincirde derinlikler $0, 1, \\dots, 6$: toplam $21$. Dengeli sırayla yalnızca $10$.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- BST özelliğini yalnızca doğrudan çocuklar için kontrol etmek: “3’ün sağ çocuğu 7, 7’nin sol çocuğu 2” yerel olarak doğru görünür ama 2 < 3 olduğu için BST değildir (notlardaki Örnek 5).
@@ -197,6 +219,12 @@ Yani sıradan bir BST için **$O(\\log n)$ garantisi yoktur**. Logaritmik yükse
           prompt: `Kendi örneğimiz: $\\{1, 2, \\dots, 7\\}$ anahtarlarını öyle bir sırayla ekleyin ki BST’nin yüksekliği 2 olsun. Kaç farklı sıra bu ağacı verir sorusunu düşünün (cevabı hesaplamanız gerekmez).`,
           hints: ['Kök hangi anahtar olmalı?', 'Her alt ağaçta da aynı fikir.'],
           solution: `Örneğin $4, 2, 6, 1, 3, 5, 7$: kök 4, ikinci seviye 2 ve 6, yapraklar 1, 3, 5, 7 → yükseklik 2. Her düğüm, alt ağacındaki tüm düğümlerden önce eklenmelidir; bu kısıtı sağlayan her sıra aynı ağacı verir (ör. $4, 6, 2, 7, 5, 3, 1$ de çalışır). Görselleştiricide “Dengeli sıra” örneğini deneyin.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: 1, 2, 3 anahtarlarının $3! = 6$ ekleme sırası var. Her sırayla boş bir BST’ye ekleyin. Kaç farklı ağaç şekli çıkar? Kaç sıra yüksekliği 1 olan (dengeli) ağacı verir?`,
+          hints: ['Kökte hangi anahtar olur? İlk eklenen.', 'Kök 2 ise ağaç zaten dengelidir.'],
+          solution: `Kök, ilk eklenen anahtardır. Kök 2 ise (sıralar 2,1,3 ve 2,3,1) iki sıra da aynı dengeli ağacı verir: yükseklik 1. Kök 1 ise geriye kalan 2 ve 3 sağ alt ağaçta zincir olur ve iki farklı şekil çıkar (1,2,3 ve 1,3,2); kök 3 için de aynısı (3,2,1 ve 3,1,2). Toplam $1 + 2 + 2 = 5$ farklı BST şekli (3. Catalan sayısı) ve 6 sıradan yalnızca **2**’si dengeli. Rastgele bir sıra her zaman dengeli değildir, ama Ders 5’teki gibi beklenen derinlik $O(\\log n)$’dir.`,
         },
       ],
       sources: [SRC.l7.pre, SRC.l7.notes, SRC.l7.slides, SRC.l7.concept, SRC.sec.s4],

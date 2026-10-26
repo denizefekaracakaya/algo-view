@@ -15,7 +15,7 @@ export const lecture8: Lecture = {
       title: 'Hash tabloları ve evrensel hashing',
       titleEn: 'Hash tables and universal hashing',
       summary: 'Zincirleme, rastgele hash fonksiyonu, evrensel aileler ve doğum günü paradoksu.',
-      minutes: 50,
+      minutes: 55,
       objectives: [
         'Zincirlemeli bir hash tablosunda insert, lookup ve delete işlemlerinin maliyetini zincir uzunluğuna bağlamak.',
         'Sabit bir hash fonksiyonu için kötü bir anahtar kümesinin her zaman var olduğunu açıklamak.',
@@ -210,6 +210,28 @@ $m \\approx 1.18\\sqrt{n}$ olunca çakışma olasılığı 1/2’yi geçer.
           ],
         },
         {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: tablo dolunca ikiye katlamak',
+          label: 'formal',
+          body: `Beklenen $O(1)$ süre, yük faktörü $\\alpha = m/n$ sabit kaldığı sürece geçerlidir. Kaç anahtar geleceğini bilmiyorsak tabloyu büyütmemiz gerekir: tablo dolunca boyutu **ikiye katlayıp** bütün anahtarları yeni hash fonksiyonuyla yeniden yerleştiririz. Bu pahalı bir adım; toplamda ne kadar tutar?`,
+          proof: [
+            { title: 'Kural', body: 'Boyutu 1 olan bir tabloyla başla. Dolu bir tabloya ekleme yapılacaksa önce boyutu ikiye katla ve eski anahtarların hepsini yeniden yerleştir.' },
+            { title: '16 ekleme', body: 'Büyütmeler 2., 3., 5. ve 9. eklemelerde olur ve sırasıyla 1, 2, 4, 8 anahtar taşınır: toplam $1 + 2 + 4 + 8 = 15$. 16. eklemede tablo (boyut 16) henüz dolu değildir.' },
+            { title: 'Genel', body: '$m$ eklemede taşınan anahtar sayısı $1 + 2 + 4 + \\dots < 2m$ olur (geometrik seri). Eklemelerin kendisiyle birlikte toplam iş $O(m)$: ekleme başına **amortize** $O(1)$.' },
+            { title: 'Neden ikiye katlamak?', body: 'Boyutu sabit bir miktarla (örneğin +100) artırsaydık büyütmeler çok sık olurdu ve toplam iş $\\Theta(m^2)$’ye çıkardı (aşağıdaki alıştırma). Python’un sözlükleri ve Java’nın HashMap’i de geometrik büyür.' },
+          ],
+          check: [
+            {
+              id: 'c7',
+              kind: 'numeric',
+              prompt: 'Bu kuralla 16 anahtar eklenirken büyütmelerde toplam kaç anahtar yeniden yerleştirilir?',
+              answer: 15,
+              hint: 'Büyütmeler 1, 2, 4, 8 boyutlu dolu tablolarda olur.',
+              explanation: '$1 + 2 + 4 + 8 = 15 < 2 \\cdot 16$: amortize olarak ekleme başına 1’den az taşıma.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- “Hash tabloları en kötü durumda $O(1)$’dir” demek. Garanti **beklenen** değerdir ve rastgelelik hash fonksiyonunun seçimindedir.
@@ -269,6 +291,12 @@ $m \\approx 1.18\\sqrt{n}$ olunca çakışma olasılığı 1/2’yi geçer.
           prompt: `Kendi örneğimiz: $p = 7$, $n = 3$ ve $h_{a,b}(x) = ((ax+b) \\bmod 7) \\bmod 3$. $x_1 = 1$ ve $x_2 = 4$ anahtarları için $a = 1, b = 0$ ve $a = 2, b = 1$ seçimlerinde çakışma olup olmadığını hesaplayın. Ailede toplam kaç fonksiyon var ve sınır en fazla kaç tanesinin bu iki anahtarı çakıştırabileceğini söylüyor?`,
           hints: ['Önce $(ax + b) \\bmod 7$’yi, sonra $\\bmod 3$’ü hesaplayın.', 'Aile büyüklüğü $p(p-1)$, sınır $p(p-1)/n$.'],
           solution: `$a = 1, b = 0$: $1 \\bmod 7 = 1 \\to 1$, $4 \\bmod 7 = 4 \\to 1$: **çakışır**. $a = 2, b = 1$: $3 \\to 0$, $9 \\bmod 7 = 2 \\to 2$: çakışmaz. Ailede $7 \\cdot 6 = 42$ fonksiyon var; en fazla $42/3 = 14$ tanesi bu iki anahtarı çakıştırır, yani çakışma olasılığı $\\le 1/3$.`,
+        },
+        {
+          id: 'p3',
+          prompt: `Kendi örneğimiz: boyutu 100 olan bir tabloyla başlıyoruz ve 1000 anahtar ekliyoruz. (a) Tablo dolunca boyutu **100 artırırsak**, (b) **ikiye katlarsak** büyütmelerde toplam kaç anahtar taşınır? 10 000 anahtar için oran nasıl değişir?`,
+          hints: ['(a) Büyütmeler 100, 200, …, 900 boyutlu dolu tablolarda olur.', '(b) 100, 200, 400, 800.'],
+          solution: `(a) $100 + 200 + \\dots + 900 = 4500$ taşıma. (b) $100 + 200 + 400 + 800 = 1500$ taşıma. 10 000 anahtarda fark büyür: (a) $100 + 200 + \\dots + 9900 = 495\\,000$, yani $\\Theta(m^2)$; (b) $100 + 200 + \\dots + 6400 = 12\\,700$, yani $< 2m$. Sabit artış ekleme başına $\\Theta(m)$ amortize maliyet demektir; geometrik büyüme $O(1)$.`,
         },
       ],
       sources: [SRC.l8.notes, SRC.l8.slides, SRC.l8.pre, SRC.l8.notebook, SRC.l8.concept],

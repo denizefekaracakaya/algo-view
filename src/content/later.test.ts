@@ -8,7 +8,12 @@ import { MWIS_EXAMPLE, NOTES_ITEMS, knapsack01, knapsackUnbounded, lcs, lcsTable
 import { ACTIVITIES, HUFFMAN_EXAMPLE, activityTrace, huffmanTrace, weightedCompletion } from '../engines/greedy'
 import { kruskalTrace, primTrace } from '../engines/mst'
 import { fordFulkersonTrace } from '../engines/maxFlow'
-import { MATCHING_EXAMPLE, allStableMatchings, blockingPairs, galeShapleyTrace } from '../engines/stableMatching'
+import { MATCHING_AGREE, MATCHING_EXAMPLE, allStableMatchings, blockingPairs, galeShapleyTrace } from '../engines/stableMatching'
+import { sccByReachability } from '../engines/scc'
+import { bstFromSequence } from '../engines/bst'
+import { height, type TNode } from '../engines/tree'
+import { maxActivitiesBrute } from '../engines/greedy'
+import { minCutBrute } from '../engines/maxFlow'
 
 /** Numbers quoted in the content of Lectures 8–17 (checks, quiz answers, practice solutions). */
 
@@ -201,5 +206,204 @@ describe('numeric claims in Lectures 8–17', () => {
     expect(q.match).toEqual({ A: 'D2', B: 'D1', C: 'D3' })
     expect(Object.values(q.trace.at(-1)!.counters!)[0]).toBe(6)
     expect(blockingPairs(p, q.match)).toEqual([])
+  })
+})
+
+describe('worked examples and practice problems added to Lectures 7–17', () => {
+  const perms = <T,>(a: T[]): T[][] => (a.length <= 1 ? [a] : a.flatMap((x, i) => perms([...a.slice(0, i), ...a.slice(i + 1)]).map((p) => [x, ...p])))
+  const nodes = (...names: string[]) => names.map((id) => ({ id, x: 0, y: 0 }))
+
+  it('Lecture 7: insertion order and BST shape', () => {
+    const depthSum = (t: TNode | null, d = 0): number => (t ? d + depthSum(t.left, d + 1) + depthSum(t.right, d + 1) : 0)
+    const chain = bstFromSequence([1, 2, 3, 4, 5, 6, 7])
+    expect(height(chain)).toBe(6)
+    expect(depthSum(chain)).toBe(21)
+    const balanced = bstFromSequence([4, 2, 6, 1, 3, 5, 7])
+    expect(height(balanced)).toBe(2)
+    expect(depthSum(balanced)).toBe(10)
+    const shape = (t: TNode | null): string => (t ? `(${shape(t.left)}${t.key}${shape(t.right)})` : '')
+    const trees = perms([1, 2, 3]).map((p) => bstFromSequence(p))
+    expect(new Set(trees.map(shape)).size).toBe(5)
+    expect(trees.filter((t) => height(t) === 1)).toHaveLength(2)
+  })
+
+  it('Lecture 8: table growth', () => {
+    const moves = (start: number, m: number, grow: (n: number) => number) => {
+      let size = start
+      let total = 0
+      for (let count = 0; count < m; count++) {
+        if (count === size) {
+          total += count
+          size = grow(size)
+        }
+      }
+      return total
+    }
+    expect(moves(1, 16, (n) => 2 * n)).toBe(15)
+    expect(moves(100, 1000, (n) => n + 100)).toBe(4500)
+    expect(moves(100, 1000, (n) => 2 * n)).toBe(1500)
+    expect(moves(100, 10000, (n) => n + 100)).toBe(495000)
+    expect(moves(100, 10000, (n) => 2 * n)).toBe(12700)
+  })
+
+  it('Lecture 9: bipartiteness, topological orders, back edges', () => {
+    const cycle = (k: number) => g(false, Array.from({ length: k }, (_, i): [string, string, number] => [`v${i}`, `v${(i + 1) % k}`, 1]))
+    const bipartite = (gr: G.Graph) => {
+      const d = bfsDistances(gr, gr.nodes[0].id)
+      return gr.edges.every((e) => (d[e.u]! - d[e.v]!) % 2 !== 0)
+    }
+    expect(bipartite(cycle(6))).toBe(true)
+    expect(bipartite(cycle(5))).toBe(false)
+    expect(bipartite(cycle(3))).toBe(false)
+    const k4 = g(false, [['a', 'b', 1], ['a', 'c', 1], ['a', 'd', 1], ['b', 'c', 1], ['b', 'd', 1], ['c', 'd', 1]])
+    expect(bipartite(k4)).toBe(false)
+
+    const dag: G.Graph = { ...g(true, [['a', 'c', 1], ['b', 'c', 1], ['c', 'd', 1], ['c', 'e', 1]]), nodes: nodes('a', 'b', 'c', 'd', 'e') }
+    expect(dfsTimes(dag)).toEqual({ d: { a: 1, c: 2, d: 3, e: 5, b: 9 }, f: { d: 4, e: 6, c: 7, a: 8, b: 10 } })
+    expect(topoOrder(dag)).toEqual(['b', 'a', 'c', 'e', 'd'])
+    const valid = (o: string[]) => dag.edges.every((e) => o.indexOf(e.u) < o.indexOf(e.v))
+    expect(perms(['a', 'b', 'c', 'd', 'e']).filter(valid)).toHaveLength(4)
+
+    const cyc: G.Graph = { ...g(true, [['a', 'b', 1], ['b', 'c', 1], ['c', 'd', 1], ['d', 'b', 1], ['a', 'e', 1]]), nodes: nodes('a', 'b', 'c', 'd', 'e') }
+    expect(dfsTimes(cyc)).toEqual({ d: { a: 1, b: 2, c: 3, d: 4, e: 8 }, f: { d: 5, c: 6, b: 7, e: 9, a: 10 } })
+  })
+
+  it('Lecture 10: condensation', () => {
+    const base: [string, string, number][] = [['a', 'b', 1], ['b', 'c', 1], ['c', 'a', 1], ['c', 'd', 1], ['d', 'e', 1], ['e', 'd', 1], ['e', 'f', 1]]
+    const count = (extra: [string, string, number][]) => sccByReachability(g(true, [...base, ...extra])).length
+    expect(count([])).toBe(3)
+    expect(count([['f', 'd', 1]])).toBe(2)
+    expect(count([['e', 'a', 1]])).toBe(2)
+    // exactly the edges f→a, f→b, f→c make the graph strongly connected
+    const names = ['a', 'b', 'c', 'd', 'e', 'f']
+    const winners = names.flatMap((u) => names.filter((v) => v !== u && count([[u, v, 1]]) === 1).map((v) => u + v))
+    expect(winners).toEqual(['fa', 'fb', 'fc'])
+  })
+
+  it('Lectures 11–12: parents, edge order, negative cycles, closure', () => {
+    const dg = g(true, [['s', 'a', 4], ['s', 'b', 1], ['b', 'a', 2], ['a', 'c', 1], ['b', 'c', 5]])
+    expect(dijkstraTrace(dg, 's').d).toEqual({ s: 0, a: 3, b: 1, c: 4 })
+    const dg2 = g(true, [['s', 'a', 4], ['s', 'b', 1], ['b', 'a', 4], ['a', 'c', 1], ['b', 'c', 5]])
+    expect(dijkstraTrace(dg2, 's').d).toEqual({ s: 0, a: 4, b: 1, c: 5 })
+
+    // Bellman–Ford on a path with the edges in a given order (an update is used later in the same round)
+    const run = (edges: [string, string, number][]) => {
+      const d: Record<string, number> = { s: 0, a: Infinity, b: Infinity, c: Infinity, d: Infinity }
+      const correctAfter: Record<string, number> = {}
+      for (let round = 1; round <= 10; round++) {
+        let changed = false
+        for (const [u, v, w] of edges) {
+          if (d[u] + w < d[v]) {
+            d[v] = d[u] + w
+            changed = true
+          }
+        }
+        for (const [k, want] of Object.entries({ a: 1, b: 2, c: 3, d: 4 })) if (d[k] === want && !(k in correctAfter)) correctAfter[k] = round
+        if (!changed) return { rounds: round, correctAfter }
+      }
+      throw new Error('no convergence')
+    }
+    const path: [string, string, number][] = [['s', 'a', 1], ['a', 'b', 1], ['b', 'c', 1], ['c', 'd', 1]]
+    expect(run(path)).toEqual({ rounds: 2, correctAfter: { a: 1, b: 1, c: 1, d: 1 } })
+    expect(run([...path].reverse())).toEqual({ rounds: 5, correctAfter: { a: 1, b: 2, c: 3, d: 4 } })
+
+    expect(bellmanFordTrace(g(true, [['s', 'a', 2], ['a', 'b', 1], ['b', 'a', -3]]), 's').negativeCycle).toBe(true)
+
+    const m = floydTrace(g(true, [['a', 'b', 1], ['b', 'a', -3]])).matrix
+    expect(Math.min(m[0][0], m[1][1])).toBeLessThan(0)
+    const closure = floydTrace(g(true, [['a', 'b', 1], ['b', 'c', 1], ['c', 'a', 1], ['c', 'd', 1]])).matrix
+    expect(closure.flatMap((row, i) => row.filter((x, j) => i !== j && Number.isFinite(x)))).toHaveLength(9)
+  })
+
+  it('Lecture 13: edit distance and knapsack', () => {
+    const edit = (x: string, y: string) => {
+      const E = Array.from({ length: x.length + 1 }, (_, i) => Array.from({ length: y.length + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0)))
+      for (let i = 1; i <= x.length; i++) {
+        for (let j = 1; j <= y.length; j++) {
+          E[i][j] = x[i - 1] === y[j - 1] ? E[i - 1][j - 1] : 1 + Math.min(E[i - 1][j], E[i][j - 1], E[i - 1][j - 1])
+        }
+      }
+      return E[x.length][y.length]
+    }
+    expect(edit('SUNDAY', 'SATURDAY')).toBe(3)
+    expect(edit('CAT', 'CUT')).toBe(1)
+    expect(lcs('SUNDAY', 'SATURDAY')).toBe('SUDAY')
+    expect(6 + 8 - 2 * lcsTable('SUNDAY', 'SATURDAY')[6][8]).toBe(4)
+
+    const items = [{ name: 'A', w: 6, v: 30 }, { name: 'B', w: 5, v: 20 }, { name: 'C', w: 5, v: 20 }]
+    expect(knapsack01(items, 10).value).toBe(40)
+    expect([4, 5, 6, 9, 10, 11].map((W) => knapsackUnbounded(items, W).value)).toEqual([0, 20, 30, 30, 40, 50])
+  })
+
+  it('Lecture 14: wrong greedy rules, ratio rule, Huffman', () => {
+    type Act = { name: string; s: number; f: number }
+    const pick = (acts: Act[], key: (a: Act) => number) => {
+      const chosen: Act[] = []
+      for (const a of [...acts].sort((x, y) => key(x) - key(y))) if (chosen.every((c) => a.f <= c.s || c.f <= a.s)) chosen.push(a)
+      return chosen.length
+    }
+    const early = [{ name: 'x', s: 0, f: 10 }, { name: 'y', s: 1, f: 2 }, { name: 'z', s: 3, f: 4 }]
+    expect(pick(early, (a) => a.s)).toBe(1)
+    expect(maxActivitiesBrute(early)).toBe(2)
+    const short = [{ name: 'x', s: 0, f: 5 }, { name: 'y', s: 4, f: 6 }, { name: 'z', s: 5, f: 10 }]
+    expect(pick(short, (a) => a.f - a.s)).toBe(1)
+    expect(maxActivitiesBrute(short)).toBe(2)
+    expect(activityTrace(short).chosen).toHaveLength(2)
+
+    const jobs = [{ name: 'A', l: 3, w: 1 }, { name: 'B', l: 1, w: 2 }, { name: 'C', l: 2, w: 2 }]
+    const costs = Object.fromEntries(perms(jobs).map((o) => [o.map((j) => j.name).join(''), weightedCompletion(o)]))
+    expect(costs).toMatchObject({ BCA: 14, CBA: 16, BAC: 18, ABC: 23 })
+    expect(Math.min(...Object.values(costs))).toBe(14)
+
+    expect(huffmanTrace([['a', 8], ['b', 4], ['c', 2], ['d', 1], ['e', 1]]).cost * 16).toBeCloseTo(30)
+    expect(huffmanTrace([['a', 5], ['b', 5], ['c', 5], ['d', 5]]).cost * 20).toBeCloseTo(40)
+  })
+
+  it('Lecture 15: cycle property', () => {
+    const name = (gr: G.Graph, i: number) => gr.edges[i].u + gr.edges[i].v
+    const cheaper: G.Graph = { ...G.MST_SMALL, edges: G.MST_SMALL.edges.map((e) => (e.u === 'b' && e.v === 'd' ? { ...e, w: 0 } : e)) }
+    expect(kruskalTrace(cheaper).weight).toBe(6)
+    const tree = kruskalTrace(G.MST_SMALL).tree.map((i) => name(G.MST_SMALL, i))
+    expect(tree).not.toContain('de')
+    expect(tree).not.toContain('bc')
+    const four = g(false, [['p', 'q', 1], ['p', 'r', 4], ['p', 's', 3], ['q', 'r', 2], ['q', 's', 5], ['r', 's', 6]])
+    const k = kruskalTrace(four)
+    expect(k.weight).toBe(6)
+    expect(k.tree.map((i) => name(four, i)).sort()).toEqual(['pq', 'ps', 'qr'])
+  })
+
+  it('Lecture 16: reverse edges and cuts', () => {
+    const net = g(true, [['s', 'a', 1], ['s', 'b', 1], ['a', 'c', 1], ['a', 'd', 1], ['b', 'c', 1], ['c', 't', 1], ['d', 't', 1]])
+    expect(fordFulkersonTrace(net, 's', 't').value).toBe(2)
+    // once s→a→c→t is full, no path of non-full forward edges leads from s to t
+    const full = new Set(['sa', 'ac', 'ct'])
+    const reach = new Set(['s'])
+    let changed = true
+    while (changed) {
+      changed = false
+      for (const e of net.edges) {
+        if (reach.has(e.u) && !reach.has(e.v) && !full.has(e.u + e.v)) {
+          reach.add(e.v)
+          changed = true
+        }
+      }
+    }
+    expect(reach.has('t')).toBe(false)
+
+    const cut = (S: string[]) => G.FLOW_ZIGZAG.edges.filter((e) => S.includes(e.u) && !S.includes(e.v)).reduce((sum, e) => sum + e.w!, 0)
+    expect([['s'], ['s', 'a'], ['s', 'b'], ['s', 'a', 'b']].map(cut)).toEqual([200, 201, 200, 200])
+    expect(minCutBrute(G.FLOW_ZIGZAG, 's', 't')).toBe(200)
+  })
+
+  it('Lecture 17: agreement and two stable matchings', () => {
+    const r = galeShapleyTrace(MATCHING_AGREE)
+    expect(r.match).toEqual({ W: 'Deniz', X: 'Can', Y: 'Bora', Z: 'Ada' })
+    expect(Object.values(r.trace.at(-1)!.counters!)[0]).toBe(10)
+    expect(allStableMatchings(MATCHING_AGREE)).toHaveLength(1)
+
+    const p = { doctors: ['Ada', 'Bora'], hospitals: ['X', 'Y'], dPref: { Ada: ['X', 'Y'], Bora: ['Y', 'X'] }, hPref: { X: ['Bora', 'Ada'], Y: ['Ada', 'Bora'] } }
+    expect(galeShapleyTrace(p).match).toEqual({ X: 'Ada', Y: 'Bora' })
+    expect(allStableMatchings(p)).toHaveLength(2)
+    expect(blockingPairs(p, { X: 'Bora', Y: 'Ada' })).toEqual([])
   })
 })

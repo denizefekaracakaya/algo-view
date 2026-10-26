@@ -15,7 +15,7 @@ export const lecture11: Lecture = {
       title: 'Dijkstra’s algorithm',
       titleEn: 'Dijkstra’s algorithm',
       summary: 'Relaxing estimates, finalizing the smallest estimate, and choosing a priority queue.',
-      minutes: 50,
+      minutes: 55,
       objectives: [
         'State Dijkstra’s two invariants ($d[t] \\ge d(s, t)$; equality for finished nodes).',
         'Run the algorithm step by step and explain the relax operation.',
@@ -140,6 +140,28 @@ $$n \\cdot (T_{\\text{FindMin}} + T_{\\text{DeleteMin}}) + m \\cdot T_{\\text{De
 - **Negative weights:** with weights $-\\log(\\text{rate})$ on currency exchange rates, a negative cycle is a profitable arbitrage opportunity; Bellman–Ford detects it.`,
         },
         {
+          kind: 'steps',
+          title: 'Worked example: distances and parents',
+          label: 'formal',
+          body: `Our own example: $s \\to a$ (4), $s \\to b$ (1), $b \\to a$ (2), $a \\to c$ (1), $b \\to c$ (5). While running Dijkstra, every time $d[v]$ is updated we also record the **parent** of $v$ ($\\pi[v]$, the node that made the update); we read the paths off these later.`,
+          proof: [
+            { title: 's is finalized (d = 0)', body: '$d[a] = 4$ ($\\pi[a] = s$), $d[b] = 1$ ($\\pi[b] = s$).' },
+            { title: 'b is finalized (d = 1)', body: '$a$: $1 + 2 = 3 < 4$ → $d[a] = 3$, $\\pi[a] = b$. $c$: $1 + 5 = 6$ → $d[c] = 6$, $\\pi[c] = b$.' },
+            { title: 'a is finalized (d = 3)', body: '$c$: $3 + 1 = 4 < 6$ → $d[c] = 4$, $\\pi[c] = a$. Finally $c$ is finalized ($d = 4$).' },
+            { title: 'Reading the path back', body: 'Follow the parents from $c$: $c \\leftarrow a \\leftarrow b \\leftarrow s$. Reversed: $s \\to b \\to a \\to c$, length $1 + 2 + 1 = 4$. Together the parent edges form a **shortest-path tree**: one parent per node is enough because every prefix of a shortest path is itself a shortest path.' },
+          ],
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'In this example, how many times is $d[c]$ updated (counting the change from infinity to its first value)?',
+              answer: 2,
+              hint: 'First from $b$, then from $a$.',
+              explanation: '$\\infty \\to 6$ (when $b$ is finalized) and $6 \\to 4$ (when $a$ is finalized). The final parent is $\\pi[c] = a$.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- Using Dijkstra on graphs with negative edges (it can be wrong even without a negative cycle).
@@ -192,6 +214,12 @@ $$n \\cdot (T_{\\text{FindMin}} + T_{\\text{DeleteMin}}) + m \\cdot T_{\\text{De
           prompt: `Our own example: directed edges s→a (7), s→b (2), b→a (3), a→c (1), b→c (8), c→t (2), b→t (9). Run Dijkstra from $s$ by hand: write the chosen node and the estimates at every step. Draw the final shortest-path tree.`,
           hints: ['First $s$ is chosen, then $b$ (estimate 2).', '$a$’s estimate drops from 7 to 5.'],
           solution: `Initially $d = (s: 0, a: \\infty, b: \\infty, c: \\infty, t: \\infty)$. Choose $s$: $a = 7$, $b = 2$. Choose $b$ (2): $a = \\min(7, 5) = 5$, $c = 10$, $t = 11$. Choose $a$ (5): $c = \\min(10, 6) = 6$. Choose $c$ (6): $t = \\min(11, 8) = 8$. Choose $t$ (8). Result: $s$ 0, $b$ 2, $a$ 5, $c$ 6, $t$ 8. Tree: s→b, b→a, a→c, c→t.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Our own example: in the graph above ($s \\to a$ 4, $s \\to b$ 1, $b \\to a$ 2, $a \\to c$ 1, $b \\to c$ 5) the weight of $b \\to a$ rises from 2 to 4. How do the distances and the shortest-path tree change? What happens with ties?`,
+          hints: ['$s \\to a$ directly is 4; $s \\to b \\to a$ is now $1 + 4 = 5$.', 'For $c$ compare the two paths $s \\to a \\to c$ and $s \\to b \\to c$.'],
+          solution: `Now $d[a] = 4$ ($\\pi[a] = s$, the direct edge). For $c$: $s \\to a \\to c = 4 + 1 = 5$ and $s \\to b \\to c = 1 + 5 = 6$, so $d[c] = 5$, $\\pi[c] = a$. The new tree: $s \\to a$, $s \\to b$, $a \\to c$. With a tie (say $b \\to a$ of weight 3: $1 + 3 = 4$) both paths would be shortest; Dijkstra updates only on a **strict improvement** ($<$), so which parent stays depends on the processing order. The distances are unique either way.`,
         },
       ],
       sources: [SRC.l11.notes, SRC.l11.slides, SRC.l11.pre, SRC.l11.notebook, SRC.l11.concept],

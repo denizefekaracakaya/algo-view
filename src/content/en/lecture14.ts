@@ -15,7 +15,7 @@ export const lecture14: Lecture = {
       title: 'The greedy choice: activity selection and scheduling',
       titleEn: 'The greedy choice: activity selection and scheduling',
       summary: 'Looking at a single subproblem; the earliest-finishing activity and the $l/w$ ratio.',
-      minutes: 40,
+      minutes: 45,
       objectives: [
         'See a greedy algorithm as a refinement of dynamic programming: only one subproblem at each step.',
         'Prove with an exchange argument that the earliest-finishing activity is in some optimal solution.',
@@ -127,6 +127,28 @@ Example: choosing the **shortest** activity, on the input [0, 5), [4, 6), [5, 10
           ],
         },
         {
+          kind: 'steps',
+          title: 'Worked example: wrong greedy rules',
+          label: 'formal',
+          body: `Instead of “earliest finish”, other reasonable-looking rules come to mind for activity selection. **A single counterexample** is enough to refute a greedy rule. (Intervals are $[s, f)$: one may start exactly when another ends.)`,
+          proof: [
+            { title: 'Earliest start', body: '$[0, 10)$, $[1, 2)$, $[3, 4)$: the rule picks $[0, 10)$ and the other two conflict with it → 1 activity. Optimal: $[1, 2)$ and $[3, 4)$ → 2.' },
+            { title: 'Shortest first', body: '$[0, 5)$, $[4, 6)$, $[5, 10)$: the shortest one, $[4, 6)$, conflicts with both others → 1 activity. Optimal: $[0, 5)$ and $[5, 10)$ → 2.' },
+            { title: 'Why is earliest finish different?', body: 'The exchange argument of Proposition 1: replacing the first activity of any optimal solution by the earliest-finishing one creates no conflict, because the earliest-finishing one ends no later. No such exchange works for the other rules.' },
+            { title: 'The lesson', body: 'Before writing a greedy algorithm, either prove it (exchange argument) or compare it against brute force on small examples. Intuition alone misleads.' },
+          ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'For the activities $[0, 5)$, $[4, 6)$, $[5, 10)$, how many activities does the “shortest first” rule select?',
+              answer: 1,
+              hint: 'Which one is shortest, and what does it conflict with?',
+              explanation: '$[4, 6)$ is picked; it conflicts with $[0, 5)$ and $[5, 10)$, so nothing else can be added. The optimum is 2.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- Accepting a greedy rule without proof: working on a few examples is not enough.
@@ -184,6 +206,12 @@ Example: choosing the **shortest** activity, on the input [0, 5), [4, 6), [5, 10
           prompt: `Our own example: four jobs — P ($l = 4$, $w = 2$), Q ($l = 1$, $w = 1$), R ($l = 3$, $w = 3$), S ($l = 2$, $w = 1$). Find the best order and $\\sum w_j c_j$.`,
           hints: ['Ratios: P 2, Q 1, R 1, S 2.', 'The order of jobs with equal ratios does not change the result.'],
           solution: `Ratios $l/w$: Q 1, R 1, P 2, S 2. Order Q, R, P, S: completion times 1, 4, 8, 10 → $1 \\cdot 1 + 3 \\cdot 4 + 2 \\cdot 8 + 1 \\cdot 10 = 1 + 12 + 16 + 10 = 39$. (R, Q, P, S also gives 39: $3 \\cdot 3 + 1 \\cdot 4 + 16 + 10 = 39$.)`,
+        },
+        {
+          id: 'p2',
+          prompt: `Our own example: three jobs, (length $\\ell$, weight $w$): A (3, 1), B (1, 2), C (2, 2). Which order minimizes the weighted completion time $\\sum w_j c_j$? Find it without trying all 6 orders, then compare with a few.`,
+          hints: ['The ratio rule: $\\ell / w$ from smallest to largest.', 'B: 0.5; C: 1; A: 3.'],
+          solution: `Ratio order B, C, A. Completion times $c_B = 1$, $c_C = 3$, $c_A = 6$: $2 \\cdot 1 + 2 \\cdot 3 + 1 \\cdot 6 = 14$. Comparison: C, B, A → $2 \\cdot 2 + 2 \\cdot 3 + 1 \\cdot 6 = 16$; B, A, C → $2 \\cdot 1 + 1 \\cdot 4 + 2 \\cdot 6 = 18$; A, B, C → $1 \\cdot 3 + 2 \\cdot 4 + 2 \\cdot 6 = 23$. The best is 14, the order the ratio rule gives. Swapping two adjacent jobs only changes the contribution of those two; that is exactly where the exchange argument works.`,
         },
       ],
       sources: [SRC.l14.notes, SRC.l14.slides, SRC.l14.pre, SRC.l14.notebook, SRC.l14.concept],
@@ -331,6 +359,14 @@ A tree minimizing $B(T)$ is **optimal**. An optimal tree is **full**: every inte
           hint: '$n - 1$ merges, each a few queue operations.',
           explanation: 'Each merge does two ExtractMins and one Insert: $O(\\log n)$. Total $O(n \\log n)$.',
         },
+        {
+          id: 'q5',
+          kind: 'numeric',
+          prompt: 'Frequencies a: 8, b: 4, c: 2, d: 1, e: 1. How many bits in total does this 16-letter text take with a Huffman code?',
+          answer: 30,
+          hint: 'First d and e merge, then with c, then with b.',
+          explanation: 'Depths a 1, b 2, c 3, d 4, e 4: $8 + 8 + 6 + 4 + 4 = 30$ bits. A fixed-length code (3 bits) would take 48 bits.',
+        },
       ],
       practice: [
         {
@@ -338,6 +374,12 @@ A tree minimizing $B(T)$ is **optimal**. An optimal tree is **full**: every inte
           prompt: `Our own example: build a Huffman code from the letter frequencies of the word “ABRACADABRA”. How many bits does the word take? How many would a fixed-length code need?`,
           hints: ['Counts: A 5, B 2, R 2, C 1, D 1.', 'The first merge is C with D.'],
           solution: `Counts A 5, B 2, R 2, C 1, D 1 (11 in total). Merges: C + D = 2; then the two smallest: B (2) and R (2) or CD (2) — there is a tie, e.g. B + R = 4; CD (2) + BR (4) = 6; A (5) + 6 = 11. Codes: A 1 bit, B/R/C/D 3 bits. Total $5 \\cdot 1 + (2 + 2 + 1 + 1) \\cdot 3 = 23$ bits. Check it in the visualizer with “A:5, B:2, R:2, C:1, D:1” (if ties break differently the codes may change, but the total is still 23 bits). A fixed-length code for 5 letters needs 3 bits: $11 \\cdot 3 = 33$ bits.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Our own example: four letters, all equally frequent (a, b, c, d: 5 each). Build the Huffman tree. Is the result better than a fixed-length code? What happens when all frequencies are equal and there are $2^k$ letters?`,
+          hints: ['The first two merges: (a, b) and (c, d).', 'Equal frequencies give a balanced tree.'],
+          solution: `a + b = 10, c + d = 10, then 10 + 10 = 20. Every letter sits at depth 2: a 2-bit code each, $20 \\cdot 2 = 40$ bits in total, the same as a fixed-length 2-bit code. With $2^k$ equally frequent letters Huffman builds a perfectly balanced tree and every letter gets $k$ bits: there is no gain. Huffman’s gain comes from **skewed** distributions (like a: 8, b: 4, … in the quiz); in information theory this corresponds to the entropy being smaller than $\\log_2(\\text{number of letters})$.`,
         },
       ],
       sources: [SRC.l14.notes, SRC.l14.slides, SRC.l14.notebook, SRC.l14.concept],

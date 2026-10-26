@@ -15,7 +15,7 @@ export const lecture13: Lecture = {
       title: 'En uzun ortak altdizi (LCS)',
       titleEn: 'Longest common subsequence (LCS)',
       summary: 'Öneklerin tablosu, üç komşudan bir değer ve geriye doğru izleme.',
-      minutes: 40,
+      minutes: 45,
       objectives: [
         'Bir DP algoritması tasarlamanın beş adımını sıralamak.',
         'LCS için öneklerden oluşan alt problemleri ve $C[i, j]$ bağıntısını türetmek.',
@@ -120,6 +120,28 @@ Bu basit algoritma bilinen en iyisidir: $O(mn)$’yi polinom ölçüde iyileşti
           ],
         },
         {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: akraba bir problem, düzenleme uzaklığı',
+          label: 'formal',
+          body: `Aynı tasarım tarifi (alt problemler, bağıntı, tablo) başka bir dizi problemine de uygulanır. **Düzenleme uzaklığı** (Levenshtein): $X$’i $Y$’ye çevirmek için gereken en az ekleme, silme ve değiştirme sayısı. Yazım denetleyicileri “bunu mu demek istediniz?” önerisini böyle bulur.`,
+          proof: [
+            { title: 'Alt problem', body: '$E[i][j]$: $X$’in ilk $i$ harfini $Y$’nin ilk $j$ harfine çevirmenin maliyeti. Taban: $E[i][0] = i$ ($i$ silme), $E[0][j] = j$ ($j$ ekleme).' },
+            { title: 'Bağıntı', body: 'Son harfler eşitse $E[i][j] = E[i-1][j-1]$. Değilse üç seçenekten en ucuzu: $1 + \\min(E[i-1][j]$ (sil), $E[i][j-1]$ (ekle), $E[i-1][j-1]$ (değiştir)$)$. LCS’teki “iki durum”un neredeyse aynısı.' },
+            { title: 'Örnek', body: 'SUNDAY → SATURDAY: S aynı; A ve T eklenir; U aynı; N, R ile değiştirilir; D, A, Y aynı. Toplam 3 işlem ve daha azı mümkün değil: tablonun sağ alt köşesi 3.' },
+            { title: 'Süre', body: 'Yine $(m + 1)(n + 1)$ hücre, her biri $O(1)$: $O(mn)$. Geri izleme işlemlerin listesini verir.' },
+          ],
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'CAT ile CUT arasındaki düzenleme uzaklığı kaçtır?',
+              answer: 1,
+              hint: 'Hangi harfler farklı?',
+              explanation: 'Yalnızca ortadaki harf farklı: A → U, tek bir değiştirme.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- Altdiziyi alt**dize** (substring, bitişik) ile karıştırmak.
@@ -173,6 +195,12 @@ Bu basit algoritma bilinen en iyisidir: $O(mn)$’yi polinom ölçüde iyileşti
           hints: ['İlk satır (K) ve ilk sütun (K) eşleşmesiyle başlar.', 'Cevabın uzunluğu 4.'],
           solution: `Satırlar K, A, R, T, A, L; sütunlar K, A, T, A, R. Tablonun son hücresi $C[6, 5] = 4$. Geri izleme “KATA”yı verir: X’in 1, 2, 4, 5. harfleri ve Y’nin 1, 2, 3, 4. harfleri. “KAR” da ortak bir altdizidir ama uzatılamaz: X’te R’den sonra yalnızca T, A, L gelir, Y’de ise R son harftir. Görselleştiricide X = KARTAL, Y = KATAR girerek kontrol edin.`,
         },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: yalnızca **ekleme ve silmeye** izin verilirse (değiştirme yok), SUNDAY’i SATURDAY’e çevirmek kaç işlem sürer? Bunu LCS ile nasıl hesaplarsınız?`,
+          hints: ['LCS’teki harfler yerinde kalır; geri kalan her harf ya silinir ya eklenir.', 'LCS(SUNDAY, SATURDAY) = SUDAY.'],
+          solution: `LCS’in harfleri dokunulmadan kalır; $X$’in geri kalan harfleri silinir, $Y$’nin geri kalanları eklenir. İşlem sayısı $|X| + |Y| - 2\\,|LCS|$. LCS = SUDAY (uzunluk 5): $6 + 8 - 10 = 4$ işlem (N’yi sil; A, T, R’yi ekle). Değiştirmeye izin verilince bir sil + ekle çifti (N → R) tek işleme iner ve düzenleme uzaklığı 3 olur. Unix’teki diff aracı tam bu ekle/sil sürümünü kullanır.`,
+        },
       ],
       sources: [SRC.l13.notes, SRC.l13.slides, SRC.l13.concept],
     },
@@ -182,7 +210,7 @@ Bu basit algoritma bilinen en iyisidir: $O(mn)$’yi polinom ölçüde iyileşti
       title: 'Sırt çantası ve ağaçta bağımsız küme',
       titleEn: 'Knapsack and independent set in a tree',
       summary: 'Kapasiteye göre alt problemler, “al ya da alma” ve alt ağaçlarda iki değer.',
-      minutes: 45,
+      minutes: 50,
       objectives: [
         'Sınırsız ve 0/1 sırt çantası için alt problemleri ve bağıntıları yazmak.',
         '0/1 sırt çantasında neden ikinci bir boyutun (eşya sayısı) gerektiğini açıklamak.',
@@ -318,6 +346,28 @@ Değerler yapraklardan köke (post-order) hesaplanır; cevap $A(r)$.`,
           body: `Her düğüm bir kez işlenir ve çocuklarının değerlerini toplar; her kenar bir kez sayılır: **$O(|V|)$**.`,
         },
         {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: açgözlü neden yetmez?',
+          label: 'formal',
+          body: `Akla ilk gelen kural: değer/ağırlık oranı en yüksek eşyadan başla. Kendi örneğimiz: kapasite $W = 10$; A (ağırlık 6, değer 30), B (5, 20), C (5, 20).`,
+          proof: [
+            { title: 'Açgözlü', body: 'Oranlar: A 5, B 4, C 4. Önce A alınır (ağırlık 6); kalan 4 birime ne B ne C sığar. Değer: 30.' },
+            { title: 'Optimal', body: 'A’yı almayıp B ve C’yi alırsak ağırlık tam 10, değer 40. Açgözlü seçim (A) hiçbir optimal çözümde yoktur: değiştirme argümanı burada çalışmaz.' },
+            { title: 'DP neden kurtarır?', body: '$K[i][x]$ her kapasite $x$ için en iyi değeri tutar; A’yı “almak” ve “almamak” iki seçeneğini de dener. Tablo $K[3][10] = 40$ bulur.' },
+            { title: 'Kesirli sürüm', body: 'Eşyaları bölebilseydik (toz, sıvı) açgözlü kural optimal olurdu: A’nın tamamı ve B’nin 4/5’i, değer $30 + 16 = 46$. Tam sayı kısıtı problemi zorlaştıran şeydir.' },
+          ],
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'Bu örnekte (W = 10; A 6/30, B 5/20, C 5/20) 0/1 sırt çantasının optimal değeri kaçtır?',
+              answer: 40,
+              hint: 'A’sız seçenekleri de deneyin.',
+              explanation: 'B + C: ağırlık 10, değer 40. A ile en fazla 30 (A + B ya da A + C kapasiteyi aşar).',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- 0/1 sırt çantasını tek boyutlu $K(x)$ ile çözmeye çalışmak: aynı eşya birden çok kez sayılır.
@@ -369,6 +419,12 @@ Değerler yapraklardan köke (post-order) hesaplanır; cevap $A(r)$.`,
           prompt: `Kendi örneğimiz: W = 7 ve eşyalar X (3 kg, 9), Y (4 kg, 11), Z (2 kg, 5). Hem 0/1 hem sınırsız sırt çantası için en iyi değeri ve seçimi bulun.`,
           hints: ['0/1: X + Y tam 7 kg.', 'Sınırsız: X + X + ? veya X + Z + Z?'],
           solution: `**0/1:** X + Y = 7 kg, değer 20 (X + Z = 14, Y + Z = 16). **Sınırsız:** $K(2) = 5$, $K(3) = 9$, $K(4) = 11$, $K(5) = 14$, $K(6) = 18$ (X + X) ve $K(7) = \\max(K(4) + 9,\\ K(3) + 11,\\ K(5) + 5) = \\max(20, 20, 19) = 20$, yani yine X + Y. Burada kopya almak işe yaramıyor.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: aynı eşyalar (A 6/30, B 5/20, C 5/20) ama her eşyadan **sınırsız** sayıda alınabiliyor, $W = 10$. Optimal değer nedir? $W = 11$ olsaydı?`,
+          hints: ['Sınırsız sürümün bağıntısı: $K[x] = \\max_i (K[x - w_i] + v_i)$.', 'B’den iki tane alınabilir mi?'],
+          solution: `$W = 10$: B iki kez (ağırlık 10, değer 40) ya da B + C, yine 40; A’yla en fazla 30 (A’dan sonra 4 birim kalır). Optimal 40. $W = 11$: A + B (ağırlık 11, değer 50) en iyisidir; iki B 40, tek A 30. Tablo: $K[x] = 0$ ($x < 5$), $20$ ($5 \\le x < 6$), $30$ ($6 \\le x < 10$), $40$ ($x = 10$), $50$ ($x = 11$). Kapasiteyi bir birim artırmak optimal çözümü tamamen değiştirebilir; açgözlü bir kural bunu yakalayamaz.`,
         },
       ],
       sources: [SRC.l13.notes, SRC.l13.slides, SRC.l13.concept],
