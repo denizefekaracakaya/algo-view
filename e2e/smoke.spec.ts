@@ -5,11 +5,11 @@ async function noHorizontalOverflow(page: Page) {
   expect(overflow).toBeLessThanOrEqual(1)
 }
 
-test('dashboard lists lectures 1–7 and nothing beyond', async ({ page }) => {
+test('dashboard lists lectures 1–17 and nothing beyond', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Algoritmaları görünür kıl.' })).toBeVisible()
-  for (let n = 1; n <= 7; n++) await expect(page.getByText(new RegExp(`^Ders ${n} ·`)).first()).toBeVisible()
-  await expect(page.getByText(/^Ders 8 ·/)).toHaveCount(0)
+  for (let n = 1; n <= 17; n++) await expect(page.getByText(new RegExp(`^Ders ${n} ·`)).first()).toBeVisible()
+  await expect(page.getByText(/^Ders 18 ·/)).toHaveCount(0)
   await noHorizontalOverflow(page)
 })
 
@@ -86,15 +86,15 @@ test('progress reset asks for confirmation', async ({ page }) => {
 
 test('red-black tree: insert runs and invariants hold at the end', async ({ page }) => {
   await page.goto('/#/ders/l7-redblack')
-  const viz = page.getByRole('region', { name: 'Kırmızı-siyah ağaç ekleme görselleştirmesi' })
-  await viz.getByLabel('Anahtar ekle').fill('12')
+  const viz = page.getByRole('region', { name: 'Kırmızı-siyah ağaç görselleştirmesi' })
+  await viz.getByRole('textbox', { name: 'Anahtar' }).fill('12')
   await viz.getByRole('button', { name: 'insert_rb' }).click()
   await viz.getByRole('button', { name: 'Sona git' }).click()
   await expect(viz.locator('.explain')).toContainText('12 eklendi')
   await expect(viz.getByText('— BOZUK')).toHaveCount(0)
 })
 
-for (const id of ['l1-karatsuba', 'l2-asymptotics', 'l3-master', 'l3-substitution', 'l4-select', 'l5-quicksort', 'l5-expected', 'l6-bucketsort', 'l6-compare', 'l7-bst', 'l7-compare']) {
+for (const id of ['l1-karatsuba', 'l2-asymptotics', 'l3-master', 'l3-substitution', 'l4-select', 'l5-quicksort', 'l5-expected', 'l6-bucketsort', 'l6-compare', 'l7-bst', 'l7-compare', 'l8-hashing', 'l9-graphs', 'l9-dfs', 'l10-scc', 'l11-dijkstra', 'l12-bellman-ford', 'l12-floyd', 'l13-lcs', 'l13-knapsack', 'l14-greedy', 'l14-huffman', 'l15-mst', 'l16-maxflow', 'l17-stable-matching']) {
   test(`lesson ${id} renders without errors or overflow`, async ({ page }) => {
     const errors: string[] = []
     page.on('pageerror', (e) => errors.push(e.message))
@@ -114,7 +114,7 @@ test('English mode: header switch translates the app; every lesson renders witho
   await page.goto('/#/')
   await page.getByRole('button', { name: 'EN' }).click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Make algorithms visible.')
-  for (const id of ['l1-why', 'l1-karatsuba', 'l2-insertion', 'l2-mergesort', 'l2-asymptotics', 'l3-master', 'l3-substitution', 'l4-select', 'l5-quicksort', 'l5-expected', 'l6-lower-bound', 'l6-bucketsort', 'l6-compare', 'l7-bst', 'l7-redblack', 'l7-compare']) {
+  for (const id of ['l1-why', 'l1-karatsuba', 'l2-insertion', 'l2-mergesort', 'l2-asymptotics', 'l3-master', 'l3-substitution', 'l4-select', 'l5-quicksort', 'l5-expected', 'l6-lower-bound', 'l6-bucketsort', 'l6-compare', 'l7-bst', 'l7-redblack', 'l7-compare', 'l8-hashing', 'l9-graphs', 'l9-dfs', 'l10-scc', 'l11-dijkstra', 'l12-bellman-ford', 'l12-floyd', 'l13-lcs', 'l13-knapsack', 'l14-greedy', 'l14-huffman', 'l15-mst', 'l16-maxflow', 'l17-stable-matching']) {
     await page.goto(`/#/ders/${id}`)
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     await expect(page.getByText('Learning objectives')).toBeVisible()
@@ -230,4 +230,32 @@ test('backup download and restore bring work back after storage is cleared', asy
   await page.reload()
   await page.goto('/#/notlar')
   await expect(page.getByRole('textbox')).toHaveValue('yedeklenecek not')
+})
+
+test('Lectures 8–17: every visualizer plays to the end without errors', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (e) => errors.push(e.message))
+  page.on('console', (m) => m.type() === 'error' && errors.push(m.text()))
+  for (const id of ['l8-hashing', 'l9-graphs', 'l9-dfs', 'l10-scc', 'l11-dijkstra', 'l12-bellman-ford', 'l12-floyd', 'l13-lcs', 'l13-knapsack', 'l14-greedy', 'l14-huffman', 'l15-mst', 'l16-maxflow', 'l17-stable-matching']) {
+    await page.goto(`/#/ders/${id}`)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    const ends = page.getByRole('button', { name: 'Sona git' })
+    const n = await ends.count()
+    for (let i = 0; i < n; i++) {
+      await ends.nth(i).scrollIntoViewIfNeeded()
+      await ends.nth(i).click()
+      await page.getByRole('button', { name: 'Önceki adım' }).nth(i).click()
+    }
+    await noHorizontalOverflow(page)
+  }
+  expect(errors).toEqual([])
+})
+
+test('red-black deletion runs from the lesson page', async ({ page }) => {
+  await page.goto('/#/ders/l7-redblack')
+  const viz = page.getByRole('region', { name: 'Kırmızı-siyah ağaç görselleştirmesi' })
+  await viz.getByRole('textbox', { name: 'Anahtar' }).fill('20')
+  await viz.getByRole('button', { name: 'delete_rb' }).click()
+  await viz.getByRole('button', { name: 'Sona git' }).click()
+  await expect(viz.locator('.explain')).toContainText('20 silindi')
 })

@@ -13,6 +13,14 @@ import { DecisionTreeViz } from './DecisionTreeViz'
 import { BucketSortViz } from './BucketSortViz'
 import { SortComparison } from './SortComparison'
 import { BSTViz, RBPlayground, RBViz, TreeCompare } from './TreeViz'
+import { BirthdayViz, HashTableViz } from './HashViz'
+import { GraphSearchViz, SccViz } from './GraphSearchViz'
+import { BellmanFordViz, DijkstraViz, FloydViz } from './ShortestPathViz'
+import { KnapsackViz, LcsViz, MwisViz } from './DPViz'
+import { ActivityViz, HuffmanViz } from './GreedyViz'
+import { MSTViz } from './MSTViz'
+import { MaxFlowViz } from './FlowViz'
+import { StableMatchingViz } from './MatchingViz'
 
 /** Maps the `viz` keys used in lesson content to components. */
 export const VIZ: Record<string, ComponentType> = {
@@ -41,4 +49,21 @@ export const VIZ: Record<string, ComponentType> = {
   rb: RBViz,
   rbPlayground: RBPlayground,
   treeCompare: TreeCompare,
+  hashTable: HashTableViz,
+  birthday: BirthdayViz,
+  bfs: () => <GraphSearchViz initial="bfs" />,
+  dfs: () => <GraphSearchViz initial="dfs" />,
+  dfsApps: () => <GraphSearchViz initial="components" />,
+  scc: SccViz,
+  dijkstra: DijkstraViz,
+  bellmanFord: BellmanFordViz,
+  floyd: FloydViz,
+  lcs: LcsViz,
+  knapsack: KnapsackViz,
+  mwis: MwisViz,
+  activity: ActivityViz,
+  huffman: HuffmanViz,
+  mst: MSTViz,
+  maxFlow: MaxFlowViz,
+  stableMatching: StableMatchingViz,
 }

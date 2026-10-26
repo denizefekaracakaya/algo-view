@@ -213,6 +213,7 @@ Yani sıradan bir BST için **$O(\\log n)$ garantisi yoktur**. Logaritmik yükse
         'Rotasyonun BST özelliğini koruyan $O(1)$ bir yerel işlem olduğunu görmek.',
         'Ekleme sırasında Durum 1, 2, 3’ü tanımak ve her durumun hangi özelliği nasıl onardığını açıklamak.',
         'Siyah yükseklik argümanıyla $h \\le 2\\log_2(n+1)$ sınırını kanıtlamak ve bunu $O(\\log n)$ işlem süresine bağlamak.',
+        'Silmede “ekstra siyah” fikrini ve dört düzeltme durumunu tanımak.',
       ],
       prerequisites: ['İkili arama ağaçları', 'Tümevarım'],
       sections: [
@@ -284,9 +285,10 @@ Sezgi (Remark 15): kırmızı düğümler bir yolun “uzamaya başladığı” 
             '“Durum 3 üçgen” örneğinde önce $p$’de, sonra $g$’de yapılan iki rotasyonu adım adım izle.',
             '**Tahmin modu**nda her düzeltme adımından önce hangi durumun uygulanacağını tahmin et.',
             '“Durum 2 zinciri” örneğinde ihlalin yukarı doğru nasıl taşındığını izle.',
+            'Ağaç kurulduktan sonra bir anahtarı **delete_rb** ile sil: silinen konum siyahsa hangi durum(lar) uygulandı? Kırmızı bir yaprağı silince ne oldu?',
           ],
           viz: 'rb',
-          body: `Ağacı bir sırayla kurun ya da tek tek anahtar ekleyin. Her adımda x, p (ebeveyn), u (amca), g (büyük ebeveyn) etiketlenir ve sağdaki denetleyici o anki ağacın hangi özellikleri sağladığını gösterir — düzeltme sırasında geçici ihlalleri görebilirsiniz. Tahmin modunda her durumdan önce hangi durumun uygulanacağını tahmin edin. “Sıralı 1…10” girdisini deneyin.`,
+          body: `Ağacı bir sırayla kurun ya da tek tek anahtar ekleyip silin. Her adımda x, p (ebeveyn), u (amca), g (büyük ebeveyn) etiketlenir ve sağdaki denetleyici o anki ağacın hangi özellikleri sağladığını gösterir — düzeltme sırasında geçici ihlalleri görebilirsiniz. Tahmin modunda her durumdan önce hangi durumun uygulanacağını tahmin edin. “Sıralı 1…10” girdisini deneyin.`,
         },
         {
           kind: 'steps',
@@ -299,6 +301,34 @@ Sezgi (Remark 15): kırmızı düğümler bir yolun “uzamaya başladığı” 
 - Düzeltme köke ulaşırsa ve kök kırmızıysa kök siyaha boyanır (özellik 2).
 
 Notlar $x$’in sol, $u$’nun sağ çocuk olduğu durumu ayrıntılı gösterir; diğer durumlar simetriktir (CLRS 13.3).`,
+        },
+        {
+          kind: 'steps',
+          title: 'Silme: ekstra siyah ve dört durum',
+          label: 'formal',
+          body: `Ders 7 silmeyi ayrıntılı işlemez; görselleştiricideki **delete_rb** CLRS 13.4’teki yaygın biçimi izler. Fikir eklemeye benzer: önce sıradan BST silmesi, sonra **yerel onarım**.
+
+1. **BST silmesi:** $z$ en fazla bir çocukluysa doğrudan çıkarılır; iki çocukluysa ardılı $y$, $z$’nin yerine (ve rengine) geçer. Ağaçtan fiilen ayrılan konum $y$’nin eski yeridir.
+2. **Ayrılan konum kırmızıysa** hiçbir yolun siyah sayısı değişmez: bitti.
+3. **Siyahsa** o konumdan geçen yollar bir siyah kaybeder (özellik 5 bozulur). Yerine gelen $x$’e (NIL olabilir) bir **ekstra siyah** yüklenir. $x$ kırmızıysa siyaha boyanır, bitti. Değilse $x$’in kardeşi $w$’ye bakılır:
+
+- **Durum 1 — $w$ kırmızı:** $w$ siyaha, ebeveyn $p$ kırmızıya boyanır, $p$’de $x$ yönüne rotasyon. $x$’in yeni kardeşi siyahtır; 2, 3 ya da 4 ile devam.
+- **Durum 2 — $w$ siyah, iki çocuğu siyah:** $w$ kırmızıya boyanır; artık $p$’nin iki tarafı da bir siyah eksik, ekstra siyah $p$’ye çıkar. $p$ kırmızıysa siyaha boyanıp biter.
+- **Durum 3 — $w$ siyah, yakın çocuğu kırmızı, uzak çocuğu siyah:** yakın çocuk siyaha, $w$ kırmızıya boyanır, $w$’de $x$’ten uzağa rotasyon. Durum 4’e dönüşür.
+- **Durum 4 — $w$ siyah, uzak çocuğu kırmızı:** $w$, $p$’nin rengini alır; $p$ ve uzak çocuk siyaha boyanır; $p$’de $x$ yönüne rotasyon. Ekstra siyah yok olur, bitti.
+
+Yalnızca Durum 2 yukarı taşınır; 1, 3 ve 4 en fazla 3 rotasyonla biter. Toplam iş $O(h) = O(\\log n)$.`,
+          check: [
+            {
+              id: 'c7',
+              kind: 'mcq',
+              prompt: 'Kırmızı-siyah ağaçtan **kırmızı bir yaprak** silinirse ne yapılır?',
+              options: ['Durum 1’den başlanır.', 'Hiçbir şey: yolların siyah sayısı değişmez ve kırmızı-kırmızı oluşmaz.', 'Kök kırmızıya boyanır.', 'Ebeveynde bir rotasyon yapılır.'],
+              answer: 1,
+              hint: 'Silinen düğüm hangi özellikleri etkileyebilir? Kırmızı düğümler siyah sayısına katılmaz.',
+              explanation: 'Kırmızı bir düğüm hiçbir yolun siyah sayısına katkı yapmaz ve onu kaldırmak iki kırmızıyı yan yana getiremez; beş özellik de korunur.',
+            },
+          ],
         },
         {
           kind: 'correctness',

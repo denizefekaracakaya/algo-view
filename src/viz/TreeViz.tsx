@@ -5,6 +5,7 @@ import { TreeView } from '../components/TreeView'
 import { ArrayInput } from '../components/ArrayInput'
 import { BST_DELETE_CODE, BST_INSERT_CODE, BST_SEARCH_CODE, bstFromSequence, bstOperationTrace, searchCost, type TreeOp, type TreeState } from '../engines/bst'
 import { RB_INSERT_CODE, rbFromSequence, rbInsertTrace, type RBState } from '../engines/redBlack'
+import { RB_DELETE_CODE, rbDeleteTrace, type RBDeleteState } from '../engines/redBlackDelete'
 import { checkRedBlack, height, inorder, isBST, size, toggleColor, type TNode, blackHeight } from '../engines/tree'
 import { makeRng, randomPermutation } from '../engines/random'
 import type { Trace } from '../trace/types'
@@ -197,8 +198,9 @@ export function RBViz() {
   const [seq, setSeq] = useState([10, 20, 30, 15, 25, 5, 1])
   const initial = useMemo(() => buildRbTrace([10, 20, 30, 15, 25, 5, 1]), [])
   const [tree, setTree] = useState<TNode | null>(initial.tree)
-  const [trace, setTrace] = useState<Trace<RBState>>(initial.trace)
+  const [trace, setTrace] = useState<Trace<RBDeleteState>>(initial.trace)
   const [keyText, setKeyText] = useState('12')
+  const [lastOp, setLastOp] = useState<'insert' | 'delete'>('insert')
   const [err, setErr] = useState<string | null>(null)
   const [runId, setRunId] = useState(0)
 
@@ -207,20 +209,22 @@ export function RBViz() {
     setSeq(v)
     setTree(r.tree)
     setTrace(r.trace)
+    setLastOp('insert')
     setRunId((x) => x + 1)
   }
-  const insert = () => {
+  const run = (op: 'insert' | 'delete') => {
     const k = Number(keyText)
     if (!Number.isInteger(k) || Math.abs(k) > 999 || keyText.trim() === '') {
       setErr(tx('−999…999 aralığında bir tam sayı girin.', 'Enter an integer in the range −999…999.'))
       return
     }
-    if (size(tree) >= 31) {
+    if (op === 'insert' && size(tree) >= 31) {
       setErr(tx('Okunabilirlik için en fazla 31 düğüm.', 'At most 31 nodes, for readability.'))
       return
     }
     setErr(null)
-    const r = rbInsertTrace(tree, k)
+    const r = op === 'insert' ? rbInsertTrace(tree, k) : rbDeleteTrace(tree, k)
+    setLastOp(op)
     setTree(r.result)
     setTrace(r.trace)
     setRunId((x) => x + 1)
@@ -240,23 +244,26 @@ export function RBViz() {
         random={() => randomPermutation(makeRng(Date.now() % 7907), 12)}
         label={tx('Ekleme sırası (ağacı yeniden kurar)', 'Insertion order (rebuilds the tree)')}
         hint={tx(
-          'Farklı tam sayılar, en fazla 20. Kırmızı-siyah silme bu derste ayrıntılı işlenmediği için yalnızca ekleme gösterilir.',
-          'Distinct integers, at most 20. Only insertion is shown, since red-black deletion is not covered in detail in this lecture.',
+          'Farklı tam sayılar, en fazla 20. Ağaç kurulduktan sonra aşağıdan tek tek anahtar ekleyip silebilirsiniz.',
+          'Distinct integers, at most 20. Once the tree is built you can insert and delete single keys below.',
         )}
       />
       <form
         className="row"
         onSubmit={(e) => {
           e.preventDefault()
-          insert()
+          run('insert')
         }}
       >
         <label className="field">
-          {tx('Anahtar ekle', 'Insert key')}
+          {tx('Anahtar', 'Key')}
           <input className="input mono" style={{ width: 80 }} value={keyText} onChange={(e) => setKeyText(e.target.value)} aria-invalid={!!err} />
         </label>
         <button className="btn primary" type="submit" style={{ alignSelf: 'flex-end' }}>
           insert_rb
+        </button>
+        <button className="btn" type="button" style={{ alignSelf: 'flex-end' }} onClick={() => run('delete')}>
+          delete_rb
         </button>
       </form>
       {err && (
@@ -270,9 +277,9 @@ export function RBViz() {
     <TraceViewer
       key={runId}
       trace={trace}
-      label={tx('Kırmızı-siyah ağaç ekleme görselleştirmesi', 'Red-black tree insertion visualization')}
+      label={tx('Kırmızı-siyah ağaç görselleştirmesi', 'Red-black tree visualization')}
       toolbar={toolbar}
-      code={RB_INSERT_CODE}
+      code={lastOp === 'insert' ? RB_INSERT_CODE : RB_DELETE_CODE}
       render={(step) => {
         const checks = checkRedBlack(step.state.root)
         const bad = checks.flatMap((c) => (c.id === 4 ? c.offenders : c.id === 2 ? c.offenders : []))
@@ -292,8 +299,8 @@ export function RBViz() {
       legend={
         <span className="muted">
           {tx(
-            'Dolgu rengi düğüm rengidir; ekran okuyucular için ayrıca “kırmızı/siyah” olarak etiketlenir. x, p, u, g: düğüm, ebeveyn, amca, büyük ebeveyn. “!” = ihlal.',
-            'The fill color is the node color; for screen readers it is also labelled “red/black”. x, p, u, g: node, parent, uncle, grandparent. “!” = violation.',
+            'Dolgu rengi düğüm rengidir; ekran okuyucular için ayrıca “kırmızı/siyah” olarak etiketlenir. Eklemede x, p, u, g: düğüm, ebeveyn, amca, büyük ebeveyn. Silmede z: silinen, y: ardıl, x: ekstra siyahı taşıyan, w: x’in kardeşi. “!” = ihlal.',
+            'The fill color is the node color; for screen readers it is also labelled “red/black”. In insertion x, p, u, g: node, parent, uncle, grandparent. In deletion z: deleted, y: successor, x: carrier of the extra black, w: x’s sibling. “!” = violation.',
           )}
         </span>
       }

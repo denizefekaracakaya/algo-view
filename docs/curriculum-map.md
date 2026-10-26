@@ -21,8 +21,21 @@ Lesson ids are the URL slugs (`#/ders/<id>`). Content lives in `src/content/lect
 | 7 | `l7-redblack` — Kırmızı-siyah ağaçlar | 5 properties, rotations, insertion cases 1/2/3, black-height proof | h ≤ 2 log₂(n+1) | `rbPlayground` (toggle colors, live invariant checker), `rb` (insert trace with x/p/u/g labels, invariant panel per step, predict case) + proof stepper | 5 Q; 1 practice (10,5,15,3,7,1) | L7 notes, slides, concept, HW4 |
 | 7 | `l7-compare` — BST ve RB karşılaştırması | Same sequence → different heights; proven vs measured | — | `treeCompare` (heights, avg/worst search comparisons, guaranteed bound) | 2 Q; 1 practice (root rank) | L7 notes, slides, concept |
 
+| 8 | `l8-hashing` — Hash tabloları ve evrensel hashing | Chaining, random hash function, universal family, balls and bins | Expected chain length ≤ 2; Proposition 1 | `hashTable`, `birthday` | 6 checks; 4 Q; 2 practice | L8 notes, slides, pre, notebook, concept |
+| 9 | `l9-graphs`, `l9-dfs` | Representations, BFS layers, DFS times, components, topological order | Proposition 1 (layers = distance classes) | `bfs`, `dfs`, `dfsApps` | 5 checks; 8 Q; 2 practice | L9 notes, slides, pre, notebook, concept |
+| 10 | `l10-scc` | SCCs, meta-graph DAG, two-pass algorithm (G_rev first, as in the notes) | Key Lemma 5 | `scc` | 3 checks; 4 Q; 1 practice | L10 notes, slides, pre, notebook, concept |
+| 11 | `l11-dijkstra` | Dijkstra, negative edges and cycles, priority queues, amortized time | Claims 1–2 | `dijkstra` | 4 checks; 4 Q; 1 practice | L11 notes, slides, pre, notebook, concept |
+| 12 | `l12-bellman-ford`, `l12-floyd` | Bellman–Ford as DP, the DP recipe, Floyd–Warshall, negative cycles | Claims 3–4 | `bellmanFord`, `floyd` | 4 checks; 8 Q; 2 practice | L12 notes, slides, pre, notebook, concept |
+| 13 | `l13-lcs`, `l13-knapsack` | LCS, unbounded and 0/1 knapsack, pseudo-polynomial time, MWIS in trees | — | `lcs`, `knapsack`, `mwis` | 7 checks; 8 Q; 2 practice | L13 notes, slides, concept |
+| 14 | `l14-greedy`, `l14-huffman` | Activity selection, weighted completion time, Huffman codes | Propositions 1–3 | `activity`, `huffman` | 5 checks; 8 Q; 2 practice | L14 notes, slides, pre, notebook, concept |
+| 15 | `l15-mst` | Cuts, light edges, Prim, Kruskal, union-find | Theorem 1 (cut property) | `mst` | 3 checks; 4 Q; 1 practice | L15 notes, slides, pre, notebook, concept |
+| 16 | `l16-maxflow` | Flows, cuts, residual graph, Ford–Fulkerson, Edmonds–Karp, bipartite matching | Max-flow min-cut theorem | `maxFlow` | 3 checks; 4 Q; 1 practice | L16 notes, slides, pre, concept |
+| 17 | `l17-stable-matching` | Blocking pairs, deferred acceptance, doctor-optimality, truthfulness | Theorems 7–9 | `stableMatching` | 3 checks; 4 Q; 1 practice | L17 notes, slides, concept |
+
+Lecture 7 also gained red-black **deletion** (`delete_rb` in the `rb` visualizer, CLRS 13.4 cases 1–4), which the lecture itself only sketches.
+
 Totals: 7 lectures, 16 lessons, 60 quiz questions, 75 ungraded in-text “try it yourself” questions, 18 practice problems.
 
 Every lesson also has guided tasks before each visualizer and an “In practice / in real life” section (libraries such as Timsort, introsort, `std::nth_element`, B-trees, RadixSort on GPUs; applications such as percentiles, external sorting, schedulers). Additional figures beyond the table: `inversions` (L2 InsertionSort: each shift removes one inversion arc) and `rotation` (L7 red-black trees: animated rotation with subtrees α, β, γ).
 
-Out of scope by design: Lecture 8 (Hashing) and later (graphs, Dijkstra, DP, greedy, MST, max-flow, stable matching). The test `no out-of-scope topics leak into lesson titles` guards this.
+Lecture 18 (“What’s next?”) is a wrap-up without its own lesson. Numbers quoted in the Lecture 8–17 content are re-checked in `src/content/later.test.ts`.

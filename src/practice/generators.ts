@@ -13,6 +13,7 @@ import { bstFromSequence, searchCost } from '../engines/bst'
 import { height } from '../engines/tree'
 import { factorial } from '../engines/decisionTree'
 import { tx } from '../i18n/lang'
+import { LATER_GENERATORS } from './generatorsLater'
 
 export interface Generator {
   id: string
@@ -699,6 +700,7 @@ export const GENERATORS: Generator[] = [
       }
     },
   },
+  ...LATER_GENERATORS,
 ]
 
 export const generatorsFor = (lessonId: string | null): Generator[] => (lessonId ? GENERATORS.filter((g) => g.lessonId === lessonId) : GENERATORS)

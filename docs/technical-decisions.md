@@ -62,6 +62,13 @@ Semantic landmarks, skip link, visible focus rings, labelled controls, `aria-liv
 
 ## Testing strategy
 - `src/engines/*.test.ts`: correctness on edge cases (empty, single, duplicates, negatives, extreme values) and hundreds of seeded random inputs; trace-consistency checks (final snapshot sorted, loop/partition invariants at the right lines, counters equal to the untraced versions, prediction answers equal the branch actually taken); RB invariants after **every** insertion for sorted, reversed, zig-zag and random orders, plus height ≤ 2 log₂(n+1); BST delete across all cases; decision trees have n! leaves and height ≥ ⌈log₂ n!⌉; Master/substitution results for every example used in the lessons.
-- `src/content/content.test.ts`: curriculum integrity (lectures 1–7 only, unique ids, valid answers, registered viz keys, official links) and every computed number quoted in practice solutions.
+- `src/content/content.test.ts`: curriculum integrity (lectures in order, unique ids, valid answers, registered viz keys, official links) and every computed number quoted in practice solutions.
 - `src/ui.test.tsx`: player reducer, persistence round-trip, TraceViewer next/prev/reset/end/keyboard/auto-play/prediction mode, quiz feedback for all question kinds, input validation, lesson page and dashboard state.
 - `e2e/smoke.spec.ts` (Playwright, desktop 1366×900 and Pixel 7): navigation, controls, invalid input, quiz + persistence across reload, reset confirmation, RB insert, every lesson renders without console errors or horizontal overflow (in both languages), and the theme toggle survives a reload.
+
+## Graph lectures (8–17)
+- `src/engines/graph.ts` holds a tiny graph model with fixed drawing positions (0–100) and the example graphs; `src/components/GraphView.tsx` draws any of them as SVG (directed arrows, weight labels, bent antiparallel residual edges) and describes every node and edge state in its aria label.
+- Each algorithm engine (`hashing`, `graphSearch`, `scc`, `shortestPaths`, `dp`, `greedy`, `mst`, `maxFlow`, `stableMatching`) produces immutable trace snapshots for the shared `TraceViewer`, plus plain helpers for tests and question generators. Neighbors are scanned in alphabetical order so traces are deterministic.
+- Engines are cross-checked against independent references in `src/engines/later.test.ts`: BFS against unit-weight Bellman–Ford, Dijkstra = Bellman–Ford = Floyd–Warshall, SCCs against mutual reachability, LCS / independent set / activity selection / MST / min cut against brute force, and Gale–Shapley stability and doctor-optimality against all stable matchings.
+- Red-black deletion lives in `src/engines/redBlackDelete.ts` and is tested on 150 random insert/delete sequences (every tree after a delete is a valid red-black tree; all four fix-up cases are reached).
+- `src/practice/generatorsLater.ts` adds 15 question generators for Lectures 8–17 to the practice lab and to exam mode.

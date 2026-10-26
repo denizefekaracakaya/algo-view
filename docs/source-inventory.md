@@ -9,7 +9,7 @@ Legend — **Read**: text read in full. **Skimmed**: headings/key passages read.
 | Source | URL | Use |
 |---|---|---|
 | Lectures page | https://stanford-cs161.github.io/winter2026/lectures/ | Lecture titles, dates, list of resources per lecture (parsed in full) |
-| Schedule | https://stanford-cs161.github.io/winter2026/schedule/ | Confirmed order: L1 Jan 5 … L7 Jan 28, L8 Hashing Feb 2 (out of scope); midterm covers through L7 |
+| Schedule | https://stanford-cs161.github.io/winter2026/schedule/ | Confirmed order: L1 Jan 5 … L17 Mar 9, L18 Mar 11 (wrap-up) |
 | Homework | https://stanford-cs161.github.io/winter2026/homework/ | HW1–4 release/due dates relative to L1–7 |
 | Sections | https://stanford-cs161.github.io/winter2026/sections/ | Section handout list |
 
@@ -48,6 +48,10 @@ Legend — **Read**: text read in full. **Skimmed**: headings/key passages read.
 | 7 | | Pre-lecture (+ solutions on the same PDF) | `/winter2026/assets/files/lecture7-pre.pdf` | Read | Tree 5;3,9;1,4,6; insert 7/8; delete 4 and 3 → preset “Ön alıştırma ağacı”, quiz q3 |
 | 7 | | Pre-lecture solutions (separate file) | `/winter2026/assets/files/lecture7-pre-sol.pdf` | **Unavailable** (HTTP error on download) | Solutions are included at the end of `lecture7-pre.pdf` |
 | 7 | | Concept check “Binary Search Trees” | `/winter2025-bank/bst.pdf` | Read | In-order invariance, relationships A/B/C, RB validity, path length 100 question, root rank → quiz items (reworded/original numbers) |
+
+## Lectures 8–17 (added 26 Oct 2026)
+
+Notes PDFs for Lectures 8–17 and the matching concept-check PDFs (`/winter2025-bank/{hashing,bfsdfs,scc,dijkstra,dp1,dp2,greedy,mst,maxflow,stablematching}.pdf`) were downloaded to a temporary folder, converted with `pdftotext` and **read**; slides, pre-lecture exercises and notebooks are **linked only**. Algorithms follow the notes (SCC runs DFS on G_rev first; Bellman–Ford is presented as rows d(k); the notes’ DFS timestamp rule). Examples taken from the notes: the table for h(x) = 13x + 2 mod 5, the DFS example a–f, knapsack items A–D with W = 10, “abracadabra/bxqrabry”, the Huffman frequencies a–f, the MST graph a–i (weight 37) and the preference structure of the stable-matching example (with our own names). All other graphs, questions and practice problems are original. Lecture 18 (“What’s next?”) has slides only and no lesson.
 
 ## Homework and sections (learning outcomes only)
 

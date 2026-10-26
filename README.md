@@ -4,7 +4,7 @@
 
 Algo View, algoritma analizi dersine çalışanlar için hazırlanmış Türkçe ve İngilizce, etkileşimli bir çalışma uygulaması. Kendi dizini girersin, algoritmayı adım adım ileri geri oynatırsın, her adımda *neden* öyle olduğunu okursun. Sonra elle iz sürerek, soru çözerek, kod yazarak ve deneme sınavlarıyla öğrendiğini pekiştirirsin.
 
-İçerik, Stanford CS161 *Design and Analysis of Algorithms* (Winter 2026) dersinin herkese açık materyallerinin ilk yedi dersini takip ediyor: asimptotik analizden kırmızı-siyah ağaçlara kadar.
+İçerik, Stanford CS161 *Design and Analysis of Algorithms* (Winter 2026) dersinin herkese açık materyallerinin 17 dersini takip ediyor: asimptotik analizden hash tablolarına, grafik algoritmalarından dinamik programlamaya, maksimum akıştan kararlı eşleşmeye kadar.
 
 ---
 
@@ -13,9 +13,9 @@ Algo View, algoritma analizi dersine çalışanlar için hazırlanmış Türkçe
 | | |
 |---|---|
 | **Etkileşimli dersler** | Her konu sezgiyle başlar, sonra tanım, sözde kod, doğruluk kanıtı ve karmaşıklık analizi gelir. Kanıtlar adım adım açılır, aradaki “Kendini dene” soruları anlayıp anlamadığını yoklar. |
-| **Görselleştiriciler** | MergeSort, QuickSort, Select, RadixSort, BST ve kırmızı-siyah ağaç gibi algoritmaları kendi girdinle adım adım oynat. Bir sonraki adımı tahmin etmeni isteyen bir *tahmin modu* da var. |
+| **Görselleştiriciler** | MergeSort, QuickSort, Select, kırmızı-siyah ağaç (ekleme ve silme), hash tablosu, BFS/DFS, Dijkstra, Bellman–Ford, Floyd–Warshall, LCS ve sırt çantası tabloları, Huffman, Prim/Kruskal, Ford–Fulkerson ve Gale–Shapley gibi algoritmaları kendi girdinle adım adım oynat. Bir sonraki adımı tahmin etmeni isteyen bir *tahmin modu* da var. |
 | **Elle iz sürme** | Algoritmanın her kararını sen verirsin: hangi eleman nereye gider, pivot nereye oturur, düğüm hangi tarafa eklenir. Takılırsan ipucu var. |
-| **Soru üreteci** | 21 soru türü, her seferinde yeni sayılarla. Bitmeyen bir alıştırma kaynağı. |
+| **Soru üreteci** | 36 soru türü, her seferinde yeni sayılarla. Bitmeyen bir alıştırma kaynağı. |
 | **Kod alıştırmaları** | 13 algoritmayı JavaScript ile kendin yaz, testler tarayıcıda anında çalışsın. Sonsuz döngüye girsen bile sayfa donmaz. |
 | **Deneme sınavı** | Dersleri, soru sayısını ve süreyi seç; sonunda ders ders puanını ve her sorunun çözümünü gör. |
 | **Notlar** | Her dersin sonuna kendi özetini yaz, hepsini tek bir Markdown dosyası olarak indir. |
@@ -58,7 +58,17 @@ Ders sonundaki **Notlarım** kutusu, kendi cümlelerinle kısa bir özet yazmak 
 | 4 | Medyan ve seçim problemi, medyanların medyanı ile Select |
 | 5 | Rastgele algoritmalar, QuickSort ve beklenen çalışma süresi |
 | 6 | Karşılaştırmalı sıralamanın alt sınırı, CountingSort, RadixSort |
-| 7 | İkili arama ağaçları, kırmızı-siyah ağaçlar |
+| 7 | İkili arama ağaçları, kırmızı-siyah ağaçlar (ekleme ve silme) |
+| 8 | Hash tabloları, evrensel hashing, doğum günü paradoksu |
+| 9 | Grafik gösterimi, BFS, DFS, bağlı bileşenler, topolojik sıra |
+| 10 | Güçlü bağlı bileşenler |
+| 11 | Dijkstra, negatif kenarlar, amortize analiz |
+| 12 | Dinamik programlama: Bellman–Ford, Floyd–Warshall |
+| 13 | En uzun ortak altdizi, sırt çantası, ağaçta bağımsız küme |
+| 14 | Açgözlü algoritmalar: etkinlik seçimi, zamanlama, Huffman kodları |
+| 15 | Minimum yayılan ağaçlar: Prim ve Kruskal |
+| 16 | Maksimum akış, minimum kesme, Ford–Fulkerson, eşleştirme |
+| 17 | Kararlı eşleşme ve Gale–Shapley |
 
 Her dersin sonunda kısa bir quiz ve dersin resmî slayt ve notlarına bağlantılar bulunur.
 
@@ -76,7 +86,7 @@ Gizli pencerede tarayıcılar kayıt tutmaz; düzenli çalışmak için normal b
 
 ## In English
 
-Algo View is an interactive study companion for an algorithms course, available in Turkish and English. It follows the first seven lectures of the public Stanford CS161 (Winter 2026) materials: asymptotics, MergeSort, recurrences and the Master Theorem, selection, QuickSort, sorting lower bounds and RadixSort, BSTs and red-black trees.
+Algo View is an interactive study companion for an algorithms course, available in Turkish and English. It follows 17 lectures of the public Stanford CS161 (Winter 2026) materials: asymptotics and sorting, recurrences, selection, randomized algorithms, BSTs and red-black trees, hashing, graph search, strongly connected components, shortest paths, dynamic programming, greedy algorithms, minimum spanning trees, max flow and stable matching.
 
 You can step through algorithms on your own input, trace them by hand, solve generated questions, write and test code in the browser, and take timed practice exams. Install [Node.js](https://nodejs.org/) and Git, run the four commands from the quick start above, open http://localhost:5173 and switch to English with the **TR | EN** button. Your work is saved in the browser automatically, and **Settings → Save your work** lets you download a backup or move it to another computer.
 

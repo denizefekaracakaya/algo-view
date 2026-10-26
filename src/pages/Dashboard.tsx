@@ -41,7 +41,7 @@ export function Dashboard() {
     <div>
       <section className="hero">
         <div>
-          <p className="lecture-num">{tx('CS161 · Ders 1–7 · Türkçe', 'CS161 · Lectures 1–7 · English')}</p>
+          <p className="lecture-num">{tx('CS161 · Ders 1–17 · Türkçe', 'CS161 · Lectures 1–17 · English')}</p>
           <h1>{tx('Algoritmaları görünür kıl.', 'Make algorithms visible.')}</h1>
           <p className="lead">
             {tx(
@@ -181,8 +181,8 @@ export function Dashboard() {
       )}
       <p className="small muted" style={{ marginTop: 24 }}>
         {tx(
-          'Kapsam: Ders 1–7 (“Why are you here?”tan “Binary Search Trees and Red-Black Trees”e). Ders 8 (Hashing) ve sonrası bu sürümün kapsamı dışındadır.',
-          'Scope: Lectures 1–7 (from “Why are you here?” to “Binary Search Trees and Red-Black Trees”). Lecture 8 (Hashing) and later are outside the scope of this release.',
+          'Kapsam: Ders 1–17 (“Why are you here?”tan “Stable Matchings and Gale-Shapley”e). Ders 18 (“What’s next?”) bir kapanış dersi olduğu için ayrı bir derse dönüştürülmedi.',
+          'Scope: Lectures 1–17 (from “Why are you here?” to “Stable Matchings and Gale-Shapley”). Lecture 18 (“What’s next?”) is a wrap-up and has no lesson of its own.',
         )}
       </p>
     </div>

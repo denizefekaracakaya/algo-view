@@ -44,6 +44,39 @@ function Tree({ colors }: { colors?: string[] }) {
   )
 }
 
+
+/** Tiny graph: nodes as [x, y], edges as index pairs; `hl` nodes and `he` edges use the accent color. */
+function Mini({ pts, edges, hl = [], he = [], fills }: { pts: number[][]; edges: number[][]; hl?: number[]; he?: number[]; fills?: string[] }) {
+  return (
+    <>
+      {edges.map(([a, b], i) => (
+        <line key={i} x1={pts[a][0]} y1={pts[a][1]} x2={pts[b][0]} y2={pts[b][1]} stroke={he.includes(i) ? A : M} strokeWidth={he.includes(i) ? 2 : 1.1} />
+      ))}
+      {pts.map(([x, y], i) => (
+        <circle key={i} cx={x} cy={y} r={4.5} fill={fills ? fills[i] : hl.includes(i) ? A : S} stroke={A} strokeWidth={0.9} />
+      ))}
+    </>
+  )
+}
+
+const GP = [
+  [10, 23],
+  [30, 8],
+  [30, 38],
+  [56, 8],
+  [56, 38],
+  [78, 23],
+]
+const GE = [
+  [0, 1],
+  [0, 2],
+  [1, 3],
+  [2, 3],
+  [2, 4],
+  [3, 5],
+  [4, 5],
+]
+
 const DRAW: Record<string, () => ReactElement> = {
   'l1-why': () => (
     <>
@@ -138,6 +171,101 @@ const DRAW: Record<string, () => ReactElement> = {
       {[[64, 10], [54, 24], [74, 24], [48, 38], [60, 38]].map(([x, y], i) => (
         <circle key={i} cx={x} cy={y} r={3.5} fill={i === 0 ? B : S} stroke={A} />
       ))}
+    </>
+  ),
+  'l8-hashing': () => (
+    <>
+      {[0, 1, 2, 3].map((r) => (
+        <g key={r}>
+          <rect x={6} y={4 + r * 10} width={12} height={8} rx={1.5} fill={S} stroke={A} strokeWidth={0.8} />
+          {Array.from({ length: [2, 0, 3, 1][r] }, (_, k) => (
+            <rect key={k} x={24 + k * 18} y={4 + r * 10} width={14} height={8} rx={2} fill={r === 2 && k === 2 ? A : 'transparent'} stroke={M} strokeWidth={0.8} />
+          ))}
+        </g>
+      ))}
+    </>
+  ),
+  'l9-graphs': () => <Mini pts={GP} edges={GE} fills={[A, S, S, 'transparent', 'transparent', 'transparent']} />,
+  'l9-dfs': () => <Mini pts={GP} edges={GE} hl={[0, 1, 3, 5]} he={[0, 2, 5]} />,
+  'l10-scc': () => <Mini pts={GP} edges={GE} fills={[A, A, A, R, R, R]} />,
+  'l11-dijkstra': () => <Mini pts={GP} edges={GE} hl={[0, 2, 3, 5]} he={[1, 3, 5]} />,
+  'l12-bellman-ford': () => (
+    <>
+      {[0, 1, 2, 3].map((r) => (
+        <g key={r}>
+          {[0, 1, 2, 3, 4].map((c) => (
+            <rect key={c} x={8 + c * 15} y={4 + r * 10} width={13} height={8} rx={1.5} fill={c <= r ? S : 'transparent'} stroke={M} strokeWidth={0.7} />
+          ))}
+        </g>
+      ))}
+    </>
+  ),
+  'l12-floyd': () => (
+    <>
+      {[0, 1, 2, 3].map((r) =>
+        [0, 1, 2, 3].map((c) => <rect key={r * 4 + c} x={22 + c * 11} y={4 + r * 10} width={9} height={8} rx={1.5} fill={r === 1 || c === 1 ? S : 'transparent'} stroke={r === 2 && c === 3 ? A : M} strokeWidth={r === 2 && c === 3 ? 1.6 : 0.7} />),
+      )}
+    </>
+  ),
+  'l13-lcs': () => (
+    <>
+      {[0, 1, 2, 3].map((r) =>
+        [0, 1, 2, 3, 4].map((c) => <rect key={r * 5 + c} x={14 + c * 12} y={4 + r * 10} width={10} height={8} rx={1.5} fill={r === c || r === c - 1 ? S : 'transparent'} stroke={M} strokeWidth={0.7} />),
+      )}
+    </>
+  ),
+  'l13-knapsack': () => (
+    <>
+      <path d="M24 16 Q24 6 44 6 Q64 6 64 16" fill="none" stroke={A} strokeWidth={1.6} />
+      <rect x={18} y={16} width={52} height={26} rx={6} fill={S} stroke={A} strokeWidth={1} />
+      <rect x={26} y={24} width={12} height={12} rx={2} fill={A} />
+      <rect x={42} y={28} width={18} height={8} rx={2} fill="transparent" stroke={A} />
+    </>
+  ),
+  'l14-greedy': () => (
+    <>
+      {[
+        [6, 30, 1],
+        [22, 44, 0],
+        [34, 52, 1],
+        [48, 82, 0],
+        [58, 80, 1],
+      ].map(([x1, x2, on], i) => (
+        <rect key={i} x={x1} y={6 + i * 8} width={x2 - x1} height={6} rx={2} fill={on ? A : 'transparent'} stroke={on ? A : M} strokeWidth={0.8} />
+      ))}
+    </>
+  ),
+  'l14-huffman': () => (
+    <Mini
+      pts={[
+        [44, 6],
+        [24, 22],
+        [64, 22],
+        [12, 38],
+        [36, 38],
+      ]}
+      edges={[
+        [0, 1],
+        [0, 2],
+        [1, 3],
+        [1, 4],
+      ]}
+      fills={['transparent', 'transparent', A, S, S]}
+    />
+  ),
+  'l15-mst': () => <Mini pts={GP} edges={GE} he={[0, 1, 3, 5, 6]} />,
+  'l16-maxflow': () => <Mini pts={GP} edges={GE} hl={[0, 5]} he={[1, 3, 5]} />,
+  'l17-stable-matching': () => (
+    <>
+      {[0, 1, 2].map((i) => (
+        <g key={i}>
+          <circle cx={20} cy={8 + i * 15} r={4.5} fill={S} stroke={A} />
+          <circle cx={68} cy={8 + i * 15} r={4.5} fill={S} stroke={A} />
+        </g>
+      ))}
+      <line x1={25} y1={8} x2={63} y2={23} stroke={A} strokeWidth={2} />
+      <line x1={25} y1={23} x2={63} y2={38} stroke={A} strokeWidth={2} />
+      <line x1={25} y1={38} x2={63} y2={8} stroke={A} strokeWidth={2} />
     </>
   ),
 }

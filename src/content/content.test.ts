@@ -18,8 +18,8 @@ import { searchCost } from '../engines/bst'
 describe.each(['tr', 'en'] as const)('curriculum integrity (%s)', (lang) => {
   const LECTURES = LECTURES_BY_LANG[lang]
   const ALL_LESSONS = LECTURES.flatMap((l) => l.lessons)
-  it('covers exactly lectures 1–7 in order', () => {
-    expect(LECTURES.map((l) => l.n)).toEqual([1, 2, 3, 4, 5, 6, 7])
+  it('covers the lectures in course order without gaps', () => {
+    expect(LECTURES.map((l) => l.n)).toEqual(LECTURES.map((_, i) => i + 1))
   })
   it('lesson ids are unique and every lesson has the required parts', () => {
     const ids = ALL_LESSONS.map((l) => l.id)
@@ -57,8 +57,8 @@ describe.each(['tr', 'en'] as const)('curriculum integrity (%s)', (lang) => {
     for (const l of ALL_LESSONS)
       for (const s of l.sources) expect(s.url).toMatch(/^https?:\/\/(stanford-cs161\.github\.io|colab\.research\.google\.com\/github\/stanford-cs161|www\.cs\.cmu\.edu\/~avrim)/)
   })
-  it('no out-of-scope topics leak into lesson titles', () => {
-    for (const l of ALL_LESSONS) expect(l.title + l.titleEn).not.toMatch(/hash|dijkstra|dynamic programming|greedy|BFS|DFS/i)
+  it('every lesson belongs to the lecture it is listed under', () => {
+    for (const lec of LECTURES) for (const l of lec.lessons) expect(l.lecture).toBe(lec.n)
   })
 })
 

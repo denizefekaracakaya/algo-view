@@ -213,6 +213,7 @@ So a plain BST has **no $O(\\log n)$ guarantee**. Logarithmic height requires re
         'See that a rotation is an $O(1)$ local operation that preserves the BST property.',
         'Recognize Cases 1, 2, 3 during insertion and explain which property each case repairs and how.',
         'Prove the bound $h \\le 2\\log_2(n+1)$ with the black-height argument and connect it to $O(\\log n)$ operation time.',
+        'Recognize the “extra black” idea of deletion and its four fix-up cases.',
       ],
       prerequisites: ['Binary search trees', 'Induction'],
       sections: [
@@ -284,9 +285,10 @@ Intuition (Remark 15): red nodes mark the places where a path “starts to get l
             'In the “Case 3 triangle” example, follow the two rotations — first at $p$, then at $g$ — step by step.',
             'In **prediction mode**, predict which case applies before each fix-up step.',
             'In the “Case 2 chain” example, watch the violation move upward.',
+            'Once the tree is built, delete a key with **delete_rb**: if the removed position was black, which case(s) applied? What happens when you delete a red leaf?',
           ],
           viz: 'rb',
-          body: `Build the tree from an order or insert keys one at a time. At each step x, p (parent), u (uncle) and g (grandparent) are labelled, and the checker on the right shows which properties the current tree satisfies — you can see the temporary violations during the fix-up. In prediction mode, guess which case applies before each one. Try the input “Sorted 1…10”.`,
+          body: `Build the tree from an order or insert and delete keys one at a time. At each step x, p (parent), u (uncle) and g (grandparent) are labelled, and the checker on the right shows which properties the current tree satisfies — you can see the temporary violations during the fix-up. In prediction mode, guess which case applies before each one. Try the input “Sorted 1…10”.`,
         },
         {
           kind: 'steps',
@@ -299,6 +301,34 @@ Intuition (Remark 15): red nodes mark the places where a path “starts to get l
 - If the fix-up reaches the root and the root is red, the root is colored black (property 2).
 
 The notes show the case where $x$ is a left child and $u$ a right child in detail; the other cases are symmetric (CLRS 13.3).`,
+        },
+        {
+          kind: 'steps',
+          title: 'Deletion: the extra black and four cases',
+          label: 'formal',
+          body: `Lecture 7 does not cover deletion in detail; the **delete_rb** in the visualizer follows the common version in CLRS 13.4. The idea mirrors insertion: an ordinary BST delete first, then a **local repair**.
+
+1. **BST delete:** if $z$ has at most one child it is removed directly; if it has two, its successor $y$ takes $z$’s place (and color). The position that actually leaves the tree is $y$’s old one.
+2. **If that position was red,** no path changes its black count: done.
+3. **If it was black,** paths through it lose one black (property 5 breaks). The $x$ that took its place (possibly NIL) is given an **extra black**. If $x$ is red it is colored black and we are done. Otherwise look at $x$’s sibling $w$:
+
+- **Case 1 — $w$ red:** color $w$ black and the parent $p$ red, rotate at $p$ toward $x$. The new sibling of $x$ is black; continue with 2, 3 or 4.
+- **Case 2 — $w$ black, both children black:** color $w$ red; now both sides of $p$ are one black short, so the extra black moves up to $p$. If $p$ is red, color it black and stop.
+- **Case 3 — $w$ black, near child red, far child black:** color the near child black and $w$ red, rotate at $w$ away from $x$. This turns into case 4.
+- **Case 4 — $w$ black, far child red:** $w$ takes $p$’s color; $p$ and the far child become black; rotate at $p$ toward $x$. The extra black disappears: done.
+
+Only case 2 moves upward; cases 1, 3 and 4 finish with at most 3 rotations. Total work $O(h) = O(\\log n)$.`,
+          check: [
+            {
+              id: 'c7',
+              kind: 'mcq',
+              prompt: 'What has to be done when a **red leaf** is deleted from a red-black tree?',
+              options: ['Start with case 1.', 'Nothing: no path changes its black count and no red-red pair appears.', 'Color the root red.', 'Rotate at the parent.'],
+              answer: 1,
+              hint: 'Which properties can the deleted node affect? Red nodes do not count toward black counts.',
+              explanation: 'A red node contributes to no path’s black count, and removing it cannot put two reds next to each other; all five properties still hold.',
+            },
+          ],
         },
         {
           kind: 'correctness',

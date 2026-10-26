@@ -729,7 +729,16 @@ textarea.input {
   margin-top: 24px;
   flex-wrap: wrap;
 }
+.lesson-nav .btn {
+  white-space: normal;
+  max-width: 100%;
+  min-width: 0;
+  text-align: left;
+}
 .katex-display {
+  /* relative: keeps KaTeX's absolutely positioned MathML copy inside the scroll box */
+  position: relative;
+  max-width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   padding: 4px 0;
@@ -2380,4 +2389,250 @@ td.hl-cell {
 .exam-qnum {
   display: block;
   margin-bottom: 4px;
+}
+
+/* ---- Lectures 8–17: graphs, tables, timelines ---- */
+.graph-svg {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  overflow: visible;
+}
+.graph-svg .g-id {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 13px;
+  fill: var(--text);
+}
+.graph-svg .g-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  fill: var(--text-2);
+}
+.graph-svg .g-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  fill: var(--accent-ink);
+}
+.graph-svg .g-weight {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+}
+.graph-svg .g-node {
+  transition: transform var(--move) var(--ease-move);
+}
+.graph-svg circle,
+.graph-svg path {
+  transition: fill var(--dur), stroke var(--dur), stroke-width var(--dur);
+}
+.grid-wrap {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.dp-grid {
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  margin: 0 auto;
+}
+.dp-grid th,
+.dp-grid td {
+  min-width: 30px;
+  height: 28px;
+  padding: 2px 6px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+.dp-grid th {
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-weight: 600;
+}
+.dp-grid td {
+  transition: background var(--dur);
+}
+.dp-grid td.c-cur {
+  background: var(--st-compare-bg);
+  outline: 2px solid var(--st-compare);
+  outline-offset: -2px;
+  font-weight: 700;
+}
+.dp-grid td.c-from {
+  background: var(--st-less-bg);
+}
+.dp-grid td.c-path {
+  background: var(--st-sorted-bg);
+  font-weight: 700;
+}
+.dp-grid td.c-hl {
+  background: var(--st-compare-bg);
+}
+.hash-buckets {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 6px;
+}
+.hash-buckets li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  min-height: 36px;
+  flex-wrap: wrap;
+}
+.hash-buckets li.active {
+  border-color: var(--st-compare);
+  background: var(--st-compare-bg);
+}
+.hash-index {
+  width: 34px;
+  font-weight: 700;
+  color: var(--text-2);
+}
+.hash-chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.hash-item-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.hash-item {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface);
+  font-weight: 600;
+  transition: background var(--dur), border-color var(--dur);
+}
+.hash-item.probe {
+  border-color: var(--st-compare);
+  background: var(--surface);
+  box-shadow: 0 0 0 2px var(--st-compare);
+}
+.hash-item.found {
+  border-color: var(--st-sorted);
+  background: var(--st-sorted-bg);
+}
+.timeline {
+  display: grid;
+  gap: 4px;
+}
+.timeline-row {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  align-items: center;
+  gap: 6px;
+}
+.timeline-track {
+  position: relative;
+  height: 24px;
+  background: var(--surface-2);
+  border-radius: 6px;
+}
+.timeline-bar {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  border-radius: 5px;
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface);
+  font-family: var(--mono);
+  font-size: 11px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: background var(--dur), border-color var(--dur);
+}
+.timeline-bar.chosen {
+  background: var(--st-sorted-bg);
+  border-color: var(--st-sorted);
+  font-weight: 700;
+}
+.timeline-bar.rejected {
+  background: var(--st-elim-bg);
+  border-color: var(--st-elim);
+  color: var(--muted);
+}
+.timeline-bar.current {
+  background: var(--st-compare-bg);
+  border-color: var(--st-compare);
+  box-shadow: 0 0 0 2px var(--st-compare);
+}
+.timeline-line {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  background: var(--st-compare);
+}
+.match-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+.pref-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+  display: grid;
+  gap: 6px;
+}
+.pref-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.pref-list li.current {
+  border-color: var(--st-compare);
+}
+.pref-list strong {
+  min-width: 46px;
+}
+.pref-row {
+  display: inline-flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.pref {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  padding: 1px 7px;
+  border-radius: 5px;
+  border: 1.5px solid var(--border);
+  transition: background var(--dur), border-color var(--dur);
+}
+.pref.tried {
+  color: var(--muted);
+}
+.pref.matched {
+  background: var(--st-sorted-bg);
+  border-color: var(--st-sorted);
+  font-weight: 700;
+}
+.pref.proposing {
+  background: var(--st-compare-bg);
+  border-color: var(--st-compare);
+}
+.pref.rejected {
+  background: var(--st-bad-bg);
+  border-color: var(--st-bad);
+  text-decoration: line-through;
 }
