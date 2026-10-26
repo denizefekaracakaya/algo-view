@@ -491,6 +491,12 @@ Intuitively: the lengths of all root-to-NIL paths are within a factor of 2 of ea
 
 Final tree: 10 (B) → left 5 (R) [left 3 (B) → left 1 (R); right 7 (B)], right 15 (B). Every root→NIL path has 3 black nodes (including the NIL).`,
         },
+        {
+          id: 'p2',
+          prompt: `Our own example: in a red-black tree with black height $b$ (every root-to-NIL path contains $b$ black nodes, not counting NIL), what is the smallest and the largest possible number of internal nodes? Compute both for $b = 3$.`,
+          hints: ['Smallest: what does the tree look like when there are no red nodes at all?', 'Largest: if red and black nodes alternate on every level, the height is at most $2b$.'],
+          solution: `**Smallest:** every root-to-NIL path has exactly $b$ black nodes; with no red nodes all paths have length $b$ and the tree is a perfect binary tree: $2^b - 1$ nodes. Adding red nodes only increases the count. **Largest:** red nodes cannot be consecutive, so every path has at most $2b$ nodes; at most $2^{2b} - 1$ nodes (a perfect tree whose levels alternate black and red). For $b = 3$: at least 7, at most 63 nodes. Turned around: $n \\ge 2^b - 1$, so $b \\le \\log_2(n + 1)$ and the height is $\\le 2b \\le 2\\log_2(n + 1)$: Claim 16.`,
+        },
       ],
       sources: [SRC.l7.notes, SRC.l7.slides, SRC.l7.concept, SRC.hw.hw4],
     },
@@ -584,6 +590,12 @@ But real data is often not random: timestamps, increasing ID numbers and alphabe
           prompt: `Our own example: let the root of a red-black tree be the $i$-th key in sorted order. What can we say about $i$: is $i = \\Theta(n)$? In the comparison panel, observe where the root ends up with sorted insertions.`,
           hints: ['The left and right subtrees of the root have equal black heights.', 'Each subtree has at least $2^{b} - 1$ nodes; how many can it have at most?'],
           solution: `The left and right subtrees have the same black height ($b$). Each contains at least $2^{b}-1$ and at most (height $\\le 2b$) about $4^{b}$ nodes. So the smaller side has at least $\\approx 2^b \\approx \\sqrt{\\text{larger side}}$ nodes: the root’s rank must be $i = \\Omega(\\sqrt n)$, but it need not be $\\Theta(n)$. (Inspired by a question in the Lecture 7 concept check.)`,
+        },
+        {
+          id: 'p2',
+          prompt: `Our own example: insert the keys 1, 2, …, 15 and 1, 2, …, 31 in order into (a) a plain BST, (b) a red-black tree. What is the height (edges from the root to the deepest node) in each case? Compare with a perfectly balanced tree. (Check in the comparison panel.)`,
+          hints: ['In a plain BST, sorted insertion produces a chain.', 'In a red-black tree the height is $\\le 2\\log_2(n + 1)$.'],
+          solution: `(a) BST: a chain of height $n - 1$: 14 and 30. (b) Red-black tree: 5 and 7. A perfectly balanced tree: $\\log_2(n + 1) - 1$, i.e. 3 and 4. The red-black tree is not perfect, but the bound $2\\log_2(n + 1)$ (8 and 10) holds comfortably. Sorted insertion is not a worst case for a red-black tree: red nodes pile up along the right spine and rotations rebalance them regularly.`,
         },
       ],
       sources: [SRC.l7.notes, SRC.l7.slides, SRC.l7.concept],

@@ -255,6 +255,12 @@ Rastgele bir dizide her çift $\\tfrac12$ olasılıkla terstir, yani beklenen $I
           hints: ['Doğruluk kanıtında $A[j^*] \\le$ `current` koşulunu nasıl değiştirirsiniz?', 'İkinci 3 (c) içeri alınırken önceki 3’ün (a) önüne geçer mi?'],
           solution: `Evet, hâlâ sıralar (kanıtta $j^*$’yi “$A[j^*] < $ current olan en büyük indeks” olarak tanımlamak yeterli). Ancak eşit anahtarlar artık birbirinin önüne geçer: çıktı $[(1,b), (3,c), (3,a)]$ olur. Orijinal \`>\` sürümü $[(1,b), (3,a), (3,c)]$ verir ve **kararlıdır** (stable). Kararlılık Ders 6’da RadixSort için kritik olacak.`,
         },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: “İkili InsertionSort”, yeni elemanın yerini sıralı önekte **ikili arama** ile bulur. Ters sıralı 8 elemanlı dizide en fazla kaç karşılaştırma ve kaç kaydırma yapar? Çalışma süresi değişir mi?`,
+          hints: ['$i$ elemanlı sıralı önekte ikili arama en fazla $\\lceil \\log_2(i + 1) \\rceil$ karşılaştırma yapar.', 'Kaydırma sayısı yine ters çift sayısıdır.'],
+          solution: `Karşılaştırmalar: $i = 1, \\dots, 7$ için en fazla $1 + 2 + 2 + 3 + 3 + 3 + 3 = 17$ (normal InsertionSort’ta 28). Ama kaydırmalar değişmez: her ters çift için bir kaydırma, $\\binom{8}{2} = 28$. Genel olarak karşılaştırmalar $O(n \\log n)$’e iner, kaydırmalar $\\Theta(n^2)$ kalır: toplam süre yine $\\Theta(n^2)$. Karşılaştırmanın pahalı olduğu durumlarda (örneğin uzun metinler) yine de işe yarar; Timsort küçük parçalarda tam bunu kullanır.`,
+        },
       ],
       sources: [SRC.l2.pre, SRC.l2.notes, SRC.l2.slides, SRC.l2.proof, SRC.l2.notebook, SRC.l2.conceptSort],
     },

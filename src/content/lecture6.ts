@@ -194,7 +194,7 @@ Sonuç: karşılaştırma modelinde MergeSort **asimptotik olarak optimaldir**.`
       title: 'BucketSort: CountingSort ve RadixSort',
       titleEn: 'BucketSort: CountingSort and RadixSort',
       summary: 'Değerleri kova indeksi olarak kullan: $O(n + r)$ ve $O(d(n + r))$.',
-      minutes: 45,
+      minutes: 50,
       objectives: [
         'CountingSort’u (anahtar başına bir FIFO kova) çalıştırmak ve $O(n + r)$ süresini açıklamak.',
         'Kararlılığı (stability) tanımlamak ve neden önemli olduğunu göstermek.',
@@ -317,6 +317,28 @@ Ders başlığındaki “BucketSort” bu kova fikridir; notlar ve slaytlar onu 
           ],
         },
         {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: bağlı listesiz CountingSort',
+          label: 'formal',
+          body: `Notlardaki sürüm her anahtar için bir kova (bağlı liste) tutar. Pratikte aynı işi iki dizi yapar: sayaçlar ve önek toplamları. Kendi örneğimiz: $A = [3, 1, 4, 1, 5, 2, 3]$, anahtarlar $\\{0, \\dots, 5\\}$.`,
+          proof: [
+            { title: 'Say', body: '$C[k]$ = $k$ anahtarlı eleman sayısı: $C = [0, 2, 1, 2, 1, 1]$ (0’dan 5’e).' },
+            { title: 'Önek toplamı', body: '$C[k]$’yı “$k$’den küçük anahtar sayısı”na çevir: $[0, 0, 2, 3, 5, 6]$. Bu, $k$ anahtarlı ilk elemanın çıktıdaki indeksidir (0 tabanlı).' },
+            { title: 'Yerleştir', body: '$A$’yı **soldan sağa** dolaş; $x$’i $C[x]$ indeksine yaz ve $C[x]$’i bir artır. 3 → 3, 1 → 0, 4 → 5, 1 → 1, 5 → 6, 2 → 2, 3 → 4. Çıktı $[1, 1, 2, 3, 3, 4, 5]$.' },
+            { title: 'Kararlılık', body: 'Eşit anahtarlar girdideki sıralarıyla yerleşir (ilk 3 indeks 3’e, ikinci 3 indeks 4’e): sıralama kararlıdır, RadixSort’un istediği tam da bu. Süre $O(n + r)$, ek bellek $O(n + r)$.' },
+          ],
+          check: [
+            {
+              id: 'c6',
+              kind: 'numeric',
+              prompt: 'Bu örnekte 4 anahtarı çıktıda hangi indekse (0 tabanlı) yazılır?',
+              answer: 5,
+              hint: '4’ten küçük kaç anahtar var?',
+              explanation: '4’ten küçük anahtarlar 1, 1, 2, 3, 3: beş tane, yani indeks 5.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- RadixSort’u en anlamlı basamaktan başlatıp her geçişte tüm diziyi yeniden kovalamak: yanlış sonuç verir.
@@ -369,6 +391,12 @@ Ders başlığındaki “BucketSort” bu kova fikridir; notlar ve slaytlar onu 
           prompt: `Kendi örneğimiz: $[170, 45, 75, 90, 802, 24, 2, 66]$ dizisine taban 10 LSD RadixSort uygulayın; her geçişten sonraki diziyi yazın.`,
           hints: ['Üç basamak var (802); 45 gibi sayıların yüzler basamağı 0’dır.'],
           solution: `Geçiş 1 (birler): $[170, 90, 802, 2, 24, 45, 75, 66]$. Geçiş 2 (onlar): $[802, 2, 24, 45, 66, 170, 75, 90]$. Geçiş 3 (yüzler): $[2, 24, 45, 66, 75, 90, 170, 802]$. Görselleştiricideki “Tekrarlı” örnekle karşılaştırın.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: $n = 10^6$ tam sayı, hepsi $[0, 10^{12})$ aralığında. Taban 10 ile RadixSort kaç geçiş yapar? Taban $r = n = 10^6$ ile kaç geçiş? Her birinin toplam işi nedir?`,
+          hints: ['Geçiş sayısı = $r$ tabanında basamak sayısı = $\\lceil \\log_r 10^{12} \\rceil$.', 'Her geçiş $O(n + r)$.'],
+          solution: `Taban 10: 12 basamak, 12 geçiş, her biri $O(10^6 + 10)$: yaklaşık $1{,}2 \\cdot 10^7$ adım. Taban $10^6$: $10^{12} = (10^6)^2$, yani 2 basamak, 2 geçiş, her biri $O(10^6 + 10^6)$: yaklaşık $4 \\cdot 10^6$ adım. Taban $r = n$ seçmek, değerler $n^c$’ye kadarsa $c$ geçiş ve $O(cn)$ süre verir. Karşılaştırmalı sıralama $n \\log_2 n \\approx 2 \\cdot 10^7$ karşılaştırma yapardı.`,
         },
       ],
       sources: [SRC.l6.pre, SRC.l6.notes, SRC.l6.slides, SRC.l6.notebook, SRC.l6.concept],
@@ -464,6 +492,12 @@ Ortak ders: hiçbir algoritma her durumda en iyisi değildir; model (karşılaş
           prompt: `Kendi örneğimiz: 10 milyon ürün kaydını, 0–999 arasındaki kategori koduna göre, **aynı kategorideki kayıtların mevcut sırası bozulmadan** sıralamanız gerekiyor. Hangi algoritmayı seçerdiniz? Neden?`,
           hints: ['“Mevcut sıra bozulmadan” hangi özelliği istiyor?', '$r = 1000 \\ll n$.'],
           solution: `CountingSort ($r = 1000$ kova): $O(n + r) = O(n)$ ve kararlı — aynı kategorideki kayıtlar girdi sırasını korur. MergeSort da kararlıdır ama $O(n\\log n)$; QuickSort kararlı değildir.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: bir sunucu günlüğü zaman damgasına göre **neredeyse** sıralı geliyor: ağ gecikmeleri yüzünden her kayıt, sıralı konumundan en fazla $k = 3$ yer uzakta. $n = 10^6$ kayıt için hangi algoritmayı seçerdiniz ve neden?`,
+          hints: ['InsertionSort’un süresi $O(n + I)$, $I$ ters çift sayısı.', 'Bir eleman kaç elemanla ters çift oluşturabilir?'],
+          solution: `Her eleman en fazla $k$ yer kaydığından yalnızca kendisine $2k$ uzaklıktaki elemanlarla ters çift oluşturabilir: $I \\le 2kn = 6 \\cdot 10^6$. InsertionSort $O(n + I) = O(kn)$, yani birkaç milyon adımda biter; MergeSort ya da HeapSort girdinin bu yapısından yararlanmaz ve $n \\log_2 n \\approx 2 \\cdot 10^7$ karşılaştırma yapar. Timsort da bu durumu fark edip doğrusal zamana yakın çalışır. Zaman damgaları büyük tam sayılar olduğu için RadixSort mümkün ama gereksiz: girdi zaten neredeyse sıralı.`,
         },
       ],
       sources: [SRC.l6.slides, SRC.l5.slides, SRC.l2.notes],

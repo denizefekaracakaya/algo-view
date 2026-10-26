@@ -255,6 +255,12 @@ Hoping that it is “fast on average” does not save InsertionSort; but it real
           hints: ['How would you change the condition $A[j^*] \\le$ `current` in the correctness proof?', 'When the second 3 (c) is inserted, does it jump in front of the earlier 3 (a)?'],
           solution: `Yes, it still sorts (it is enough to define $j^*$ in the proof as “the largest index with $A[j^*] < $ current”). But equal keys now overtake each other: the output becomes $[(1,b), (3,c), (3,a)]$. The original \`>\` version gives $[(1,b), (3,a), (3,c)]$ and is **stable**. Stability becomes critical for RadixSort in Lecture 6.`,
         },
+        {
+          id: 'p2',
+          prompt: `Our own example: “binary InsertionSort” finds the place of the new element in the sorted prefix with **binary search**. On a reverse-sorted array of 8 elements, at most how many comparisons and how many shifts does it make? Does the running time change?`,
+          hints: ['On a sorted prefix of $i$ elements binary search makes at most $\\lceil \\log_2(i + 1) \\rceil$ comparisons.', 'The number of shifts is still the number of inversions.'],
+          solution: `Comparisons: for $i = 1, \\dots, 7$ at most $1 + 2 + 2 + 3 + 3 + 3 + 3 = 17$ (plain InsertionSort makes 28). But the shifts do not change: one per inversion, $\\binom{8}{2} = 28$. In general comparisons drop to $O(n \\log n)$ while shifts stay $\\Theta(n^2)$: the total time is still $\\Theta(n^2)$. It still pays off when comparisons are expensive (long strings, for example); Timsort uses exactly this on small runs.`,
+        },
       ],
       sources: [SRC.l2.pre, SRC.l2.notes, SRC.l2.slides, SRC.l2.proof, SRC.l2.notebook, SRC.l2.conceptSort],
     },

@@ -206,7 +206,7 @@ Multiplication is an everyday example too: the encryption in banking apps (RSA) 
       title: 'Divide and conquer: Karatsuba multiplication',
       titleEn: 'Divide and conquer: Karatsuba integer multiplication',
       summary: 'Three subproblems instead of four: a small algebraic observation, a big asymptotic win.',
-      minutes: 40,
+      minutes: 45,
       objectives: [
         'Apply the divide-and-conquer paradigm to integer multiplication.',
         'See that Mult1, with four subproblems, is not asymptotically better than the grade-school method.',
@@ -344,6 +344,28 @@ The Master Theorem in Lecture 3 lets us compute such “fewer subproblems” gai
           ],
         },
         {
+          kind: 'steps',
+          title: 'Worked example: the real count and carries',
+          label: 'formal',
+          body: `On paper Karatsuba makes exactly $3^s$ one-digit multiplications for $n = 2^s$ digits. Real numbers add a small wrinkle: the sums $a + b$ and $c + d$ can have **one extra digit**. Let us count with the same rule as the visualizer’s counter.`,
+          proof: [
+            { title: 'Without carries', body: '$x = y = 11111111$ (8 digits): at every level $a + b$ keeps the same length ($1111 + 1111 = 2222$). The count is exactly $3^3 = 27$; the grade-school method needs $8^2 = 64$.' },
+            { title: 'With carries', body: '$x = y = 99999999$: $9999 + 9999 = 19998$, five digits. The $z_3$ subproblem grows a little and the count rises to 63: just one below 64.' },
+            { title: 'Larger inputs', body: 'For the same “all 9s” inputs: 197 against 256 at 16 digits, 601 against 1024 at 32 digits, 1815 against 4096 at 64 digits. Each doubling multiplies the ratio by about $3/4$: $n^{\\log_2 3} / n^2$.' },
+            { title: 'The lesson', body: 'Carries only affect the constant factor; $T(n) \\le 3T(n/2 + 1) + O(n)$ still gives $O(n^{\\log_2 3})$. But for small $n$ the gain is negligible: libraries switch to Karatsuba only after a few dozen machine words.' },
+          ],
+          check: [
+            {
+              id: 'c6',
+              kind: 'numeric',
+              prompt: 'How many one-digit multiplications does Karatsuba make for $x = y = 11111111$?',
+              answer: 27,
+              hint: '8 = 2³ digits, no carries.',
+              explanation: 'Three levels with 3 subproducts each: $3^3 = 27$.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- “Divide and conquer always speeds things up.” — Mult1 divides but is still $n^2$; the gain comes from reducing the **number** of subproblems.
@@ -399,6 +421,12 @@ The Master Theorem in Lecture 3 lets us compute such “fewer subproblems” gai
           prompt: `Our own example: run Karatsuba by hand on $x = 47$, $y = 83$. How many one-digit multiplications are made? How many does Mult1 need for the same product?`,
           hints: ['$a = 4, b = 7, c = 8, d = 3$.', '$a + b = 11$ and $c + d = 11$ have two digits; $z_3$ recurses once more.'],
           solution: `$z_1 = 4\\cdot 8 = 32$ (1 multiplication), $z_2 = 7 \\cdot 3 = 21$ (1 multiplication), $z_3 = 11 \\cdot 11$: this splits again ($1\\cdot1$, $1\\cdot1$, $2\\cdot2$ → 3 multiplications) and gives $121$. $ad + bc = 121 - 32 - 21 = 68$. The result is $3200 + 680 + 21 = 3901 = 47 \\cdot 83$. In total **5** one-digit multiplications; Mult1 makes **4**! On small inputs, and because of the “carry digit”, Karatsuba’s advantage may not show; the gain is asymptotic, for large $n$. (Try 47 × 83 in the visualizer.)`,
+        },
+        {
+          id: 'p2',
+          prompt: `Our own example: Karatsuba’s trick goes back to Gauss. Multiplying complex numbers, $(a + bi)(c + di) = (ac - bd) + (ad + bc)i$, takes four real multiplications. Do it with **three**, and try it on $(3 + 2i)(1 + 4i)$.`,
+          hints: ['Compute $ac$ and $bd$, plus $(a + b)(c + d)$.', '$(a + b)(c + d) = ac + ad + bc + bd$.'],
+          solution: `$p_1 = ac$, $p_2 = bd$, $p_3 = (a + b)(c + d)$. The real part is $p_1 - p_2$, the imaginary part $p_3 - p_1 - p_2 = ad + bc$. Example: $p_1 = 3 \\cdot 1 = 3$, $p_2 = 2 \\cdot 4 = 8$, $p_3 = 5 \\cdot 5 = 25$. Result $(3 - 8) + (25 - 3 - 8)i = -5 + 14i$. Directly: $3 + 12i + 2i + 8i^2 = -5 + 14i$. A few additions instead of one multiplication: exactly the idea behind $z_3$ in Karatsuba.`,
         },
       ],
       sources: [SRC.l1.notes, SRC.l1.slides, SRC.l1.notebook, SRC.l1.concept, SRC.l3.notes],

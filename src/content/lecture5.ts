@@ -227,6 +227,12 @@ Slaytlardaki karşılaştırma: QuickSort (rastgele pivot) yerinde kolayca uygul
           hints: ['$T(n) \\le cn + T(n/10) + T(9n/10)$.', 'Her seviyenin toplam işi en fazla $cn$; en uzun dal kaç seviye?'],
           solution: `Her seviyede toplam iş en fazla $cn$’dir (parçaların boyutları toplamı $\\le n$). En derin dal boyutu her seferinde $9/10$ ile çarpar: $\\log_{10/9} n = O(\\log n)$ seviye. Toplam $O(n\\log n)$. Sabit oranlı herhangi bir bölünme — ne kadar dengesiz olursa olsun — $O(n\\log n)$ verir; sorun yalnızca $k = O(1)$ gibi “sabit kayıklık”tadır.`,
         },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: rastgele pivotlu QuickSort, 4 farklı elemanlı bir dizide en kötü durumu (her bölümlemede pivotun en küçük ya da en büyük olması, toplam 6 karşılaştırma) hangi olasılıkla yaşar? $n$ eleman için genel formül nedir?`,
+          hints: ['İlk pivot 4 elemandan biri; kaç tanesi “uç”?', 'Uç bir pivottan sonra $n - 1$ elemanlı tek bir alt problem kalır.'],
+          solution: `İlk bölümlemede pivotun uç olma olasılığı $2/4$; sonra 3 elemanlı alt problemde $2/3$; 2 elemanda her pivot uçtur. Toplam $\\frac{2}{4} \\cdot \\frac{2}{3} \\cdot 1 = \\frac{1}{3}$. Genel olarak $\\frac{2^{n-1}}{n!}$: $n = 10$ için yaklaşık $1{,}4 \\cdot 10^{-4}$, $n = 20$ için $2 \\cdot 10^{-13}$. Küçük $n$’de en kötü durum sık görülür ama zararsızdır; büyük $n$’de pratikte hiç görülmez. Beklenen süre $O(n \\log n)$ ise her $n$ için geçerlidir.`,
+        },
       ],
       sources: [SRC.l5.pre, SRC.l5.notes, SRC.l5.slides, SRC.l5.notebook, SRC.hw.hw3],
     },

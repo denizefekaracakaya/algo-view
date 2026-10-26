@@ -206,7 +206,7 @@ Aynı makine, aynı veri; fark yalnızca algoritmanın büyüme hızında. Bu y�
       title: 'Böl ve fethet: Karatsuba çarpımı',
       titleEn: 'Divide and conquer: Karatsuba integer multiplication',
       summary: 'Dört alt çarpım yerine üç: küçük bir cebirsel gözlem, büyük bir asimptotik kazanç.',
-      minutes: 40,
+      minutes: 45,
       objectives: [
         'Böl-ve-fethet (divide and conquer) paradigmasını tamsayı çarpımına uygulamak.',
         'Dört alt problemli Mult1 algoritmasının okul yönteminden asimptotik olarak daha iyi olmadığını görmek.',
@@ -344,6 +344,28 @@ Ders 3’teki Master Teoremi bu tür “alt problem sayısını azalt” kazanç
           ],
         },
         {
+          kind: 'steps',
+          title: 'Çalışılmış örnek: gerçek sayım ve taşmalar',
+          label: 'formal',
+          body: `Kâğıt üzerinde Karatsuba $n = 2^s$ basamak için tam $3^s$ tek basamaklı çarpma yapar. Gerçek sayılarda küçük bir pürüz var: $a + b$ ve $c + d$ toplamları **bir basamak fazla** olabilir. Görselleştiricinin sayacıyla aynı kuralla sayalım.`,
+          proof: [
+            { title: 'Taşma yoksa', body: '$x = y = 11111111$ (8 basamak): her seviyede $a + b$ yine aynı uzunlukta kalır ($1111 + 1111 = 2222$). Sayım tam $3^3 = 27$; okul yöntemi $8^2 = 64$.' },
+            { title: 'Taşma varsa', body: '$x = y = 99999999$: $9999 + 9999 = 19998$, beş basamak. $z_3$ alt problemi biraz büyür ve sayım 63’e çıkar: 64’ten ancak bir eksik.' },
+            { title: 'Büyüdükçe', body: 'Aynı “hep 9” girdileri için 16 basamakta 197’ye 256, 32 basamakta 601’e 1024, 64 basamakta 1815’e 4096. Oran her iki katında yaklaşık $3/4$’le çarpılır: $n^{\\log_2 3} / n^2$.' },
+            { title: 'Ders', body: 'Taşmalar yalnızca sabit çarpanı etkiler; $T(n) \\le 3T(n/2 + 1) + O(n)$ yine $O(n^{\\log_2 3})$ verir. Ama küçük $n$’de kazanç yok denecek kadar azdır: kütüphaneler Karatsuba’ya ancak birkaç düzine kelimeden sonra geçer.' },
+          ],
+          check: [
+            {
+              id: 'c6',
+              kind: 'numeric',
+              prompt: '$x = y = 11111111$ için Karatsuba kaç tek basamaklı çarpma yapar?',
+              answer: 27,
+              hint: '8 = 2³ basamak, taşma yok.',
+              explanation: 'Üç seviye, her seviyede 3 alt çarpım: $3^3 = 27$.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Sık yapılan hatalar',
           body: `- “Böl ve fethet her zaman hızlandırır.” — Mult1 bölüyor ama hâlâ $n^2$; kazanç alt problem **sayısını** azaltmaktan geliyor.
@@ -399,6 +421,12 @@ Ders 3’teki Master Teoremi bu tür “alt problem sayısını azalt” kazanç
           prompt: `Kendi örneğimiz: $x = 47$, $y = 83$ için Karatsuba’yı elle çalıştırın. Kaç tek basamaklı çarpma yapılır? Aynı çarpımı Mult1 kaç tane ile yapar?`,
           hints: ['$a = 4, b = 7, c = 8, d = 3$.', '$a + b = 11$ ve $c + d = 11$ iki basamaklıdır; $z_3$ kendi içinde bir özyineleme daha yapar.'],
           solution: `$z_1 = 4\\cdot 8 = 32$ (1 çarpma), $z_2 = 7 \\cdot 3 = 21$ (1 çarpma), $z_3 = 11 \\cdot 11$: bu da bölünür ($1\\cdot1$, $1\\cdot1$, $2\\cdot2$ → 3 çarpma) ve $121$ verir. $ad + bc = 121 - 32 - 21 = 68$. Sonuç $3200 + 680 + 21 = 3901 = 47 \\cdot 83$. Toplam **5** tek basamaklı çarpma; Mult1 ise **4** yapar! Küçük girdilerde ve “taşma basamağı” yüzünden Karatsuba’nın avantajı görünmeyebilir; kazanç büyük $n$ için asimptotiktir. (Görselleştiricide 47 × 83’ü deneyin.)`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: Karatsuba’nın hilesi Gauss’a kadar gider. Karmaşık sayıların çarpımı $(a + bi)(c + di) = (ac - bd) + (ad + bc)i$ dört gerçek çarpma ister. Bunu **üç** çarpmayla yapın ve $(3 + 2i)(1 + 4i)$ üzerinde deneyin.`,
+          hints: ['$ac$ ve $bd$’yi hesaplayın; bir de $(a + b)(c + d)$.', '$(a + b)(c + d) = ac + ad + bc + bd$.'],
+          solution: `$p_1 = ac$, $p_2 = bd$, $p_3 = (a + b)(c + d)$. Gerçek kısım $p_1 - p_2$, sanal kısım $p_3 - p_1 - p_2 = ad + bc$. Örnek: $p_1 = 3 \\cdot 1 = 3$, $p_2 = 2 \\cdot 4 = 8$, $p_3 = 5 \\cdot 5 = 25$. Sonuç $(3 - 8) + (25 - 3 - 8)i = -5 + 14i$. Doğrudan: $3 + 12i + 2i + 8i^2 = -5 + 14i$. Bir çarpma yerine birkaç toplama: Karatsuba’daki $z_3$ ile birebir aynı fikir.`,
         },
       ],
       sources: [SRC.l1.notes, SRC.l1.slides, SRC.l1.notebook, SRC.l1.concept, SRC.l3.notes],

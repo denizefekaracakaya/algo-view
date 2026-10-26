@@ -194,7 +194,7 @@ Consequence: in the comparison model MergeSort is **asymptotically optimal**.`,
       title: 'BucketSort: CountingSort and RadixSort',
       titleEn: 'BucketSort: CountingSort and RadixSort',
       summary: 'Use values as bucket indices: $O(n + r)$ and $O(d(n + r))$.',
-      minutes: 45,
+      minutes: 50,
       objectives: [
         'Run CountingSort (one FIFO bucket per key) and explain its $O(n + r)$ time.',
         'Define stability and show why it matters.',
@@ -317,6 +317,28 @@ The “BucketSort” in the lecture title is this bucket idea; the notes and sli
           ],
         },
         {
+          kind: 'steps',
+          title: 'Worked example: CountingSort without linked lists',
+          label: 'formal',
+          body: `The version in the notes keeps one bucket (a linked list) per key. In practice two arrays do the same job: counters and prefix sums. Our own example: $A = [3, 1, 4, 1, 5, 2, 3]$, keys $\\{0, \\dots, 5\\}$.`,
+          proof: [
+            { title: 'Count', body: '$C[k]$ = number of elements with key $k$: $C = [0, 2, 1, 2, 1, 1]$ (from 0 to 5).' },
+            { title: 'Prefix sums', body: 'Turn $C[k]$ into “number of keys smaller than $k$”: $[0, 0, 2, 3, 5, 6]$. This is the output index (0-based) of the first element with key $k$.' },
+            { title: 'Place', body: 'Walk through $A$ **from left to right**; write $x$ at index $C[x]$ and increase $C[x]$ by one. 3 → 3, 1 → 0, 4 → 5, 1 → 1, 5 → 6, 2 → 2, 3 → 4. The output is $[1, 1, 2, 3, 3, 4, 5]$.' },
+            { title: 'Stability', body: 'Equal keys land in their input order (the first 3 at index 3, the second at index 4): the sort is stable, exactly what RadixSort needs. Time $O(n + r)$, extra memory $O(n + r)$.' },
+          ],
+          check: [
+            {
+              id: 'c6',
+              kind: 'numeric',
+              prompt: 'In this example, at which output index (0-based) is the key 4 written?',
+              answer: 5,
+              hint: 'How many keys are smaller than 4?',
+              explanation: 'The keys smaller than 4 are 1, 1, 2, 3, 3: five of them, so index 5.',
+            },
+          ],
+        },
+        {
           kind: 'mistakes',
           title: 'Common mistakes',
           body: `- Starting RadixSort from the most significant digit and re-bucketing the whole array on every pass: gives a wrong result.
@@ -369,6 +391,12 @@ The “BucketSort” in the lecture title is this bucket idea; the notes and sli
           prompt: `Our own example: apply base-10 LSD RadixSort to $[170, 45, 75, 90, 802, 24, 2, 66]$; write the array after each pass.`,
           hints: ['There are three digits (802); numbers like 45 have a hundreds digit of 0.'],
           solution: `Pass 1 (ones): $[170, 90, 802, 2, 24, 45, 75, 66]$. Pass 2 (tens): $[802, 2, 24, 45, 66, 170, 75, 90]$. Pass 3 (hundreds): $[2, 24, 45, 66, 75, 90, 170, 802]$. Compare with the “Duplicates” example in the visualizer.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Our own example: $n = 10^6$ integers, all in $[0, 10^{12})$. How many passes does RadixSort make in base 10? How many in base $r = n = 10^6$? What is the total work of each?`,
+          hints: ['Number of passes = number of digits in base $r$ = $\\lceil \\log_r 10^{12} \\rceil$.', 'Each pass costs $O(n + r)$.'],
+          solution: `Base 10: 12 digits, 12 passes at $O(10^6 + 10)$ each: about $1.2 \\cdot 10^7$ steps. Base $10^6$: $10^{12} = (10^6)^2$, so 2 digits, 2 passes at $O(10^6 + 10^6)$ each: about $4 \\cdot 10^6$ steps. Choosing base $r = n$ gives $c$ passes and $O(cn)$ time when the values go up to $n^c$. A comparison sort would make $n \\log_2 n \\approx 2 \\cdot 10^7$ comparisons.`,
         },
       ],
       sources: [SRC.l6.pre, SRC.l6.notes, SRC.l6.slides, SRC.l6.notebook, SRC.l6.concept],
@@ -464,6 +492,12 @@ The common lesson: no algorithm is best in every situation; the model (compariso
           prompt: `Our own example: you need to sort 10 million product records by a category code between 0 and 999, **without disturbing the existing order of records within the same category**. Which algorithm would you choose? Why?`,
           hints: ['Which property does “without disturbing the existing order” ask for?', '$r = 1000 \\ll n$.'],
           solution: `CountingSort ($r = 1000$ buckets): $O(n + r) = O(n)$ and stable — records in the same category keep their input order. MergeSort is stable too, but $O(n\\log n)$; QuickSort is not stable.`,
+        },
+        {
+          id: 'p2',
+          prompt: `Our own example: a server log arrives **almost** sorted by timestamp: because of network delays every record is at most $k = 3$ places away from its sorted position. Which algorithm would you choose for $n = 10^6$ records, and why?`,
+          hints: ['InsertionSort runs in $O(n + I)$, where $I$ is the number of inversions.', 'How many elements can a single element form an inversion with?'],
+          solution: `Since every element moved at most $k$ places, it can only be inverted with elements within distance $2k$: $I \\le 2kn = 6 \\cdot 10^6$. InsertionSort runs in $O(n + I) = O(kn)$, a few million steps; MergeSort or HeapSort do not exploit this structure and make about $n \\log_2 n \\approx 2 \\cdot 10^7$ comparisons. Timsort also detects the situation and runs in close to linear time. RadixSort would work since the timestamps are integers, but it is unnecessary: the input is already almost sorted.`,
         },
       ],
       sources: [SRC.l6.slides, SRC.l5.slides, SRC.l2.notes],

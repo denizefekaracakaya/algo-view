@@ -491,6 +491,12 @@ Sezgisel ifade: kökten NIL’e tüm yolların uzunlukları birbirinin en fazla 
 
 Son ağaç: 10 (S) → sol 5 (K) [sol 3 (S) → sol 1 (K); sağ 7 (S)], sağ 15 (S). Her kök→NIL yolunda (NIL dahil) 3 siyah düğüm var.`,
         },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: siyah yüksekliği $b$ olan (kökten her NIL’e giden yolda, NIL hariç, $b$ siyah düğüm bulunan) bir kırmızı-siyah ağaçta en az ve en çok kaç iç düğüm olabilir? $b = 3$ için hesaplayın.`,
+          hints: ['En az: hiç kırmızı düğüm yoksa ağaç ne şekildedir?', 'En çok: kırmızı ve siyah düğümler her seviyede sırayla gelirse yükseklik en fazla $2b$.'],
+          solution: `**En az:** her kökten-NIL yolunda tam $b$ siyah düğüm var; kırmızı düğüm yoksa bütün yollar $b$ uzunluğunda olur ve ağaç mükemmel bir ikili ağaçtır: $2^b - 1$ düğüm. Kırmızı düğüm eklemek sayıyı yalnızca artırır. **En çok:** kırmızı düğümler ardışık olamaz, yani her yolda en fazla $2b$ düğüm; en çok $2^{2b} - 1$ düğüm (seviyeler sırayla siyah ve kırmızı olan mükemmel ağaç). $b = 3$: en az 7, en çok 63 düğüm. Ters çevirince: $n \\ge 2^b - 1$, yani $b \\le \\log_2(n + 1)$ ve yükseklik $\\le 2b \\le 2\\log_2(n + 1)$: Claim 16.`,
+        },
       ],
       sources: [SRC.l7.notes, SRC.l7.slides, SRC.l7.concept, SRC.hw.hw4],
     },
@@ -584,6 +590,12 @@ Ama gerçek veriler çoğu zaman rastgele değildir: zaman damgaları, artan kim
           prompt: `Kendi örneğimiz: Bir kırmızı-siyah ağacın kökü, sıralı anahtarlar arasında $i$. sırada olsun. $i$ için ne söyleyebiliriz: $i = \\Theta(n)$ mi? Karşılaştırma panelinde sıralı eklemelerde kökün nerede kaldığını gözlemleyin.`,
           hints: ['Kökün sol ve sağ alt ağaçlarının siyah yükseklikleri eşittir.', 'Her alt ağaçta en az $2^{b} - 1$ düğüm var; en fazla kaç olabilir?'],
           solution: `Sol ve sağ alt ağaçların siyah yüksekliği aynı ($b$). Her biri en az $2^{b}-1$, en fazla (yükseklik $\\le 2b$) yaklaşık $4^{b}$ düğüm içerir. Dolayısıyla daha küçük taraf en az $\\approx 2^b \\approx \\sqrt{\\text{büyük taraf}}$’tır: kökün sırası $i = \\Omega(\\sqrt n)$ olmak zorunda, ama $\\Theta(n)$ olması gerekmez. (Ders 7 kavram kontrolündeki bir sorudan esinlenmiştir.)`,
+        },
+        {
+          id: 'p2',
+          prompt: `Kendi örneğimiz: 1, 2, …, 15 ve 1, 2, …, 31 anahtarlarını sırayla (a) sıradan bir BST’ye, (b) bir kırmızı-siyah ağaca ekleyin. Her durumda yükseklik (kökten en derin düğüme kenar sayısı) kaçtır? Mükemmel dengeli bir ağaçla karşılaştırın. (Karşılaştırma panelinde kontrol edin.)`,
+          hints: ['Sıradan BST’de sıralı ekleme bir zincir verir.', 'Kırmızı-siyah ağaçta yükseklik $\\le 2\\log_2(n + 1)$.'],
+          solution: `(a) BST: zincir, yükseklik $n - 1$: 14 ve 30. (b) Kırmızı-siyah ağaç: 5 ve 7. Mükemmel dengeli ağaç: $\\log_2(n + 1) - 1$, yani 3 ve 4. Kırmızı-siyah ağaç mükemmel değildir, ama sınır $2\\log_2(n + 1)$ (8 ve 10) rahatça sağlanır. Sıralı ekleme, kırmızı-siyah ağaç için en kötü girdi değildir: sağ kenar boyunca kırmızı düğümler birikir ve rotasyonlar onları düzenli olarak dengeler.`,
         },
       ],
       sources: [SRC.l7.notes, SRC.l7.slides, SRC.l7.concept],

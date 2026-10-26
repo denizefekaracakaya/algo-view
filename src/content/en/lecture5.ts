@@ -227,6 +227,12 @@ The fix is **three-way partitioning** (Dijkstra’s “Dutch national flag” pr
           hints: ['$T(n) \\le cn + T(n/10) + T(9n/10)$.', 'The total work per level is at most $cn$; how many levels does the longest branch have?'],
           solution: `The total work on each level is at most $cn$ (the part sizes sum to $\\le n$). The deepest branch multiplies the size by $9/10$ each time: $\\log_{10/9} n = O(\\log n)$ levels. Total $O(n\\log n)$. Any split with a constant ratio — however unbalanced — gives $O(n\\log n)$; the problem is only a “constant offset” like $k = O(1)$.`,
         },
+        {
+          id: 'p2',
+          prompt: `Our own example: with what probability does random-pivot QuickSort hit the worst case on an array of 4 distinct elements (the pivot is the smallest or largest at every partition, 6 comparisons in total)? What is the general formula for $n$ elements?`,
+          hints: ['The first pivot is one of 4 elements; how many of them are “extreme”?', 'After an extreme pivot a single subproblem of $n - 1$ elements remains.'],
+          solution: `At the first partition the pivot is extreme with probability $2/4$; then $2/3$ in the 3-element subproblem; with 2 elements every pivot is extreme. In total $\\frac{2}{4} \\cdot \\frac{2}{3} \\cdot 1 = \\frac{1}{3}$. In general $\\frac{2^{n-1}}{n!}$: about $1.4 \\cdot 10^{-4}$ for $n = 10$, $2 \\cdot 10^{-13}$ for $n = 20$. For small $n$ the worst case is common but harmless; for large $n$ it practically never happens. The expected time $O(n \\log n)$ holds for every $n$.`,
+        },
       ],
       sources: [SRC.l5.pre, SRC.l5.notes, SRC.l5.slides, SRC.l5.notebook, SRC.hw.hw3],
     },

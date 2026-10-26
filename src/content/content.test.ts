@@ -14,6 +14,8 @@ import { mergeSortComparisons } from '../engines/mergeSort'
 import { expectedComparisons, quickSort } from '../engines/quickSort'
 import { buildDecisionTree } from '../engines/decisionTree'
 import { searchCost } from '../engines/bst'
+import { countingSort } from '../engines/bucketSort'
+import { blackHeight } from '../engines/tree'
 
 describe.each(['tr', 'en'] as const)('curriculum integrity (%s)', (lang) => {
   const LECTURES = LECTURES_BY_LANG[lang]
@@ -178,5 +180,92 @@ describe('numeric claims made in the lesson content', () => {
     const p4 = perms(4)
     const records = (p: number[]) => p.filter((x, i) => p.slice(0, i).every((y) => y < x)).length
     expect(p4.reduce((s, p) => s + records(p), 0) / p4.length).toBeCloseTo(25 / 12, 12)
+  })
+})
+
+describe('second round of worked examples in Lectures 1–7', () => {
+  it('Karatsuba counts, complex product, binary InsertionSort', () => {
+    const k = (x: string) => multiply(BigInt(x), BigInt(x), 'karatsuba').ops
+    expect(k('11111111')).toBe(27)
+    expect([8, 16, 32, 64].map((n) => k('9'.repeat(n)))).toEqual([63, 197, 601, 1815])
+    expect(multiply(BigInt('9'.repeat(64)), BigInt('9'.repeat(64)), 'mult1').ops).toBe(4096)
+    // (3 + 2i)(1 + 4i) with three real products
+    const [a, b, c, d] = [3, 2, 1, 4]
+    const p1 = a * c
+    const p2 = b * d
+    const p3 = (a + b) * (c + d)
+    expect([p1 - p2, p3 - p1 - p2]).toEqual([a * c - b * d, a * d + b * c])
+    expect([p1 - p2, p3 - p1 - p2]).toEqual([-5, 14])
+    expect([1, 2, 3, 4, 5, 6, 7].reduce((sum, i) => sum + Math.ceil(Math.log2(i + 1)), 0)).toBe(17)
+    expect(insertionSortComparisons([8, 7, 6, 5, 4, 3, 2, 1])).toBe(28)
+  })
+
+  it('QuickSort worst-case probability', () => {
+    // probability that random-pivot QuickSort makes n(n−1)/2 comparisons
+    const pWorst = (n: number): number => (n <= 1 ? 1 : (2 / n) * pWorst(n - 1))
+    expect(pWorst(4)).toBeCloseTo(1 / 3, 12)
+    const fact = (n: number): number => (n <= 1 ? 1 : n * fact(n - 1))
+    for (const n of [4, 10, 20]) expect(pWorst(n) / (2 ** (n - 1) / fact(n))).toBeCloseTo(1, 12)
+    expect(pWorst(10)).toBeCloseTo(1.41e-4, 6)
+    expect(pWorst(20) / 1e-13).toBeCloseTo(2.15, 2)
+    // exhaustive check for n = 4: average over all pivot choices
+    const worst = (keys: number[]): number => {
+      if (keys.length <= 1) return 1
+      return keys.reduce((sum, p) => {
+        const lo = keys.filter((x) => x < p)
+        const hi = keys.filter((x) => x > p)
+        const isWorst = lo.length === 0 || hi.length === 0
+        return sum + (isWorst ? worst(lo.length ? lo : hi) : 0)
+      }, 0) / keys.length
+    }
+    expect(worst([1, 2, 3, 4])).toBeCloseTo(1 / 3, 12)
+  })
+
+  it('CountingSort with prefix sums, base choice, nearly sorted input', () => {
+    const A = [3, 1, 4, 1, 5, 2, 3]
+    const C = Array(6).fill(0)
+    for (const x of A) C[x]++
+    expect(C).toEqual([0, 2, 1, 2, 1, 1])
+    const start = C.map((_, k) => C.slice(0, k).reduce((s2, v) => s2 + v, 0))
+    expect(start).toEqual([0, 0, 2, 3, 5, 6])
+    const out: number[] = Array(A.length)
+    const placed = A.map((x) => {
+      out[start[x]] = x
+      return start[x]++
+    })
+    expect(placed).toEqual([3, 0, 5, 1, 6, 2, 4])
+    expect(out).toEqual(countingSort(A, 6))
+    expect(digitCount(10 ** 12 - 1, 10)).toBe(12)
+    expect(digitCount(10 ** 12 - 1, 10 ** 6)).toBe(2)
+    // every element at most k places from its sorted position ⇒ at most 2kn inversions
+    const k = 3
+    for (let seed = 1; seed <= 20; seed++) {
+      const n = 60
+      const a = Array.from({ length: n }, (_, i) => i)
+      let r = seed
+      for (let i = 0; i + 1 < n; i++) {
+        r = (r * 1103515245 + 12345) % 2147483648
+        const j = i + 1
+        if (r % 2 && Math.abs(a[i] - i) < k && Math.abs(a[j] - j) < k) [a[i], a[j]] = [a[j], a[i]]
+      }
+      expect(a.every((x, i) => Math.abs(x - i) <= k)).toBe(true)
+      const inv = a.reduce((s2, x, i) => s2 + a.slice(i + 1).filter((y) => y < x).length, 0)
+      expect(inv).toBeLessThanOrEqual(2 * k * n)
+    }
+  })
+
+  it('red-black node counts and heights under sorted insertion', () => {
+    const r = (n: number) => Array.from({ length: n }, (_, i) => i + 1)
+    expect([15, 31].map((n) => height(bstFromSequence(r(n))))).toEqual([14, 30])
+    expect([15, 31].map((n) => height(rbFromSequence(r(n))))).toEqual([5, 7])
+    for (const n of [7, 15, 31, 100]) {
+      const t = rbFromSequence(r(n))
+      // blackHeight counts NIL but not the (black) root: the same number as black nodes on a path, root included, NIL excluded
+      const b = blackHeight(t)
+      expect(height(t) + 1).toBeLessThanOrEqual(2 * Math.log2(n + 1))
+      expect(n).toBeGreaterThanOrEqual(2 ** b - 1)
+      expect(n).toBeLessThanOrEqual(2 ** (2 * b) - 1)
+    }
+    expect([2 ** 3 - 1, 2 ** 6 - 1]).toEqual([7, 63])
   })
 })
