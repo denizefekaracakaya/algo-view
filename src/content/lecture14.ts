@@ -108,6 +108,17 @@ Yani işler **$l / w$ oranına göre artan** sırada yapılmalıdır: kısa ve �
           body: `Çoğu açgözlü algoritma “bir anahtara göre sırala, sonra tek geçiş” kalıbındadır: $O(n \\log n)$ (sıralama) + $O(n)$. Asıl zorluk süre değil, **doğruluktur**: yanlış anahtar seçmek (en kısa etkinlik, en erken başlayan etkinlik, yalnızca ağırlık…) kolayca optimal olmayan sonuç verir.
 
 Örnek: en **kısa** etkinliği seçmek, [0, 5), [4, 6), [5, 10) girdisinde [4, 6)’yı seçip diğer ikisini dışlar: 1 etkinlik, oysa optimum 2.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'Etkinlikler bitiş zamanına göre **zaten sıralı** geliyorsa açgözlü etkinlik seçimi ne kadar sürer?',
+              options: ['$O(1)$', '$O(n)$', '$O(n\\log n)$', '$O(n^2)$'],
+              answer: 1,
+              hint: 'Geriye yalnızca tek geçiş kalır.',
+              explanation: 'Sıralama adımı gereksizdir; her etkinlik bir kez, son seçilenin bitişiyle karşılaştırılır: $O(n)$.',
+            },
+          ],
         },
         {
           kind: 'text',

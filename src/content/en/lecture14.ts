@@ -108,6 +108,17 @@ So jobs should be done in **increasing order of $l / w$**: short and important j
           body: `Most greedy algorithms follow the pattern “sort by a key, then one pass”: $O(n \\log n)$ (sorting) + $O(n)$. The real difficulty is not time but **correctness**: picking the wrong key (shortest activity, earliest start, weight alone…) easily gives a non-optimal result.
 
 Example: choosing the **shortest** activity, on the input [0, 5), [4, 6), [5, 10), picks [4, 6) and excludes the other two: 1 activity, while the optimum is 2.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'If the activities **already come sorted** by finish time, how long does greedy activity selection take?',
+              options: ['$O(1)$', '$O(n)$', '$O(n\\log n)$', '$O(n^2)$'],
+              answer: 1,
+              hint: 'Only the single pass is left.',
+              explanation: 'The sorting step is unnecessary; each activity is compared once with the finish time of the last chosen one: $O(n)$.',
+            },
+          ],
         },
         {
           kind: 'text',

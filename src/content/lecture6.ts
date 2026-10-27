@@ -107,6 +107,17 @@ Sonuç: karşılaştırma modelinde MergeSort **asimptotik olarak optimaldir**.`
           body: `- Yalnızca **karşılaştırma modelindeki** algoritmalar için geçerlidir. Değerleri doğrudan kullanan (ör. kova indeksi olarak) algoritmalar bu modelin dışındadır — bir sonraki ders.
 - Bir **alt sınırdır** (Ω): “hiçbir karşılaştırma algoritması daha hızlı olamaz” der; belirli bir algoritmanın hızlı olduğunu söylemez.
 - En kötü durum içindir: bazı girdilerde (ör. sıralı dizide InsertionSort) çok daha az karşılaştırma yapılabilir; ama her algoritmanın en az bir “kötü” girdisi vardır.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'InsertionSort zaten sıralı $n$ elemanlı bir diziyi $n - 1$ karşılaştırmayla sıralar. Bu, $\\Omega(n\\log n)$ alt sınırıyla çelişir mi?',
+              options: ['Evet: alt sınır yanlış olmalı.', 'Hayır: alt sınır en kötü durum içindir; InsertionSort’un da kötü girdileri var.', 'Hayır: InsertionSort karşılaştırma tabanlı değildir.', 'Evet, ama yalnızca küçük $n$ için.'],
+              answer: 1,
+              hint: 'Alt sınır “her girdide” mi, “bazı girdilerde” mi diyor?',
+              explanation: 'Alt sınır, her karşılaştırma algoritmasının **en az bir** girdide $\\Omega(n\\log n)$ karşılaştırma yaptığını söyler. Sıralı dizi kolay bir girdidir; ters sıralı dizide InsertionSort $n(n - 1)/2$ karşılaştırma yapar.',
+            },
+          ],
         },
         {
           kind: 'text',

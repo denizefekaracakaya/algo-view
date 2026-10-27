@@ -111,6 +111,17 @@ Tek bir DFS yetmez: $u$’dan başlayan arama, $u$’nun SCC’sinin **dışına
           kind: 'complexity',
           title: 'Çalışma süresi',
           body: `Ters grafiği kurmak $O(n + m)$; iki DFS-Loop çağrısı $O(n + m)$; 2. geçişin sırası için düğümleri $f$’ye göre sıralamak gerekmez: 1. geçişte biten düğümleri bir listeye eklemek ve listeyi tersten okumak yeter. Toplam **$O(n + m)$**, yani doğrusal.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: '2. geçiş düğümleri bitiş zamanına göre azalan sırada ister. Bunun için neden sıralama gerekmez?',
+              options: ['Bitiş zamanları zaten küçük tam sayılardır, CountingSort yeter.', 'Bir düğüm bittiği anda bir listenin başına eklenirse liste azalan $f$ sırasındadır.', 'Sıra önemli değildir.', 'DFS düğümleri zaten alfabetik sırayla ziyaret eder.'],
+              answer: 1,
+              hint: 'Düğümler hangi sırayla biter?',
+              explanation: 'Düğümler artan $f$ sırasıyla biter. Her biten düğümü listenin başına eklemek (ya da sona ekleyip tersten okumak) azalan $f$ sırasını $O(n)$’de verir. CountingSort da çalışırdı ama gereksiz.',
+            },
+          ],
         },
         {
           kind: 'text',

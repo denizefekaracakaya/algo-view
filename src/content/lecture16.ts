@@ -111,6 +111,17 @@ $$c_f(u, v) = \\begin{cases} c(u, v) - f(u, v) & (u, v) \\in E \\\\ f(v, u) & (v
             { title: 'Eşitlik', body: 'Lemma 2’nin hesabına göre $|f| = \\sum_{S \\to T} f - \\sum_{T \\to S} f = c(S, T) - 0$.' },
             { title: 'Sonuç (Teorem 4)', body: 'Her akış her kesmeden küçük olduğu için (Lemma 2), $|f| = c(S, T)$ olan bir akış maksimum, kesme de minimumdur. Ford–Fulkerson durduğunda tam olarak böyle bir çift bulmuş olur: **maksimum akış = minimum kesme**.' },
           ],
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'Bir ağda değeri 7 olan bir akış ve kapasitesi 7 olan bir $s$–$t$ kesmesi buldunuz. Ne söyleyebilirsiniz?',
+              options: ['Akış maksimum, kesme minimumdur.', 'Yalnızca akışın maksimum olduğu söylenebilir.', 'Hiçbir şey söylenemez; daha büyük bir akış olabilir.', 'Ağda negatif kapasiteli bir kenar vardır.'],
+              answer: 0,
+              hint: 'Lemma 2: her akış her kesmeden küçük ya da eşittir.',
+              explanation: 'Hiçbir akış 7’yi aşamaz (bu kesme engel olur) ve hiçbir kesme 7’nin altında olamaz (bu akış engel olur). İkisi de optimaldir; algoritmayı çalıştırmadan bile bu bir **sertifikadır**.',
+            },
+          ],
         },
         {
           kind: 'complexity',

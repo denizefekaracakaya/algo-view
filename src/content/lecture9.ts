@@ -106,6 +106,16 @@ Bu dersten itibaren $n = |V|$ ve $m = |E|$ yazacağız. Bir grafikte en fazla $n
           body: `Başlangıç $O(n)$. Her düğüm bir kez bir katmandan çıkarılır: düğüm başına $O(1)$. Bir düğüm işlenirken tüm komşuları taranır; her kenar yönlü grafikte bir, yönsüz grafikte iki kez taranır: kenar başına $O(1)$. Toplam:
 $$O(\\#\\text{ziyaret} + \\#\\text{kenar taraması}) = O(n + m).$$
 Bu, girdinin okunma süresi kadardır: daha iyisi mümkün değil.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'Bağlı, yönsüz bir grafikte $n = 6$ düğüm ve $m = 7$ kenar var. BFS komşuluk listelerinde toplam kaç kenar kaydı tarar?',
+              answer: 14,
+              hint: 'Yönsüz bir kenar iki listede görünür.',
+              explanation: 'Her yönsüz kenar iki uç noktasının listesinde birer kez yer alır: $2m = 14$. Bütün düğümler ziyaret edilir: toplam $O(n + m)$.',
+            },
+          ],
         },
         {
           kind: 'text',

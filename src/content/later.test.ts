@@ -470,3 +470,37 @@ describe('more try-it-yourself questions in Lectures 9 and 12', () => {
     expect(D[0][4]).toBe(4)
   })
 })
+
+describe('one more try-it-yourself question in Lectures 9–17', () => {
+  it('deferred acceptance makes at most n² − n + 1 = 7 proposals for n = 3, and 7 is reached (l17 c5)', () => {
+    const perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]]
+    const proposals = (doc: number[][], hosp: number[][]) => {
+      const rank = hosp.map((p) => { const r = [0, 0, 0]; p.forEach((d, i) => (r[d] = i)); return r })
+      const next = [0, 0, 0]
+      const holds: (number | null)[] = [null, null, null]
+      const free = [0, 1, 2]
+      let count = 0
+      while (free.length) {
+        const d = free.pop()!
+        const h = doc[d][next[d]++]
+        count++
+        const cur = holds[h]
+        if (cur === null) holds[h] = d
+        else if (rank[h][d] < rank[h][cur]) { holds[h] = d; free.push(cur) }
+        else free.push(d)
+      }
+      return count
+    }
+    let max = 0
+    for (const a of perms) for (const b of perms) for (const c of perms)
+      for (const x of perms) for (const y of perms) for (const z of perms) max = Math.max(max, proposals([a, b, c], [x, y, z]))
+    expect(max).toBe(3 * 3 - 3 + 1)
+  })
+
+  it('small counts: BFS scans 2m entries, LCS table size', () => {
+    const graph = g(false, [['a', 'b', 1], ['a', 'c', 1], ['b', 'd', 1], ['c', 'd', 1], ['d', 'e', 1], ['e', 'f', 1], ['c', 'f', 1]])
+    expect([graph.nodes.length, graph.edges.length, 2 * graph.edges.length]).toEqual([6, 7, 14])
+    expect(Object.keys(bfsDistances(graph, 'a')).length).toBe(6)
+    expect(lcsTable('ABCBDA', 'BDCABABC').length * lcsTable('ABCBDA', 'BDCABABC')[0].length).toBe(63)
+  })
+})

@@ -312,6 +312,16 @@ First derive the condition on $D$ from the inductive step, then combine it with 
             { title: 'Condition', body: '$\\left(\\frac{5}{6}D + 1\\right)n \\le D\\,n \\iff 1 \\le \\frac{D}{6} \\iff D \\ge 6$.' },
             { title: 'Conclusion', body: '$D = \\max(1, 6) = 6$ satisfies both the base and the step: $T(n) \\le 6n$, i.e. $T(n) = O(n)$.' },
           ],
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'Apply the same method to $T(n) \\le T(n/4) + T(n/2) + n$. What is the smallest $D$ for which the step $T(n) \\le D\\,n$ works?',
+              answer: 4,
+              hint: 'The subproblems add up to $n/4 + n/2 = 3n/4$.',
+              explanation: '$D\\frac{n}{4} + D\\frac{n}{2} + n = \\left(\\frac{3}{4}D + 1\\right)n \\le D\\,n \\iff D \\ge 4$. The base case also needs $D \\ge 1$: $D = 4$, so $T(n) \\le 4n$.',
+            },
+          ],
         },
         {
           kind: 'text',

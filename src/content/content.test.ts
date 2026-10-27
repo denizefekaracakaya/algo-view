@@ -299,3 +299,18 @@ describe('worked examples in the comparison lessons', () => {
     expect(orders.map((o) => height(bstFromSequence(o)))).toEqual([6, 2, 6, 6])
   })
 })
+
+describe('substitution: T(n) ≤ T(n/4) + T(n/2) + n (l3-substitution c5)', () => {
+  it('stays below 4n and the coefficient approaches 4', () => {
+    const memo = new Map<number, number>()
+    const T = (n: number): number => {
+      if (n <= 1) return 1
+      if (!memo.has(n)) memo.set(n, T(Math.floor(n / 4)) + T(Math.floor(n / 2)) + n)
+      return memo.get(n)!
+    }
+    let worst = 0
+    for (let n = 1; n <= 200_000; n++) worst = Math.max(worst, T(n) / n)
+    expect(worst).toBeLessThanOrEqual(4)
+    expect(T(2 ** 30) / 2 ** 30).toBeGreaterThan(3.9)
+  })
+})

@@ -114,6 +114,16 @@ If none holds, $(i, j)$ is a **blocking pair**: $i$ prefers $j$ to its own hospi
           kind: 'complexity',
           title: 'Running time',
           body: `At most $n^2$ proposals (in fact $n^2 - n + 1$). Each proposal requires the hospital to compare two doctors: $O(1)$ if the rank table $H[h][d]$ is prepared in advance. Total **$O(n^2)$** — the same order as the size of the input ($2n$ lists of length $n$).`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'With $n = 3$ doctors and 3 hospitals, at most how many proposals does deferred acceptance make?',
+              answer: 7,
+              hint: 'When a doctor proposes to its last choice, every other hospital is taken.',
+              explanation: 'When a doctor reaches its $n$-th choice, the other $n - 1$ hospitals are taken, so that proposal is accepted and the algorithm stops. Only one doctor makes $n$ proposals, the others at most $n - 1$: $(n - 1)^2 + n = n^2 - n + 1 = 7$. Trying every preference profile shows that this number is reached.',
+            },
+          ],
         },
         {
           kind: 'text',

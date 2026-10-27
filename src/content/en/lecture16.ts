@@ -111,6 +111,17 @@ The **residual graph** $G_f$ consists of the edges with $c_f(u, v) > 0$. A path 
             { title: 'Equality', body: 'By the computation of Lemma 2, $|f| = \\sum_{S \\to T} f - \\sum_{T \\to S} f = c(S, T) - 0$.' },
             { title: 'Conclusion (Theorem 4)', body: 'Since every flow is at most every cut (Lemma 2), a flow with $|f| = c(S, T)$ is maximum and the cut is minimum. When Ford–Fulkerson stops it has found exactly such a pair: **max flow = min cut**.' },
           ],
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'In a network you found a flow of value 7 and an $s$–$t$ cut of capacity 7. What can you conclude?',
+              options: ['The flow is maximum and the cut is minimum.', 'Only that the flow is maximum.', 'Nothing; there may be a larger flow.', 'The network has an edge of negative capacity.'],
+              answer: 0,
+              hint: 'Lemma 2: every flow is at most every cut.',
+              explanation: 'No flow can exceed 7 (this cut blocks it) and no cut can be below 7 (this flow rules it out). Both are optimal; even without running the algorithm, this pair is a **certificate**.',
+            },
+          ],
         },
         {
           kind: 'complexity',

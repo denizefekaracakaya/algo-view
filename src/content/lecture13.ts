@@ -100,6 +100,16 @@ Her hücre yalnızca üç komşusuna bakar: üst, sol, sol-üst çapraz.`,
           body: `Tabloda $(m + 1)(n + 1)$ hücre var, her biri $O(1)$: **$O(mn)$**. Geri izleme $O(m + n)$. Yalnızca uzunluk isteniyorsa iki satır yeter: $O(\\min(m, n))$ bellek.
 
 Bu basit algoritma bilinen en iyisidir: $O(mn)$’yi polinom ölçüde iyileştirmek, önemli bir karmaşıklık varsayımını (SAT için güçlü üstel zaman hipotezi) çürütürdü.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'Uzunlukları 6 ve 8 olan iki dizinin LCS tablosunda (boş önekler için 0. satır ve sütun dahil) kaç hücre vardır?',
+              answer: 63,
+              hint: '$(m + 1)(n + 1)$.',
+              explanation: '$7 \\cdot 9 = 63$ hücre, her biri $O(1)$’de doldurulur.',
+            },
+          ],
         },
         {
           kind: 'text',

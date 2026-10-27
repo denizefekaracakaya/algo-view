@@ -22,19 +22,19 @@ Lesson ids are the URL slugs (`#/ders/<id>`). Content lives in `src/content/lect
 | 7 | `l7-compare` — BST ve RB karşılaştırması | Same sequence → different heights; proven vs measured | — | `treeCompare` (heights, avg/worst search comparisons, guaranteed bound) | 3 Q; 2 practice (root rank) | L7 notes, slides, concept |
 
 | 8 | `l8-hashing` — Hash tabloları ve evrensel hashing | Chaining, random hash function, universal family, balls and bins | Expected chain length ≤ 2; Proposition 1 | `hashTable`, `birthday` | 7 checks; 4 Q; 3 practice | L8 notes, slides, pre, notebook, concept |
-| 9 | `l9-graphs`, `l9-dfs` | Representations, BFS layers, DFS times, components, topological order | Proposition 1 (layers = distance classes) | `bfs`, `dfs`, `dfsApps` | 9 checks; 8 Q; 4 practice | L9 notes, slides, pre, notebook, concept |
-| 10 | `l10-scc` | SCCs, meta-graph DAG, two-pass algorithm (G_rev first, as in the notes) | Key Lemma 5 | `scc` | 4 checks; 4 Q; 2 practice | L10 notes, slides, pre, notebook, concept |
+| 9 | `l9-graphs`, `l9-dfs` | Representations, BFS layers, DFS times, components, topological order | Proposition 1 (layers = distance classes) | `bfs`, `dfs`, `dfsApps` | 10 checks; 8 Q; 4 practice | L9 notes, slides, pre, notebook, concept |
+| 10 | `l10-scc` | SCCs, meta-graph DAG, two-pass algorithm (G_rev first, as in the notes) | Key Lemma 5 | `scc` | 5 checks; 4 Q; 2 practice | L10 notes, slides, pre, notebook, concept |
 | 11 | `l11-dijkstra` | Dijkstra, negative edges and cycles, priority queues, amortized time | Claims 1–2 | `dijkstra` | 5 checks; 4 Q; 2 practice | L11 notes, slides, pre, notebook, concept |
 | 12 | `l12-bellman-ford`, `l12-floyd` | Bellman–Ford as DP, the DP recipe, Floyd–Warshall, negative cycles | Claims 3–4 | `bellmanFord`, `floyd` | 10 checks; 8 Q; 4 practice | L12 notes, slides, pre, notebook, concept |
-| 13 | `l13-lcs`, `l13-knapsack` | LCS, unbounded and 0/1 knapsack, pseudo-polynomial time, MWIS in trees | — | `lcs`, `knapsack`, `mwis` | 9 checks; 8 Q; 4 practice | L13 notes, slides, concept |
-| 14 | `l14-greedy`, `l14-huffman` | Activity selection, weighted completion time, Huffman codes | Propositions 1–3 | `activity`, `huffman` | 7 checks; 9 Q; 4 practice | L14 notes, slides, pre, notebook, concept |
-| 15 | `l15-mst` | Cuts, light edges, Prim, Kruskal, union-find | Theorem 1 (cut property) | `mst` | 4 checks; 4 Q; 2 practice | L15 notes, slides, pre, notebook, concept |
-| 16 | `l16-maxflow` | Flows, cuts, residual graph, Ford–Fulkerson, Edmonds–Karp, bipartite matching | Max-flow min-cut theorem | `maxFlow` | 4 checks; 4 Q; 2 practice | L16 notes, slides, pre, concept |
-| 17 | `l17-stable-matching` | Blocking pairs, deferred acceptance, doctor-optimality, truthfulness | Theorems 7–9 | `stableMatching` | 4 checks; 4 Q; 2 practice | L17 notes, slides, concept |
+| 13 | `l13-lcs`, `l13-knapsack` | LCS, unbounded and 0/1 knapsack, pseudo-polynomial time, MWIS in trees | — | `lcs`, `knapsack`, `mwis` | 10 checks; 8 Q; 4 practice | L13 notes, slides, concept |
+| 14 | `l14-greedy`, `l14-huffman` | Activity selection, weighted completion time, Huffman codes | Propositions 1–3 | `activity`, `huffman` | 8 checks; 9 Q; 4 practice | L14 notes, slides, pre, notebook, concept |
+| 15 | `l15-mst` | Cuts, light edges, Prim, Kruskal, union-find | Theorem 1 (cut property) | `mst` | 5 checks; 4 Q; 2 practice | L15 notes, slides, pre, notebook, concept |
+| 16 | `l16-maxflow` | Flows, cuts, residual graph, Ford–Fulkerson, Edmonds–Karp, bipartite matching | Max-flow min-cut theorem | `maxFlow` | 5 checks; 4 Q; 2 practice | L16 notes, slides, pre, concept |
+| 17 | `l17-stable-matching` | Blocking pairs, deferred acceptance, doctor-optimality, truthfulness | Theorems 7–9 | `stableMatching` | 5 checks; 4 Q; 2 practice | L17 notes, slides, concept |
 
 Lecture 7 also gained red-black **deletion** (`delete_rb` in the `rb` visualizer, CLRS 13.4 cases 1–4), which the lecture itself only sketches.
 
-Totals for Lectures 1–7: 16 lessons, 64 quiz questions, 89 ungraded in-text “try it yourself” questions, 32 practice problems.
+Totals for Lectures 1–7: 16 lessons, 64 quiz questions, 91 ungraded in-text “try it yourself” questions, 32 practice problems.
 
 Every lesson also has guided tasks before each visualizer and an “In practice / in real life” section (libraries such as Timsort, introsort, `std::nth_element`, B-trees, RadixSort on GPUs; applications such as percentiles, external sorting, schedulers). Additional figures beyond the table: `inversions` (L2 InsertionSort: each shift removes one inversion arc) and `rotation` (L7 red-black trees: animated rotation with subtrees α, β, γ).
 
@@ -49,3 +49,5 @@ A second round filled the remaining Lecture 1–7 lessons: Karatsuba’s real mu
 A third round added worked examples to the three lessons that still had none: sorting a million 32-bit integers with comparison sorts vs RadixSort in bases 256 and 65536 (`l6-compare`), inserting 1…7 and then 8 into a red-black tree case by case (`l7-compare`) and encoding and decoding with the Huffman code of the notes, including the effect of a single bit error (`l14-huffman`), plus a third quiz question in each comparison lesson. They are checked in `src/content/content.test.ts` and `src/content/later.test.ts`.
 
 The lessons with the fewest in-text questions then got two more each: nested or disjoint DFS intervals and BFS vs DFS for fewest-edge paths (`l9-dfs`), the weight that makes a cycle non-negative and the cost of n − 1 rounds (`l12-bellman-ford`), Floyd–Warshall vs n × Dijkstra on a sparse network and the max/min variant for widest bottleneck paths (`l12-floyd`). Numeric answers now also accept digit groups with spaces (“4 995 000”) and the typographic minus.
+
+Finally, every lesson that still had four in-text questions got a fifth, attached to a section that had none (mostly the running-time sections): the recurrence T(n/4) + T(n/2) + n (`l3-substitution`), what the lower bound does not say (`l6-lower-bound`), 2m adjacency entries in BFS (`l9-graphs`), why the second SCC pass needs no sorting (`l10-scc`), the LCS table size (`l13-lcs`), presorted activities (`l14-greedy`), Kruskal with small integer weights (`l15-mst`), a flow and a cut of equal value as a certificate (`l16-maxflow`) and the n² − n + 1 proposal bound, checked over every preference profile for n = 3 (`l17-stable-matching`).

@@ -107,6 +107,17 @@ Consequence: in the comparison model MergeSort is **asymptotically optimal**.`,
           body: `- It applies only to algorithms **in the comparison model**. Algorithms that use the values directly (e.g. as a bucket index) are outside this model — the next lesson.
 - It is a **lower bound** (Ω): it says “no comparison algorithm can be faster”; it doesn’t say any particular algorithm is fast.
 - It is about the worst case: on some inputs (e.g. InsertionSort on a sorted array) far fewer comparisons may be made; but every algorithm has at least one “bad” input.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'InsertionSort sorts an already sorted array of $n$ elements with $n - 1$ comparisons. Does this contradict the $\\Omega(n\\log n)$ lower bound?',
+              options: ['Yes: the lower bound must be wrong.', 'No: the lower bound is about the worst case; InsertionSort has bad inputs too.', 'No: InsertionSort is not comparison-based.', 'Yes, but only for small $n$.'],
+              answer: 1,
+              hint: 'Does the lower bound talk about “every input” or “some input”?',
+              explanation: 'The lower bound says that every comparison algorithm makes $\\Omega(n\\log n)$ comparisons on **at least one** input. A sorted array is an easy input; on a reversed array InsertionSort makes $n(n - 1)/2$ comparisons.',
+            },
+          ],
         },
         {
           kind: 'text',

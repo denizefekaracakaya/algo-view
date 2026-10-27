@@ -114,6 +114,16 @@ Hiçbiri doğru değilse $(i, j)$ bir **engelleyen çifttir**: $i$, $j$’yi ken
           kind: 'complexity',
           title: 'Süre',
           body: `En fazla $n^2$ teklif (aslında $n^2 - n + 1$). Her teklifte hastanenin iki doktoru karşılaştırması gerekir: $H[h][d]$ sıra tablosu önceden hazırlanırsa $O(1)$. Toplam **$O(n^2)$** — girdinin boyutu ($2n$ tane $n$ uzunluklu liste) ile aynı mertebe.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: '$n = 3$ doktor ve 3 hastane için ertelenmiş kabul algoritması en fazla kaç teklif yapar?',
+              answer: 7,
+              hint: 'Bir doktor son tercihine teklif ettiğinde diğer bütün hastaneler doludur.',
+              explanation: 'Bir doktor $n$. tercihine ulaştığında diğer $n - 1$ hastane doludur ve o teklif kabul edilip algoritma biter. Yani yalnızca bir doktor $n$ teklif yapar, diğerleri en fazla $n - 1$: $(n - 1)^2 + n = n^2 - n + 1 = 7$. Bütün tercih profilleri denenince bu sayıya ulaşıldığı görülür.',
+            },
+          ],
         },
         {
           kind: 'text',

@@ -100,6 +100,16 @@ Every cell looks at only three neighbours: above, left, and the upper-left diago
           body: `The table has $(m + 1)(n + 1)$ cells, each $O(1)$: **$O(mn)$**. The traceback is $O(m + n)$. If only the length is needed, two rows suffice: $O(\\min(m, n))$ memory.
 
 This simple algorithm is the best known: improving $O(mn)$ by a polynomial factor would refute an important complexity assumption (the strong exponential time hypothesis for SAT).`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'How many cells does the LCS table of two sequences of lengths 6 and 8 have (including row and column 0 for the empty prefixes)?',
+              answer: 63,
+              hint: '$(m + 1)(n + 1)$.',
+              explanation: '$7 \\cdot 9 = 63$ cells, each filled in $O(1)$.',
+            },
+          ],
         },
         {
           kind: 'text',

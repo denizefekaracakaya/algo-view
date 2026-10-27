@@ -312,6 +312,16 @@ Alt problemler farklı boyutlardaysa Master Teoremi yetmez; yerine koyma yöntem
             { title: 'Koşul', body: '$\\left(\\frac{5}{6}D + 1\\right)n \\le D\\,n \\iff 1 \\le \\frac{D}{6} \\iff D \\ge 6$.' },
             { title: 'Sonuç', body: '$D = \\max(1, 6) = 6$ hem tabanı hem adımı sağlar: $T(n) \\le 6n$, yani $T(n) = O(n)$.' },
           ],
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'Aynı yöntemi $T(n) \\le T(n/4) + T(n/2) + n$ için uygulayın. $T(n) \\le D\\,n$ adımının çalışması için en küçük $D$ kaçtır?',
+              answer: 4,
+              hint: 'Alt problemlerin toplamı $n/4 + n/2 = 3n/4$.',
+              explanation: '$D\\frac{n}{4} + D\\frac{n}{2} + n = \\left(\\frac{3}{4}D + 1\\right)n \\le D\\,n \\iff D \\ge 4$. Taban için $D \\ge 1$ de gerekir: $D = 4$, yani $T(n) \\le 4n$.',
+            },
+          ],
         },
         {
           kind: 'text',

@@ -108,6 +108,17 @@ Bu, yönsüz ağırlıklı bir grafikte **minimum yayılan ağaç** (MST) proble
           body: `- **Prim:** Dijkstra’nın bir değişikliği. Kırmızı-siyah ağaç ya da ikili yığınla ExtractMin ve DecreaseKey $O(\\log n)$ → $O(m \\log n)$. Fibonacci yığınıyla $O(m + n \\log n)$.
 - **Kruskal:** kenarları sıralamak $O(m \\log n)$ (ağırlıklar küçük tam sayılarsa RadixSort ile $O(m)$). Union-find ile $m$ işlem $O(m\\,\\alpha(n))$; $\\alpha$ ters Ackermann fonksiyonudur ve evrendeki atom sayısından küçük her $n$ için $\\alpha(n) \\le 4$. Pratikte neredeyse doğrusal.
 - **Daha yenileri:** Karger–Klein–Tarjan (1995) rastgele beklenen $O(n + m)$; Chazelle (2000) deterministik $O(m\\,\\alpha(n))$.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'Kenar ağırlıkları 1 ile 100 arasında tam sayılar. Kruskal’ın toplam süresi ne olur?',
+              options: ['$O(m\\log n)$', '$O(m + 100 + m\\,\\alpha(n))$, yani neredeyse doğrusal', '$O(n^2)$', '$O(mn)$'],
+              answer: 1,
+              hint: 'Kenarları sıralamak için CountingSort kullanılabilir mi?',
+              explanation: 'Ağırlıklar 100 kovaya düşer: CountingSort ile sıralama $O(m + 100)$. Geriye union-find işlemleri kalır: $O(m\\,\\alpha(n))$.',
+            },
+          ],
         },
         {
           kind: 'text',

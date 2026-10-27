@@ -106,6 +106,16 @@ First question: starting from one node, how do we find everything reachable from
           body: `Initialization is $O(n)$. Each node is removed from a layer once: $O(1)$ per node. When a node is processed all its neighbors are scanned; each edge is scanned once in a directed graph and twice in an undirected one: $O(1)$ per edge. In total
 $$O(\\#\\text{visits} + \\#\\text{edge scans}) = O(n + m).$$
 That is the time it takes to read the input: we cannot do better.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'A connected undirected graph has $n = 6$ vertices and $m = 7$ edges. How many edge entries does BFS scan in the adjacency lists in total?',
+              answer: 14,
+              hint: 'An undirected edge appears in two lists.',
+              explanation: 'Each undirected edge appears once in the list of each endpoint: $2m = 14$. Every vertex is visited: $O(n + m)$ in total.',
+            },
+          ],
         },
         {
           kind: 'text',

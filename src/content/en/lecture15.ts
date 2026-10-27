@@ -108,6 +108,17 @@ Good news: this problem is solved by greedy algorithms, in polynomial time and v
           body: `- **Prim:** a modification of Dijkstra. With a red-black tree or a binary heap, ExtractMin and DecreaseKey take $O(\\log n)$ → $O(m \\log n)$. With a Fibonacci heap, $O(m + n \\log n)$.
 - **Kruskal:** sorting the edges takes $O(m \\log n)$ (with small integer weights, $O(m)$ by RadixSort). With union-find, $m$ operations take $O(m\\,\\alpha(n))$; $\\alpha$ is the inverse Ackermann function and $\\alpha(n) \\le 4$ for every $n$ below the number of atoms in the universe. Nearly linear in practice.
 - **Newer ones:** Karger–Klein–Tarjan (1995), randomized expected $O(n + m)$; Chazelle (2000), deterministic $O(m\\,\\alpha(n))$.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'The edge weights are integers between 1 and 100. What is the total running time of Kruskal?',
+              options: ['$O(m\\log n)$', '$O(m + 100 + m\\,\\alpha(n))$, i.e. almost linear', '$O(n^2)$', '$O(mn)$'],
+              answer: 1,
+              hint: 'Can CountingSort sort the edges?',
+              explanation: 'The weights fall into 100 buckets: sorting with CountingSort takes $O(m + 100)$. What remains are the union-find operations: $O(m\\,\\alpha(n))$.',
+            },
+          ],
         },
         {
           kind: 'text',

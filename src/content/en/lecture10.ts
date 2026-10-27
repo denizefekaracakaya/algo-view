@@ -111,6 +111,17 @@ One DFS is not enough: a search from $u$ may leak **outside** $u$’s SCC. The f
           kind: 'complexity',
           title: 'Running time',
           body: `Building the reversed graph takes $O(n + m)$; the two DFS-Loop calls take $O(n + m)$; the order of pass 2 needs no sorting: append nodes to a list as they finish in pass 1 and read the list backwards. Total **$O(n + m)$**, i.e. linear.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'The second pass needs the vertices in decreasing order of finish time. Why is no sorting needed?',
+              options: ['Finish times are small integers, so CountingSort is enough.', 'If each vertex is put at the front of a list the moment it finishes, the list is in decreasing order of $f$.', 'The order does not matter.', 'DFS already visits the vertices in alphabetical order.'],
+              answer: 1,
+              hint: 'In what order do the vertices finish?',
+              explanation: 'Vertices finish in increasing order of $f$. Putting each finished vertex at the front of a list (or appending and reading it backwards) gives decreasing $f$ in $O(n)$. CountingSort would also work, but it is unnecessary.',
+            },
+          ],
         },
         {
           kind: 'text',
