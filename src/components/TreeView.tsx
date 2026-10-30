@@ -63,7 +63,8 @@ export function TreeView({ root, roles = {}, labels = {}, bad = [], label, onNod
   const desc = (n: Laid) =>
     `${n.key}${n.node.color ? (n.node.color === 'R' ? tx(', kırmızı', ', red') : tx(', siyah', ', black')) : ''}${roles[n.key] ? ', ' + roleText(roles[n.key]) : ''}${labels[n.key] ? ', ' + labels[n.key] : ''}${badSet.has(n.key) ? tx(', ihlal', ', violation') : ''}`
   return (
-    <svg className="tree-svg" viewBox={`0 0 ${width} ${height}`} width={width} role="img" aria-label={`${label}: ${nodes.map(desc).join('; ')}`}>
+    // With clickable nodes the svg is a group of buttons; role="img" would hide them from assistive tech.
+    <svg className="tree-svg" viewBox={`0 0 ${width} ${height}`} width={width} role={onNodeClick ? 'group' : 'img'} aria-label={onNodeClick ? label : `${label}: ${nodes.map(desc).join('; ')}`}>
       {nodes.map((n) => {
         if (n.parent === null) return null
         const a = pos.get(n.parent)!

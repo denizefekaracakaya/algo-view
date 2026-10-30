@@ -69,8 +69,9 @@ Ders sonundaki **Notlarım** kutusu, kendi cümlelerinle kısa bir özet yazmak 
 | 15 | Minimum yayılan ağaçlar: Prim ve Kruskal |
 | 16 | Maksimum akış, minimum kesme, Ford–Fulkerson, eşleştirme |
 | 17 | Kararlı eşleşme ve Gale–Shapley |
+| 18 | Kapanış: “Sırada ne var?” (17 dersin araç kutusu, doğrusal programlama ve dualite, hata düzelten kodlar) |
 
-Her dersin sonunda kısa bir quiz ve dersin resmî slayt ve notlarına bağlantılar bulunur.
+Her dersin sonunda kısa bir quiz ve dersin resmî slayt ve notlarına bağlantılar bulunur. Ders 18 ayrı bir ders değil, panelden ve son dersten açılan bir kapanış sayfasıdır.
 
 ## Çalışmaların güvende
 

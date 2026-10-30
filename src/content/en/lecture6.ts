@@ -435,6 +435,16 @@ The “BucketSort” in the lecture title is this bucket idea; the notes and sli
           ],
           viz: 'sortComparison',
           body: `Pick a scenario; the suitable algorithms and the reasoning are highlighted. Pay special attention to the “kind of guarantee” column in the table.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'How many comparisons does InsertionSort make on an already sorted array of $n = 1000$ elements?',
+              answer: 999,
+              hint: 'Each new element is compared only with its left neighbor and stays where it is.',
+              explanation: 'One comparison for each $i = 1, \\dots, n - 1$: $n - 1 = 999$. MergeSort still makes about $\\frac{n}{2}\\log_2 n \\approx 5000$ comparisons on sorted input: InsertionSort’s best case is linear, MergeSort’s is not.',
+            },
+          ],
         },
         {
           kind: 'text',
@@ -448,6 +458,20 @@ The “BucketSort” in the lecture title is this bucket idea; the notes and sli
               answer: 1,
               hint: 'An expected-time guarantee does not bound a single run.',
               explanation: 'Real-time systems need a worst-case guarantee: MergeSort or HeapSort guarantee $O(n\\log n)$ on every input and every run.',
+            },
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'An adversary reads the **code** of your randomized QuickSort and picks the input accordingly, but does not know the random numbers drawn while it runs. Does the expected $O(n\\log n)$ guarantee still hold?',
+              options: [
+                'Yes: the expectation is over the algorithm’s random choices, taken separately for every input.',
+                'No: the adversary can find an input whose expected time is $\\Theta(n^2)$.',
+                'Only if the input is a random permutation.',
+                'Only if all keys are distinct.',
+              ],
+              answer: 0,
+              hint: 'For which inputs was $E[C] \\le 2n \\ln n$ proven in Lecture 5?',
+              explanation: 'The proof works for every fixed input; the randomness comes from the algorithm, not the input. Only an adversary who knew the random bits in advance could pick a bad input. With fixed-pivot QuickSort, knowing the code is enough: sorted input takes $\\Theta(n^2)$.',
             },
           ],
           body: `- **Worst case (deterministic):** holds for every input (MergeSort $O(n\\log n)$, CountingSort $O(n + r)$).
@@ -526,6 +550,15 @@ The common lesson: no algorithm is best in every situation; the model (compariso
           answer: 4,
           hint: 'Each pass handles one “digit”, i.e. 16 bits.',
           explanation: '$64 / 16 = 4$ passes, each $O(n + 2^{16})$.',
+        },
+        {
+          id: 'q4',
+          kind: 'mcq',
+          prompt: 'An embedded device has only $O(1)$ extra memory and needs worst-case $O(n\\log n)$ time on every input. The keys can be compared but are not small integers. Which one fits?',
+          options: ['MergeSort', 'HeapSort', 'CountingSort', 'Randomized QuickSort'],
+          answer: 1,
+          hint: 'Rule out each candidate on two criteria: extra memory and kind of guarantee.',
+          explanation: 'HeapSort works in place and is $O(n\\log n)$ in the worst case. MergeSort’s merge step needs $O(n)$ extra memory; randomized QuickSort’s guarantee is an expected time; CountingSort needs small integer keys and $O(n + r)$ memory.',
         },
       ],
       practice: [

@@ -32,7 +32,7 @@ export function CheckBlock({
   onResult: (qid: string, correct: boolean) => void
 }) {
   return (
-    <aside className="check-block" aria-label={tx('Kendini dene', 'Try it yourself')}>
+    <div className="check-block" role="group" aria-label={tx('Kendini dene', 'Try it yourself')}>
       <div className="check-head">
         <span className="check-icon" aria-hidden>
           ?
@@ -51,7 +51,7 @@ export function CheckBlock({
           onRecord={(c) => onResult(q.id, c)}
         />
       ))}
-    </aside>
+    </div>
   )
 }
 
@@ -151,6 +151,8 @@ function McqBody({ q, onAnswer }: { q: MCQ; onAnswer: (c: boolean) => void }) {
           <label key={i} className={'option' + (checked !== null && i === checked ? (correct ? ' correct' : ' wrong') : '')}>
             <input type="radio" name={name} checked={choice === i} onChange={() => setChoice(i)} />
             <span>
+              {/* A pure-math option has no text name for assistive tech (MathML does not name a label). */}
+              {!o.replace(/\$[^$]*\$/g, '').trim() && <span className="sr-only">{tx('Seçenek', 'Option')} {String.fromCharCode(65 + i)}: </span>}
               <Inline src={o} />
             </span>
           </label>

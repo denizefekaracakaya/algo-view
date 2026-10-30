@@ -260,6 +260,16 @@ The problem: when codes are written one after another, how do we separate them? 
 If $f(c)$ is the frequency of character $c$ ($\\sum f(c) = 1$) and $d_T(c)$ the depth of its leaf (the code length), the average number of bits is
 $$B(T) = \\sum_{c} f(c)\\, d_T(c).$$
 A tree minimizing $B(T)$ is **optimal**. An optimal tree is **full**: every internal node has two children (a node with one child could be removed, shortening codes).`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'How many internal nodes does a **full** code tree have for the 6-character alphabet (a–f) of the notes?',
+              answer: 5,
+              hint: 'Every Huffman merge creates one internal node and reduces the number of trees by one.',
+              explanation: 'A full binary tree with $n$ leaves has $n - 1$ internal nodes: $6 - 1 = 5$. This is also why Huffman makes exactly $n - 1$ merges.',
+            },
+          ],
         },
         {
           kind: 'pseudocode',
@@ -354,6 +364,16 @@ A tree minimizing $B(T)$ is **optimal**. An optimal tree is **full**: every inte
 - Forgetting the new internal node: in later steps it is a candidate tree too.
 - Thinking code lengths are inversely proportional to frequencies: the relation is monotone, not proportional.
 - Believing there is a single “correct” tree when frequencies tie: there can be several optimal trees, all with the same cost.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'The frequencies are a 1, b 1, c 2, d 3, e 5 (Fibonacci numbers). How many bits long is the **longest** codeword of the Huffman code?',
+              answer: 4,
+              hint: 'Write out the merges: 1 + 1, then 2 + 2, … Is each new internal node again one of the two smallest in the next step?',
+              explanation: '1 + 1 = 2, 2 + 2 = 4, 3 + 4 = 7, 5 + 7 = 12: at every step the new node is joined with the next character and the tree becomes a chain. The codes are e 0, d 10, c 110, a 1110, b 1111: the longest is 4 bits, i.e. $n - 1$. The more skewed the frequencies, the deeper the tree; in total $1 \\cdot 4 + 1 \\cdot 4 + 2 \\cdot 3 + 3 \\cdot 2 + 5 \\cdot 1 = 25$ bits.',
+            },
+          ],
         },
       ],
       quiz: [

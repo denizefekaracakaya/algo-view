@@ -11,6 +11,7 @@ import { LANGS, tx } from './i18n/lang'
 const LessonPage = lazy(() => import('./pages/LessonPage').then((m) => ({ default: m.LessonPage })))
 const NotesPage = lazy(() => import('./pages/NotesPage').then((m) => ({ default: m.NotesPage })))
 const PracticePage = lazy(() => import('./pages/PracticePage').then((m) => ({ default: m.PracticePage })))
+const WrapUpPage = lazy(() => import('./pages/WrapUpPage').then((m) => ({ default: m.WrapUpPage })))
 
 export function Logo() {
   return (
@@ -73,6 +74,46 @@ function ScrollToTop() {
   return null
 }
 
+const SCROLLERS = '.katex-display, .table-wrap, .grid-wrap, .viz-stage'
+
+/**
+ * Wide formulas, tables and visualizer stages scroll sideways on narrow screens. Make exactly
+ * those that overflow focusable, so keyboard users can scroll them with the arrow keys.
+ */
+function ScrollRegionsFocusable() {
+  useEffect(() => {
+    const main = document.getElementById('main')
+    if (!main) return
+    let frame = 0
+    const scan = () => {
+      frame = 0
+      main.querySelectorAll<HTMLElement>(SCROLLERS).forEach((el) => {
+        const overflows = el.scrollWidth > el.clientWidth + 1
+        if (overflows && !el.hasAttribute('tabindex')) {
+          el.tabIndex = 0
+          el.dataset.scrollFocus = ''
+        } else if (!overflows && 'scrollFocus' in el.dataset) {
+          el.removeAttribute('tabindex')
+          delete el.dataset.scrollFocus
+        }
+      })
+    }
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(scan)
+    }
+    const mo = new MutationObserver(schedule)
+    mo.observe(main, { childList: true, subtree: true })
+    window.addEventListener('resize', schedule)
+    schedule()
+    return () => {
+      mo.disconnect()
+      window.removeEventListener('resize', schedule)
+      cancelAnimationFrame(frame)
+    }
+  }, [])
+  return null
+}
+
 function Shell() {
   return (
     <>
@@ -101,6 +142,7 @@ function Shell() {
       </header>
       <main id="main" className="page" tabIndex={-1}>
         <ScrollToTop />
+        <ScrollRegionsFocusable />
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route
@@ -124,6 +166,14 @@ function Shell() {
             element={
               <Suspense fallback={<p className="muted">{tx('Yükleniyor…', 'Loading…')}</p>}>
                 <NotesPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/kapanis"
+            element={
+              <Suspense fallback={<p className="muted">{tx('Yükleniyor…', 'Loading…')}</p>}>
+                <WrapUpPage />
               </Suspense>
             }
           />

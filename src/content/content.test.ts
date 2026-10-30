@@ -314,3 +314,24 @@ describe('substitution: T(n) ≤ T(n/4) + T(n/2) + n (l3-substitution c5)', () =
     expect(T(2 ** 30) / 2 ** 30).toBeGreaterThan(3.9)
   })
 })
+
+describe('try-it-yourself questions added to the comparison lessons and the 4th quiz question', () => {
+  it('l1-why q4: an n² program at 3 s for n = 1000 takes 27 s for n = 3000', () => {
+    expect(3 * (3000 / 1000) ** 2).toBe(27)
+  })
+  it('l6-compare c4: InsertionSort on sorted input makes n − 1 comparisons, MergeSort about (n/2) log₂ n', () => {
+    const sorted = Array.from({ length: 1000 }, (_, i) => i)
+    expect(insertionSortComparisons(sorted)).toBe(999)
+    const m = mergeSortComparisons(sorted)
+    expect(m).toBeGreaterThan(4500)
+    expect(m).toBeLessThan(5500)
+  })
+  it('l7-compare c4 and q4: RB bound for n = 12, measured height, chain search total for n = 100', () => {
+    expect(Math.floor(2 * Math.log2(13))).toBe(7)
+    expect(height(rbFromSequence(Array.from({ length: 12 }, (_, i) => i + 1)))).toBe(4)
+    const keys = Array.from({ length: 100 }, (_, i) => i + 1)
+    const chain = bstFromSequence(keys)
+    expect(keys.reduce((s, k) => s + searchCost(chain, k), 0)).toBe(5050)
+    expect(2 * Math.log2(101)).toBeLessThan(14)
+  })
+})

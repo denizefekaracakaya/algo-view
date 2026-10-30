@@ -124,7 +124,7 @@ export function MasterLab() {
           {shown && <CaseExplanation r={shown} />}
           {shown && <RecursionTreeLevels a={shown.a} b={shown.b} d={shown.d} />}
         </div>
-        <aside className="viz-side">
+        <div className="viz-side">
           <span className="label-tag">{tx('Master Teoremi (Ders 3)', 'Master Theorem (Lecture 3)')}</span>
           <Tex display>{'T(n)=\\begin{cases} O(n^d\\log n) & a = b^d\\\\ O(n^d) & a < b^d \\\\ O(n^{\\log_b a}) & a > b^d\\end{cases}'}</Tex>
           <p className="small">
@@ -137,7 +137,7 @@ export function MasterLab() {
               'When the work term is given as O(n^d), the theorem gives an upper bound (O). If the work is Θ(n^d), the same expressions are tight (Θ) bounds — the general version in the notes.',
             )}
           </p>
-        </aside>
+        </div>
       </div>
     </div>
   )

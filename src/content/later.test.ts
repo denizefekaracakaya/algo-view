@@ -504,3 +504,18 @@ describe('one more try-it-yourself question in Lectures 9–17', () => {
     expect(lcsTable('ABCBDA', 'BDCABABC').length * lcsTable('ABCBDA', 'BDCABABC')[0].length).toBe(63)
   })
 })
+
+describe('two more try-it-yourself questions in l14-huffman', () => {
+  it('a full code tree on 6 leaves has 5 internal nodes (c4)', () => {
+    const { root } = huffmanTrace(HUFFMAN_EXAMPLE)
+    type N = { left: N | null; right: N | null }
+    const internal = (t: N | null): number => (!t || (!t.left && !t.right) ? 0 : 1 + internal(t.left) + internal(t.right))
+    expect(internal(root as N)).toBe(5)
+  })
+  it('Fibonacci frequencies give a chain: longest code 4 bits, 25 bits in total (c5)', () => {
+    const { codes, cost } = huffmanTrace([['a', 1], ['b', 1], ['c', 2], ['d', 3], ['e', 5]])
+    expect(Math.max(...Object.values(codes).map((c) => c.length))).toBe(4)
+    expect(Object.fromEntries(Object.entries(codes).map(([k, c]) => [k, c.length]))).toEqual({ a: 4, b: 4, c: 3, d: 2, e: 1 })
+    expect(cost * 12).toBeCloseTo(25)
+  })
+})

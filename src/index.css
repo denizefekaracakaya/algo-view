@@ -9,7 +9,7 @@
   --border-strong: #c9c8c2;
   --text: #17171a;
   --text-2: #4d4c48;
-  --muted: #7a7973;
+  --muted: #686761;
   --accent: #4f46e5;
   --accent-ink: #3f37c9;
   --accent-soft: #eceafd;
@@ -33,6 +33,12 @@
   --st-active-bg: #eceafd;
   --st-bad: #c93636;
   --st-bad-bg: #fde4e4;
+  /* Text-strength variants of the state colors (WCAG AA 4.5:1 on their -bg and on surfaces). */
+  --st-compare-ink: #8a5a00;
+  --st-sorted-ink: #157249;
+  --st-less-ink: #1f62b3;
+  --st-greater-ink: #a8441a;
+  --st-bad-ink: #b02e2e;
 
   --rb-red: #d23f3f;
   --rb-black: #222226;
@@ -64,7 +70,7 @@
     --border-strong: #44444b;
     --text: #f0efec;
     --text-2: #c3c2b7;
-    --muted: #8e8d86;
+    --muted: #9a9992;
     --accent: #8f88ff;
     --accent-ink: #aaa4ff;
     --accent-soft: #24223f;
@@ -86,6 +92,11 @@
     --st-active-bg: #24223f;
     --st-bad: #ef6b6b;
     --st-bad-bg: #431d1f;
+    --st-compare-ink: var(--st-compare);
+    --st-sorted-ink: var(--st-sorted);
+    --st-less-ink: var(--st-less);
+    --st-greater-ink: var(--st-greater);
+    --st-bad-ink: var(--st-bad);
     --rb-red: #e05555;
     --rb-black: #0a0a0c;
     --series-1: #3987e5;
@@ -105,7 +116,7 @@
   --border-strong: #44444b;
   --text: #f0efec;
   --text-2: #c3c2b7;
-  --muted: #8e8d86;
+  --muted: #9a9992;
   --accent: #8f88ff;
   --accent-ink: #aaa4ff;
   --accent-soft: #24223f;
@@ -127,6 +138,11 @@
   --st-active-bg: #24223f;
   --st-bad: #ef6b6b;
   --st-bad-bg: #431d1f;
+  --st-compare-ink: var(--st-compare);
+  --st-sorted-ink: var(--st-sorted);
+  --st-less-ink: var(--st-less);
+  --st-greater-ink: var(--st-greater);
+  --st-bad-ink: var(--st-bad);
   --rb-red: #e05555;
   --rb-black: #0a0a0c;
   --series-1: #3987e5;
@@ -314,7 +330,7 @@ kbd {
 }
 .btn.danger {
   border-color: var(--st-bad);
-  color: var(--st-bad);
+  color: var(--st-bad-ink);
 }
 .btn[aria-pressed='true'] {
   background: var(--accent-soft);
@@ -374,7 +390,7 @@ textarea.input {
   font-weight: 600;
 }
 .error-msg {
-  color: var(--st-bad);
+  color: var(--st-bad-ink);
   background: var(--st-bad-bg);
   border-radius: 6px;
   padding: 6px 10px;
@@ -482,12 +498,12 @@ textarea.input {
 }
 .badge.done {
   background: var(--st-sorted-bg);
-  color: var(--st-sorted);
+  color: var(--st-sorted-ink);
   border-color: transparent;
 }
 .badge.progress {
   background: var(--st-compare-bg);
-  color: var(--st-compare);
+  color: var(--st-compare-ink);
   border-color: transparent;
 }
 .badge.accent {
@@ -1000,7 +1016,7 @@ textarea.input {
   border-color: var(--st-compare);
 }
 .st-compare .mark {
-  color: var(--st-compare);
+  color: var(--st-compare-ink);
 }
 .st-pivot .bar {
   background: var(--st-pivot-bg);
@@ -1015,24 +1031,25 @@ textarea.input {
   border-color: var(--st-sorted);
 }
 .st-sorted .mark {
-  color: var(--st-sorted);
+  color: var(--st-sorted-ink);
 }
 .st-less .bar {
   background: var(--st-less-bg);
   border-color: var(--st-less);
 }
 .st-less .mark {
-  color: var(--st-less);
+  color: var(--st-less-ink);
 }
 .st-greater .bar {
   background: var(--st-greater-bg);
   border-color: var(--st-greater);
 }
 .st-greater .mark {
-  color: var(--st-greater);
+  color: var(--st-greater-ink);
 }
 .st-elim {
-  opacity: 0.55;
+  /* Hatching and dashed borders mark elimination; the opacity stays high enough for AA text contrast. */
+  opacity: 0.8;
 }
 .st-elim .bar {
   background: repeating-linear-gradient(135deg, var(--st-elim-bg) 0 4px, var(--surface) 4px 8px);
@@ -1056,7 +1073,7 @@ textarea.input {
   color: #fff;
 }
 .st-found .mark {
-  color: var(--st-sorted);
+  color: var(--st-sorted-ink);
 }
 
 /* Prediction */
@@ -1511,7 +1528,7 @@ code {
   color: var(--muted);
 }
 .sec-toc li.read a svg.sec-done {
-  color: var(--st-sorted);
+  color: var(--st-sorted-ink);
 }
 .sec-toc a:hover {
   background: var(--surface-2);
@@ -1609,7 +1626,7 @@ code {
   border-bottom: 1px dashed var(--border);
 }
 .ok-text {
-  color: var(--st-sorted);
+  color: var(--st-sorted-ink);
   font-weight: 700;
 }
 
@@ -2138,7 +2155,7 @@ td.hl-cell {
   font-weight: 700;
 }
 .exam-timer.low {
-  color: var(--st-bad);
+  color: var(--st-bad-ink);
 }
 .exam-dots {
   display: flex;
@@ -2635,4 +2652,49 @@ td.hl-cell {
   background: var(--st-bad-bg);
   border-color: var(--st-bad);
   text-decoration: line-through;
+}
+
+/* ───────────────────────── Lecture 18 wrap-up ───────────────────────── */
+.wrap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.wrap-tool {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wrap-tool h3 {
+  margin: 0;
+}
+.wrap-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.wrap-lp {
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  font-family: var(--mono);
+}
+.wrapup details > summary {
+  cursor: pointer;
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+.closing-cta {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+@media (max-width: 760px) {
+  .wrap-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

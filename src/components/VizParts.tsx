@@ -55,7 +55,7 @@ export function Grid({ caption, colHead, rowHead, cells, tone, corner = '' }: { 
         <caption className="sr-only">{caption}</caption>
         <thead>
           <tr>
-            <th scope="col">{corner}</th>
+            {corner ? <th scope="col">{corner}</th> : <td />}
             {colHead.map((c, j) => (
               <th key={j} scope="col">
                 {c}

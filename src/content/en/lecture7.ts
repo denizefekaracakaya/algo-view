@@ -523,6 +523,16 @@ Final tree: 10 (B) → left 5 (R) [left 3 (B) → left 1 (R); right 7 (B)], righ
           ],
           viz: 'treeCompare',
           body: `Try sorted, reverse-sorted and shuffled insertion orders. Examine the average and worst-case number of search comparisons, the height, and the guaranteed bound.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'For a red-black tree with $n = 12$ nodes, what is the largest height allowed by the bound $h \\le 2\\log_2(n+1)$? (Heights are integers.)',
+              answer: 7,
+              hint: '$\\log_2 13 \\approx 3.70$.',
+              explanation: '$2\\log_2 13 \\approx 7.40$, and since the height is an integer, $h \\le 7$. Inserting 1…12 in sorted order gives a measured height of 4: the bound is an **upper** bound valid for every insertion order, not the measurement of one order.',
+            },
+          ],
         },
         {
           kind: 'text',
@@ -560,6 +570,15 @@ But real data is often not random: timestamps, increasing ID numbers and alphabe
               answer: 1,
               hint: 'Inserting increasing keys is the same as the “Sorted” example.',
               explanation: 'Each new key is larger than the previous one, so it is inserted at the far right: height $n - 1$. A self-balancing tree or randomization is needed.',
+            },
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'The same increasing timestamps are inserted into a **treap** (every node gets an independent random priority). What is the expected height?',
+              options: ['$\\Theta(n)$, because the keys arrive sorted', '$O(\\log n)$', '$\\Theta(\\sqrt n)$', 'Exactly $\\lfloor \\log_2 n \\rfloor$'],
+              answer: 1,
+              hint: 'A treap’s shape depends on the priorities, not on the insertion order.',
+              explanation: 'A treap has the same shape as a plain BST built by inserting the keys in the order of their random priorities. So whatever the data order, the expected height is $O(\\log n)$. This is an expected bound, not a per-run guarantee as in a red-black tree.',
             },
           ],
         },
@@ -613,6 +632,14 @@ But real data is often not random: timestamps, increasing ID numbers and alphabe
           answer: 1,
           hint: 'The root is the first key inserted. Which key is the median?',
           explanation: 'First the median 4 becomes the root, then the medians 2 and 6 of the two halves, and the leaves last. The other three orders give chains of height 6 (the last one zigzags).',
+        },
+        {
+          id: 'q4',
+          kind: 'numeric',
+          prompt: 'In a plain BST built by inserting 1 to 100 in sorted order, every key is searched once. How many comparisons are made in total?',
+          answer: 5050,
+          hint: 'Key $k$ is the $k$-th node of the chain, counting from the root.',
+          explanation: '$1 + 2 + \\dots + 100 = \\frac{100 \\cdot 101}{2} = 5050$, an average of 50.5 per search. In a red-black tree every search makes at most $h + 1$ comparisons and $h \\le 2\\log_2 101 < 14$.',
         },
       ],
       practice: [

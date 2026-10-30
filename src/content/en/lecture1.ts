@@ -183,6 +183,14 @@ Multiplication is an everyday example too: the encryption in banking apps (RSA) 
           hint: '$n^2 / n^{1.6} = n^{0.4}$; does this ratio grow without bound?',
           explanation: '$n^{0.4} > 10^4 \\iff n > 10^{10}$. From that point on $n^2$ is always larger; a constant factor can only delay an exponent difference for a while.',
         },
+        {
+          id: 'q4',
+          kind: 'numeric',
+          prompt: 'A program that scales like $n^2$ takes 3 seconds for $n = 1000$. About how many seconds does it take for $n = 3000$?',
+          answer: 27,
+          hint: 'When $n$ triples, by what factor does $n^2$ grow?',
+          explanation: '$(3n)^2 = 9n^2$: the time grows ninefold, $3 \\cdot 9 = 27$ seconds. The constant factor (here $3 / 1000^2$ seconds) does not change the ratio.',
+        },
       ],
       practice: [
         {

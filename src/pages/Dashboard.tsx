@@ -179,12 +179,23 @@ export function Dashboard() {
           {tx('Aramanızla eşleşen ders bulunamadı.', 'No lessons match your search.')}
         </p>
       )}
-      <p className="small muted" style={{ marginTop: 24 }}>
-        {tx(
-          'Kapsam: Ders 1–17 (“Why are you here?”tan “Stable Matchings and Gale-Shapley”e). Ders 18 (“What’s next?”) bir kapanış dersi olduğu için ayrı bir derse dönüştürülmedi.',
-          'Scope: Lectures 1–17 (from “Why are you here?” to “Stable Matchings and Gale-Shapley”). Lecture 18 (“What’s next?”) is a wrap-up and has no lesson of its own.',
-        )}
-      </p>
+      <section className="card card-pad closing-cta" aria-labelledby="closing-cta-h">
+        <div className="grow">
+          <div className="lecture-num">{tx('Ders 18 · Kapanış', 'Lecture 18 · Wrap-up')}</div>
+          <h2 id="closing-cta-h" style={{ fontSize: '1.05rem', margin: '2px 0 0' }}>
+            {tx('Sırada ne var?', 'What’s next?')}
+          </h2>
+          <p className="small" style={{ margin: '4px 0 0', color: 'var(--text-2)' }}>
+            {tx(
+              '17 dersin araç kutusu tek sayfada, birkaç “inci” (doğrusal programlama ve dualite, hata düzelten kodlar) ve buradan sonra nereye gidileceği.',
+              'The toolbox of the 17 lectures on one page, a few “gems” (linear programming and duality, error-correcting codes) and where to go from here.',
+            )}
+          </p>
+        </div>
+        <Link className="btn" to="/kapanis">
+          {tx('Kapanışı aç', 'Open the wrap-up')} <ArrowRight size={16} aria-hidden />
+        </Link>
+      </section>
     </div>
   )
 }

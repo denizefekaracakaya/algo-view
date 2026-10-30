@@ -85,7 +85,7 @@ export function TraceViewer<S>({ trace, label, render, code, codeTitle, legend, 
           {render(step, p.index)}
           {legend && <div className="legend">{legend}</div>}
         </div>
-        <aside className="viz-side" aria-label={tx('Adım açıklaması', 'Step explanation')}>
+        <div className="viz-side" role="group" aria-label={tx('Adım açıklaması', 'Step explanation')}>
           {pq ? (
             <div className="predict" role="group" aria-label={tx('Tahmin sorusu', 'Prediction question')}>
               <h3>
@@ -165,7 +165,7 @@ export function TraceViewer<S>({ trace, label, render, code, codeTitle, legend, 
               <Pseudocode lines={code} active={step.line} />
             </div>
           )}
-        </aside>
+        </div>
       </div>
       <div className="viz-controls" role="toolbar" aria-label={tx('Oynatma kontrolleri', 'Playback controls')}>
         <button className="btn icon" onClick={() => { setPending(null); p.reset() }} aria-label={tx('Başa sar', 'Reset')} title={tx('Başa sar', 'Reset')}>

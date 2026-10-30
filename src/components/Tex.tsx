@@ -25,8 +25,19 @@ export function Rich({ text, className }: { text: string; className?: string }) 
 }
 
 function Block({ src }: { src: string }) {
-  if (src.startsWith('$$') && src.endsWith('$$')) return <Tex display>{src.slice(2, -2).trim()}</Tex>
   const lines = src.split('\n')
+  // Several display formulas on consecutive lines: one display block each.
+  if (lines.length > 1 && lines.every((l) => /^\s*\$\$.*\$\$\s*$/.test(l)))
+    return (
+      <>
+        {lines.map((l, i) => (
+          <Tex key={i} display>
+            {l.trim().slice(2, -2).trim()}
+          </Tex>
+        ))}
+      </>
+    )
+  if (src.startsWith('$$') && src.endsWith('$$')) return <Tex display>{src.slice(2, -2).trim()}</Tex>
   if (lines.every((l) => /^\s*- /.test(l)))
     return (
       <ul>

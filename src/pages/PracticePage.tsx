@@ -162,7 +162,7 @@ function BankPanel({ lessonId }: { lessonId: string | null }) {
 
   return (
     <div className="bank">
-      <aside className="card card-pad bank-side">
+      <div className="card card-pad bank-side">
         <strong className="small">{tx('Soru türleri', 'Question types')}</strong>
         <ul className="bank-types">
           {gens.map((g) => (
@@ -196,7 +196,7 @@ function BankPanel({ lessonId }: { lessonId: string | null }) {
         <p className="small muted" style={{ margin: 0 }}>
           {tx('Seri yalnızca ilk denemede doğru çözülen sorularla artar.', 'The streak only grows with questions solved on the first try.')}
         </p>
-      </aside>
+      </div>
       <div className="stack">
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <span className="badge accent">
@@ -206,6 +206,7 @@ function BankPanel({ lessonId }: { lessonId: string | null }) {
             <Shuffle size={16} aria-hidden /> {tx('Yeni soru', 'New question')}
           </button>
         </div>
+        <h2 className="sr-only">{tx('Üretilen soru', 'Generated question')}</h2>
         <QuestionCard key={q.id} q={q} n={count} storeKey={`gen:${q.id}`} onRecord={record} solved={solved.includes(q.id)} />
       </div>
     </div>

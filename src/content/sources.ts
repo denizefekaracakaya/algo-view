@@ -142,6 +142,9 @@ export const SRC = {
     slides: s('Ders 17 slaytları (PDF)', 'Lecture 17 slides (PDF)', `${F}/Lecture17.pdf`, 'slides'),
     concept: s('Kavram kontrolü: Stable Matching (PDF)', 'Concept check: Stable Matching (PDF)', `${BANK}/stablematching.pdf`, 'concept'),
   },
+  l18: {
+    slides: s('Ders 18 slaytları: What’s next? (PDF)', 'Lecture 18 slides: What’s next? (PDF)', `${F}/Lecture18.pdf`, 'slides'),
+  },
   pages: {
     lectures: s('CS161 Ders sayfası', 'CS161 lectures page', COURSE.lectures, 'page'),
   },

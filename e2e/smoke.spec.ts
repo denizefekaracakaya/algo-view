@@ -5,12 +5,38 @@ async function noHorizontalOverflow(page: Page) {
   expect(overflow).toBeLessThanOrEqual(1)
 }
 
-test('dashboard lists lectures 1–17 and nothing beyond', async ({ page }) => {
+test('dashboard lists lectures 1–17 as lessons and Lecture 18 as the wrap-up page', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Algoritmaları görünür kıl.' })).toBeVisible()
   for (let n = 1; n <= 17; n++) await expect(page.getByText(new RegExp(`^Ders ${n} ·`)).first()).toBeVisible()
-  await expect(page.getByText(/^Ders 18 ·/)).toHaveCount(0)
+  await expect(page.locator('.lecture-card')).toHaveCount(17)
+  await expect(page.getByText(/^Ders 18 · Kapanış/)).toBeVisible()
   await noHorizontalOverflow(page)
+  await page.getByRole('link', { name: /Kapanışı aç/ }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Sırada ne var?')
+})
+
+test('wrap-up page: toolbox links, gem questions, last lesson leads here, English version', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (e) => errors.push(e.message))
+  page.on('console', (m) => m.type() === 'error' && errors.push(m.text()))
+  await page.goto('/#/ders/l17-stable-matching')
+  await page.getByRole('link', { name: /Ders 18 · Sırada ne var\?/ }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Sırada ne var?')
+  await expect(page.locator('.wrap-tool')).toHaveCount(9)
+  await expect(page.locator('.wrap-tool a')).toHaveCount(31)
+  await expect(page.locator('.katex-error')).toHaveCount(0)
+  const q = page.locator('.quiz-q').filter({ hasText: 'f(1) = 5' })
+  await q.getByLabel('Cevabınız').fill('3')
+  await q.getByRole('button', { name: 'Kontrol et' }).click()
+  await expect(q.getByRole('status')).toContainText('Doğru')
+  await noHorizontalOverflow(page)
+  await page.getByRole('button', { name: 'EN' }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('What’s next?')
+  await expect(page.getByRole('heading', { name: 'Linear programming and duality' })).toBeVisible()
+  await noHorizontalOverflow(page)
+  await expect(page.getByRole('link', { name: /Lecture 18 slides/ })).toHaveAttribute('href', /Lecture18\.pdf$/)
+  expect(errors).toEqual([])
 })
 
 test('search filter narrows lessons', async ({ page }) => {

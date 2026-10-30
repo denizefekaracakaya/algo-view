@@ -73,7 +73,7 @@ export function PivotCompare() {
           </ol>
           {sizes.length > 24 && <p className="small muted">{tx(`… ve ${sizes.length - 24} çağrı daha`, `… and ${sizes.length - 24} more calls`)}</p>}
         </div>
-        <aside className="viz-side">
+        <div className="viz-side">
           <dl className="kv" style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
             <div>
               <dt>{tx('çağrı sayısı', 'calls')}</dt>
@@ -116,7 +116,7 @@ export function PivotCompare() {
               'Each call does work proportional to its size (the partition), so the total length of the bars shows the total work.',
             )}
           </p>
-        </aside>
+        </div>
       </div>
     </div>
   )
@@ -222,7 +222,7 @@ export function MedianOfMediansGrid() {
             </span>
           </p>
         </div>
-        <aside className="viz-side">
+        <div className="viz-side">
           <span className="label-tag">{tx('Sayılar', 'Counts')}</span>
           <table className="data">
             <tbody>
@@ -268,7 +268,7 @@ export function MedianOfMediansGrid() {
               'The lemma does not count the pivot’s own group or a possibly incomplete last group, so it gives a smaller number than the figure — but one that holds for every input.',
             )}
           </p>
-        </aside>
+        </div>
       </div>
     </div>
   )

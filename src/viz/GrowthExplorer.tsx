@@ -49,7 +49,7 @@ export function GrowthExplorer() {
     <div className="card card-pad stack">
       <div className="row" role="group" aria-label={tx('Fonksiyon seçimi (en fazla 4)', 'Function choice (at most 4)')}>
         {GROWTH_FNS.map((f) => (
-          <button key={f.id} className="btn sm" aria-pressed={selected.includes(f.id)} onClick={() => toggle(f.id)}>
+          <button key={f.id} className="btn sm" aria-pressed={selected.includes(f.id)} aria-label={f.label} onClick={() => toggle(f.id)}>
             <Tex>{f.tex}</Tex>
           </button>
         ))}

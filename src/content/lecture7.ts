@@ -523,6 +523,16 @@ Son ağaç: 10 (S) → sol 5 (K) [sol 3 (S) → sol 1 (K); sağ 7 (S)], sağ 15 
           ],
           viz: 'treeCompare',
           body: `Sıralı, ters sıralı ve karışık ekleme sıralarını deneyin. Ortalama ve en kötü arama karşılaştırma sayısını, yüksekliği ve garanti edilen sınırı inceleyin.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: '$n = 12$ düğümlü bir kırmızı-siyah ağaç için $h \\le 2\\log_2(n+1)$ sınırı, yüksekliğin en fazla kaç olabileceğini söyler? (Yükseklik bir tam sayıdır.)',
+              answer: 7,
+              hint: '$\\log_2 13 \\approx 3.70$.',
+              explanation: '$2\\log_2 13 \\approx 7.40$, yükseklik tam sayı olduğu için $h \\le 7$. Sıralı 1…12 eklemesinde ölçülen yükseklik 4’tür: sınır her ekleme sırası için geçerli bir **üst** sınırdır, tek bir sıranın ölçümü değildir.',
+            },
+          ],
         },
         {
           kind: 'text',
@@ -560,6 +570,15 @@ Ama gerçek veriler çoğu zaman rastgele değildir: zaman damgaları, artan kim
               answer: 1,
               hint: 'Artan anahtarlarla ekleme, “Sıralı” örneğiyle aynıdır.',
               explanation: 'Her yeni anahtar bir öncekinden büyük olduğu için en sağa eklenir: yükseklik $n - 1$. Dengeleyen bir ağaç ya da rastgeleleştirme gerekir.',
+            },
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'Aynı artan zaman damgaları bir **treap**’e ekleniyor (her düğüme bağımsız, rastgele bir öncelik verilir). Beklenen yükseklik nedir?',
+              options: ['$\\Theta(n)$, çünkü anahtarlar sıralı geliyor', '$O(\\log n)$', '$\\Theta(\\sqrt n)$', 'Tam olarak $\\lfloor \\log_2 n \\rfloor$'],
+              answer: 1,
+              hint: 'Treap’in şekli ekleme sırasına değil, önceliklere bağlıdır.',
+              explanation: 'Treap’in şekli, anahtarları rastgele önceliklerin sırasıyla sıradan bir BST’ye eklemekle aynıdır. Bu yüzden veri sırası ne olursa olsun beklenen yükseklik $O(\\log n)$. Bu beklenen bir sınırdır; kırmızı-siyah ağaçtaki gibi her çalıştırma için bir garanti değildir.',
             },
           ],
         },
@@ -613,6 +632,14 @@ Ama gerçek veriler çoğu zaman rastgele değildir: zaman damgaları, artan kim
           answer: 1,
           hint: 'Kök, ilk eklenen anahtardır. Ortanca anahtar hangisi?',
           explanation: 'Önce ortanca 4 kök olur, sonra iki yarının ortancaları 2 ve 6, en son yapraklar. Diğer üç sıra yükseklik 6’lık zincirler verir (sonuncusu zikzak çizer).',
+        },
+        {
+          id: 'q4',
+          kind: 'numeric',
+          prompt: '1’den 100’e sıralı eklenen sıradan bir BST’de her anahtar bir kez aranıyor. Toplam kaç karşılaştırma yapılır?',
+          answer: 5050,
+          hint: '$k$ anahtarı zincirde kökten itibaren $k$. düğümdür.',
+          explanation: '$1 + 2 + \\dots + 100 = \\frac{100 \\cdot 101}{2} = 5050$, arama başına ortalama 50.5. Kırmızı-siyah ağaçta her arama en fazla $h + 1$ karşılaştırma yapar ve $h \\le 2\\log_2 101 < 14$.',
         },
       ],
       practice: [

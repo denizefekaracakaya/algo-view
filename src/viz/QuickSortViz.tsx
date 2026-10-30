@@ -344,8 +344,9 @@ export function PairProbability() {
                           borderRadius: 4,
                           cursor: 'pointer',
                           fontSize: 10,
-                          color: p > 0.5 ? '#fff' : 'var(--text)',
-                          background: `color-mix(in srgb, var(--series-1) ${Math.round(p * 100)}%, var(--surface))`,
+                          // At most 55% of the series color, so the normal text color keeps AA contrast in both themes.
+                          color: 'var(--text)',
+                          background: `color-mix(in srgb, var(--series-1) ${Math.round(p * 55)}%, var(--surface))`,
                         }}
                       >
                         {p.toFixed(2)}

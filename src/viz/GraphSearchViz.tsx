@@ -82,7 +82,7 @@ export function GraphSearchViz({ initial = 'bfs' }: { initial?: Mode }) {
     <TraceViewer
       key={mode + gKey + src}
       trace={trace}
-      label={tx('Grafik arama görselleştirmesi', 'Graph search visualization')}
+      label={tx('Grafik arama görselleştirmesi', 'Graph search visualization') + ` (${initial === 'bfs' ? 'BFS' : initial === 'dfs' ? 'DFS' : initial === 'components' ? tx('bileşenler', 'components') : tx('topolojik sıra', 'topological order')})`}
       toolbar={toolbar}
       code={mode === 'bfs' ? BFS_CODE : DFS_CODE}
       render={(step) => render(step.state)}

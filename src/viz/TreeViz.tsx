@@ -396,9 +396,9 @@ export function RBPlayground() {
           </div>
           <TreeView root={t} bad={bad} label={tx('Renkleri düzenlenebilir ağaç', 'Tree with editable colors')} onNodeClick={(k) => setT((x) => toggleColor(x, k))} />
         </div>
-        <aside className="viz-side">
+        <div className="viz-side">
           <InvariantPanel t={t} />
-        </aside>
+        </div>
       </div>
     </div>
   )

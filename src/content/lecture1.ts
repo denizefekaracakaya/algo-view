@@ -183,6 +183,14 @@ Aynı makine, aynı veri; fark yalnızca algoritmanın büyüme hızında. Bu y�
           hint: '$n^2 / n^{1.6} = n^{0.4}$; bu oran sınırsız büyür mü?',
           explanation: '$n^{0.4} > 10^4 \\iff n > 10^{10}$. Bu noktadan sonra $n^2$ her zaman daha büyüktür; sabit çarpan üs farkını yalnızca bir süre geciktirebilir.',
         },
+        {
+          id: 'q4',
+          kind: 'numeric',
+          prompt: '$n^2$ gibi ölçeklenen bir program $n = 1000$ için 3 saniye sürüyor. $n = 3000$ için yaklaşık kaç saniye sürer?',
+          answer: 27,
+          hint: '$n$ 3 katına çıkınca $n^2$ kaç katına çıkar?',
+          explanation: '$(3n)^2 = 9n^2$: süre 9 katına çıkar, $3 \\cdot 9 = 27$ saniye. Sabit çarpan (burada $3 / 1000^2$ saniye) oranı değiştirmez.',
+        },
       ],
       practice: [
         {

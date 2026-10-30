@@ -61,6 +61,19 @@ export function SourcesPage() {
         )
       })}
       <div className="card card-pad">
+        <h2>{tx('Ders 18', 'Lecture 18')}: What’s next?</h2>
+        <p className="small muted">
+          {tx('Algo View sayfası:', 'Algo View page:')} <Link to="/kapanis">{tx('Sırada ne var?', 'What’s next?')}</Link>
+        </p>
+        <ul className="prose small">
+          <li>
+            <a href={SRC.l18.slides.url} target="_blank" rel="noopener noreferrer">
+              {tx(SRC.l18.slides.label, SRC.l18.slides.labelEn)} <ExternalLink size={12} aria-hidden />
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div className="card card-pad">
         <h2>{tx('Ödevler ve section’lar', 'Homework and sections')}</h2>
         <p className="small">
           {tx(

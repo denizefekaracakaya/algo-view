@@ -78,7 +78,7 @@ export function DecisionTreeViz() {
             )}
           </p>
         </div>
-        <aside className="viz-side">
+        <div className="viz-side">
           <div>
             <span className="label-tag">{tx('Bu girdi için sorulan sorular', 'Questions asked for this input')}</span>
             <ol className="small" style={{ margin: 0, paddingLeft: '1.3em' }} aria-live="polite">
@@ -122,7 +122,7 @@ export function DecisionTreeViz() {
             {tx('Yüksekliği h olan bir ikili ağacın en fazla', 'A binary tree of height h has at most')} <Tex>{'2^h'}</Tex> {tx('yaprağı vardır. Doğru bir algoritma her', 'leaves. A correct algorithm must distinguish all')} <Tex>{'n!'}</Tex>{' '}
             {tx('sıralamayı ayırt etmek zorunda olduğundan', 'orderings, so')} <Tex>{'2^h \\ge n!'}</Tex>, {tx('yani', 'i.e.')} <Tex>{'h \\ge \\log_2 n!'}</Tex>.
           </p>
-        </aside>
+        </div>
       </div>
     </div>
   )

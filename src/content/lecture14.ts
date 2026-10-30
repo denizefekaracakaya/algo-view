@@ -260,6 +260,16 @@ Sorun: kodları yan yana yazınca nasıl ayıracağız? a → 0, b → 1, c → 
 $f(c)$, $c$ karakterinin sıklığı ($\\sum f(c) = 1$) ve $d_T(c)$ yaprağın derinliği (kod uzunluğu) ise ortalama bit sayısı:
 $$B(T) = \\sum_{c} f(c)\\, d_T(c).$$
 $B(T)$’yi en küçük yapan ağaç **optimaldir**. Optimal ağaç **dolu**dur: her iç düğümün iki çocuğu vardır (tek çocuklu bir düğüm silinip kodlar kısaltılabilirdi).`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'Notlardaki 6 karakterlik alfabe (a–f) için **dolu** bir kod ağacının kaç iç düğümü vardır?',
+              answer: 5,
+              hint: 'Huffman her birleştirmede bir iç düğüm oluşturur ve ağaç sayısını bir azaltır.',
+              explanation: 'Dolu bir ikili ağaçta $n$ yaprak varsa iç düğüm sayısı $n - 1$’dir: $6 - 1 = 5$. Huffman’ın tam $n - 1$ birleştirme yapması da buradan gelir.',
+            },
+          ],
         },
         {
           kind: 'pseudocode',
@@ -354,6 +364,16 @@ $B(T)$’yi en küçük yapan ağaç **optimaldir**. Optimal ağaç **dolu**dur:
 - Yeni iç düğümü unutmak: sonraki adımlarda o da bir aday ağaçtır.
 - Kod uzunluklarını sıklıklarla ters orantılı sanmak: ilişki monotondur ama oransal değildir.
 - Eşit sıklıklarda tek bir “doğru” ağaç olduğunu sanmak: birden çok optimal ağaç olabilir, maliyetleri aynıdır.`,
+          check: [
+            {
+              id: 'c5',
+              kind: 'numeric',
+              prompt: 'Sıklıklar a 1, b 1, c 2, d 3, e 5 (Fibonacci sayıları). Huffman kodunda **en uzun** kod kelimesi kaç bittir?',
+              answer: 4,
+              hint: 'Birleştirmeleri yazın: 1 + 1, sonra 2 + 2, … Her yeni iç düğüm bir sonraki adımda yine en küçüklerden biri mi?',
+              explanation: '1 + 1 = 2, 2 + 2 = 4, 3 + 4 = 7, 5 + 7 = 12: her adımda yeni düğüm bir sonraki karaktere eklenir ve ağaç bir zincir olur. Kodlar e 0, d 10, c 110, a 1110, b 1111: en uzun kod 4 bit, yani $n - 1$. Sıklıklar ne kadar çarpık olursa ağaç o kadar derinleşir; toplam $1 \\cdot 4 + 1 \\cdot 4 + 2 \\cdot 3 + 3 \\cdot 2 + 5 \\cdot 1 = 25$ bit.',
+            },
+          ],
         },
       ],
       quiz: [

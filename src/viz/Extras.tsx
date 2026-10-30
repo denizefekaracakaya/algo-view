@@ -108,7 +108,7 @@ export function InversionArcs() {
             </span>
           </p>
         </div>
-        <aside className="viz-side">
+        <div className="viz-side">
           <dl className="kv" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
             <div>
               <dt>{tx('kalan ters çift', 'inversions left')}</dt>
@@ -129,7 +129,7 @@ export function InversionArcs() {
               'Remaining arcs plus shifts done never changes: InsertionSort’s number of shifts is exactly the number of inversions in the input.',
             )}
           </p>
-        </aside>
+        </div>
       </div>
     </div>
   )
@@ -187,7 +187,7 @@ export function RotationDemo() {
             {tx('Sıralı dolaşım', 'In-order')}: α &lt; y &lt; β &lt; x &lt; γ
           </p>
         </div>
-        <aside className="viz-side">
+        <div className="viz-side">
           <span className="label-tag">{tx('Değişen işaretçiler', 'Pointers that change')}</span>
           <ol className="small" style={{ margin: 0, paddingLeft: '1.2em' }}>
             <li>{rotated ? tx('x’in sol çocuğu: y → β', 'left(x): y → β') : tx('başlangıç: left(x) = y', 'start: left(x) = y')}</li>
@@ -200,7 +200,7 @@ export function RotationDemo() {
               'Only three pointers change: O(1). β moves from y’s right to x’s left, but the in-order sequence stays the same; the BST property is preserved. Heights change: the left side moves up a level, the right side down a level.',
             )}
           </p>
-        </aside>
+        </div>
       </div>
     </div>
   )

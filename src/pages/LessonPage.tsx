@@ -367,8 +367,8 @@ function LessonBody({ lesson, lecture, index }: { lesson: Lesson; lecture: Lectu
               <Inline src={next.title} /> <ArrowRight size={16} aria-hidden />
             </Link>
           ) : (
-            <Link className="btn primary" to="/">
-              {tx('Panele dön', 'Back to dashboard')} <ArrowRight size={16} aria-hidden />
+            <Link className="btn primary" to="/kapanis">
+              {tx('Ders 18 · Sırada ne var?', 'Lecture 18 · What’s next?')} <ArrowRight size={16} aria-hidden />
             </Link>
           )}
         </nav>

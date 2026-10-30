@@ -102,7 +102,7 @@ function ExamSetup({ config, setConfig, onStart }: { config: Config; setConfig: 
           {!config.lessons.length && <span className="small error-msg"> {tx('En az bir ders seçin.', 'Choose at least one lesson.')}</span>}
         </div>
       </div>
-      <aside className="card card-pad stack">
+      <div className="card card-pad stack">
         <h2 style={{ margin: 0, fontSize: '1rem' }}>{tx('Geçmiş sınavlar', 'Past exams')}</h2>
         {progress.exams.length === 0 ? (
           <p className="small muted" style={{ margin: 0 }}>
@@ -122,7 +122,7 @@ function ExamSetup({ config, setConfig, onStart }: { config: Config; setConfig: 
             ))}
           </ol>
         )}
-      </aside>
+      </div>
     </div>
   )
 }

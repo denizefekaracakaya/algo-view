@@ -435,6 +435,16 @@ Ders başlığındaki “BucketSort” bu kova fikridir; notlar ve slaytlar onu 
           ],
           viz: 'sortComparison',
           body: `Bir senaryo seçin; uygun algoritmalar ve gerekçe vurgulanır. Tablodaki “garanti türü” sütununa özellikle dikkat edin.`,
+          check: [
+            {
+              id: 'c4',
+              kind: 'numeric',
+              prompt: 'Zaten sıralı $n = 1000$ elemanlı bir dizide InsertionSort kaç karşılaştırma yapar?',
+              answer: 999,
+              hint: 'Her yeni eleman yalnızca solundaki komşusuyla karşılaştırılır ve yerinde kalır.',
+              explanation: '$i = 1, \\dots, n - 1$ için birer karşılaştırma: $n - 1 = 999$. MergeSort ise sıralı girdide de yaklaşık $\\frac{n}{2}\\log_2 n \\approx 5000$ karşılaştırma yapar: InsertionSort’un en iyi durumu doğrusal, MergeSort’unki değil.',
+            },
+          ],
         },
         {
           kind: 'text',
@@ -448,6 +458,20 @@ Ders başlığındaki “BucketSort” bu kova fikridir; notlar ve slaytlar onu 
               answer: 1,
               hint: 'Beklenen süre garantisi tek bir çalışmayı sınırlamaz.',
               explanation: 'Gerçek zamanlı sistemlerde en kötü durum garantisi gerekir: MergeSort ya da HeapSort $O(n\\log n)$’i her girdide ve her çalıştırmada garanti eder.',
+            },
+            {
+              id: 'c5',
+              kind: 'mcq',
+              prompt: 'Bir rakip, rastgele QuickSort’unuzun **kodunu** görüp girdiyi ona göre seçiyor; ama çalışma sırasında atılacak rastgele sayıları bilmiyor. Beklenen $O(n\\log n)$ garantisi hâlâ geçerli mi?',
+              options: [
+                'Evet: beklenti algoritmanın rastgele seçimleri üzerinden, her girdi için ayrı ayrı alınır.',
+                'Hayır: rakip beklenen süreyi $\\Theta(n^2)$ yapan bir girdi bulabilir.',
+                'Yalnızca girdi rastgele bir permütasyonsa.',
+                'Yalnızca bütün anahtarlar farklıysa.',
+              ],
+              answer: 0,
+              hint: 'Ders 5’teki $E[C] \\le 2n \\ln n$ hangi girdiler için kanıtlandı?',
+              explanation: 'Kanıt her sabit girdi için çalışır; rastgelelik girdiden değil algoritmadan gelir. Rakip yalnızca rastgele bitleri önceden bilseydi kötü bir girdi seçebilirdi. Sabit pivotlu QuickSort’ta ise kodu bilmek yeter: sıralı girdi $\\Theta(n^2)$ sürer.',
             },
           ],
           body: `- **En kötü durum (deterministik):** her girdi için geçerli (MergeSort $O(n\\log n)$, CountingSort $O(n + r)$).
@@ -526,6 +550,15 @@ Ortak ders: hiçbir algoritma her durumda en iyisi değildir; model (karşılaş
           answer: 4,
           hint: 'Her geçiş bir “basamak”, yani 16 bit işler.',
           explanation: '$64 / 16 = 4$ geçiş, her biri $O(n + 2^{16})$.',
+        },
+        {
+          id: 'q4',
+          kind: 'mcq',
+          prompt: 'Gömülü bir cihazda yalnızca $O(1)$ ek bellek var ve her girdide en kötü durumda $O(n\\log n)$ süre gerekiyor. Anahtarlar karşılaştırılabilir ama küçük tam sayılar değil. Hangisi uygundur?',
+          options: ['MergeSort', 'HeapSort', 'CountingSort', 'Rastgele QuickSort'],
+          answer: 1,
+          hint: 'Her adayı iki ölçüte göre eleyin: ek bellek ve garanti türü.',
+          explanation: 'HeapSort yerinde çalışır ve en kötü durumda $O(n\\log n)$’dir. MergeSort’un birleştirme adımı $O(n)$ ek bellek ister; rastgele QuickSort’un garantisi beklenen süredir; CountingSort küçük tam sayı anahtarları ve $O(n + r)$ bellek ister.',
         },
       ],
       practice: [
