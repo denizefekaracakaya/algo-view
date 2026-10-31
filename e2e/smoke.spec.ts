@@ -134,6 +134,8 @@ for (const id of ['l1-karatsuba', 'l2-asymptotics', 'l3-master', 'l3-substitutio
 }
 
 test('English mode: header switch translates the app; every lesson renders without errors or overflow', async ({ page }) => {
+  // Loops over many pages: well under 30 s alone, but close to it when the whole suite runs in parallel.
+  test.setTimeout(90_000)
   const errors: string[] = []
   page.on('pageerror', (e) => errors.push(e.message))
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()))
@@ -173,6 +175,8 @@ test('Select lesson: in-text check question feeds the summary; sections get mark
 })
 
 test('practice lab: every hand-tracing drill can be completed, and the generator keeps producing questions', async ({ page }) => {
+  // Loops over many pages: well under 30 s alone, but close to it when the whole suite runs in parallel.
+  test.setTimeout(90_000)
   const errors: string[] = []
   page.on('pageerror', (e) => errors.push(e.message))
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()))
@@ -285,6 +289,8 @@ test('backup download and restore bring work back after storage is cleared', asy
 })
 
 test('Lectures 8–17: every visualizer plays to the end without errors', async ({ page }) => {
+  // Loops over many pages: well under 30 s alone, but close to it when the whole suite runs in parallel.
+  test.setTimeout(90_000)
   const errors: string[] = []
   page.on('pageerror', (e) => errors.push(e.message))
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()))

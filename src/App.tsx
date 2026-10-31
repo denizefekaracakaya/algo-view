@@ -84,9 +84,9 @@ function ScrollRegionsFocusable() {
   useEffect(() => {
     const main = document.getElementById('main')
     if (!main) return
-    let frame = 0
+    let timer = 0
     const scan = () => {
-      frame = 0
+      timer = 0
       main.querySelectorAll<HTMLElement>(SCROLLERS).forEach((el) => {
         const overflows = el.scrollWidth > el.clientWidth + 1
         if (overflows && !el.hasAttribute('tabindex')) {
@@ -98,8 +98,9 @@ function ScrollRegionsFocusable() {
         }
       })
     }
+    // Debounced: visualizers mutate the DOM on every animation step, and a scan forces layout.
     const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(scan)
+      if (!timer) timer = window.setTimeout(scan, 250)
     }
     const mo = new MutationObserver(schedule)
     mo.observe(main, { childList: true, subtree: true })
@@ -108,7 +109,7 @@ function ScrollRegionsFocusable() {
     return () => {
       mo.disconnect()
       window.removeEventListener('resize', schedule)
-      cancelAnimationFrame(frame)
+      clearTimeout(timer)
     }
   }, [])
   return null
